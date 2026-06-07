@@ -19,8 +19,8 @@ func main() {
 		aliases = make(map[string]string)
 	}
 
-	// 2. Load en_us to create reverse mapping
-	enData, _ := os.ReadFile("data/locales/en_us.json")
+	// 2. Load en.json to create reverse mapping
+	enData, _ := os.ReadFile("data/locales/en.json")
 	var enLoc map[string]string
 	json.Unmarshal(enData, &enLoc)
 
