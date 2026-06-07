@@ -1,3 +1,4 @@
 {
-  "_comment": "Map obsolete/alias scientific names to their canonical scientific name to automatically inherit translations across all languages. Example: 'Carduelis hornemanni': 'Acanthis hornemanni'"
+  "_comment": "Map obsolete/alias scientific names to their canonical scientific name to automatically inherit translations across all languages. Example: 'Carduelis hornemanni': 'Acanthis hornemanni'",
+  "noise-us": "Noise"
 }
