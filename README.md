@@ -59,7 +59,7 @@ go run ./cmd/compiler
 
 This will generate two artifacts:
 1. `build/translations.csv` with the schema: `scientific_name,locale,common_name`.
-2. `build/metadata.csv` with the schema: `scientific_name,class,order,family,family_common,wikipedia_url`.
+2. `build/metadata.csv` with the schema: `scientific_name,class,order,family,family_common,wikipedia_url,inaturalist_url`.
 
 ## Model Coverage
 
@@ -85,10 +85,15 @@ To import regional BattyBirdNET translations (from huggingface labels):
 go run ./cmd/import-bats
 ```
 
-### Fetching Taxonomy Metadata (GBIF)
-The taxonomy tree (Class, Order, Family) is completely CC0 Public Domain. If you add new species, you can automatically fetch their taxonomy from the GBIF Backbone API:
+### Fetching Taxonomy Metadata (GBIF & iNaturalist)
+The taxonomy tree (Class, Order, Family) is CC0 Public Domain. To fetch taxonomy from the GBIF Backbone API:
 ```bash
 go run ./cmd/fetch-gbif
+```
+
+To extract authoritative iNaturalist taxonomy URLs without querying their rate-limited API (streams directly from AWS Open Data):
+```bash
+go run ./cmd/fetch-inaturalist
 ```
 
 ## License and Attribution

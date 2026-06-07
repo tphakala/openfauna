@@ -115,16 +115,17 @@ func main() {
 		metaWriter := csv.NewWriter(outMeta)
 		defer metaWriter.Flush()
 
-		if err := metaWriter.Write([]string{"scientific_name", "class", "order", "family", "family_common", "wikipedia_url"}); err != nil {
+		if err := metaWriter.Write([]string{"scientific_name", "class", "order", "family", "family_common", "wikipedia_url", "inaturalist_url"}); err != nil {
 			log.Fatalf("Failed to write metadata header: %v", err)
 		}
 
 		var metadata map[string]struct {
-			Class        string `json:"class"`
-			Order        string `json:"order"`
-			Family       string `json:"family"`
-			FamilyCommon string `json:"family_common"`
-			WikipediaURL string `json:"wikipedia_url"`
+			Class          string `json:"class"`
+			Order          string `json:"order"`
+			Family         string `json:"family"`
+			FamilyCommon   string `json:"family_common"`
+			WikipediaURL   string `json:"wikipedia_url"`
+			INaturalistURL string `json:"inaturalist_url"`
 		}
 		if err := json.Unmarshal(metadataData, &metadata); err == nil {
 			var sciNames []string
@@ -135,7 +136,7 @@ func main() {
 
 			for _, sciName := range sciNames {
 				info := metadata[sciName]
-				metaWriter.Write([]string{sciName, info.Class, info.Order, info.Family, info.FamilyCommon, info.WikipediaURL})
+				metaWriter.Write([]string{sciName, info.Class, info.Order, info.Family, info.FamilyCommon, info.WikipediaURL, info.INaturalistURL})
 			}
 			log.Printf("Successfully compiled %d metadata records into %s", len(metadata), outMetadataFile)
 		}
