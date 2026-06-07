@@ -67,9 +67,9 @@ Currently, OpenFauna provides translation support across the major bioacoustics 
 
 | Model | Target Species | Supported by OpenFauna | Coverage |
 |---|---|---|---|
-| BirdNET V2.4 | 6,521 | 6,472 | 99.2% |
+| BirdNET V2.4 | 6,521 | 6,476 | 99.3% |
 | BirdNET V3.0 | 11,560 | 10,806 | 93.5% |
-| Perch V2 | 14,795 | 11,829 | 80.0% |
+| Perch V2 | 14,795 | 12,027 | 81.3% |
 | BattyBirdNET | 88 | 87 | 98.9% |
 
 These CSVs can be natively embedded in your application for rapid database seeding during startup.
