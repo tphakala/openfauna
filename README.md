@@ -16,8 +16,8 @@ OpenFauna decouples the "dumb" AI models from the "smart" presentation layer:
 ### The Architecture
 - **`data/locales/`**: Discrete JSON files mapping scientific names to translated common names. Managing thousands of species across 30+ languages in a single CSV file guarantees massive merge conflicts. This repository stores translations per-language in merge-friendly, sparse JSON formats.
 - **`data/aliases.json`**: Centralized mapping of taxonomic reclassifications. When a species is renamed, you add the alias here, and it inherits all translations automatically.
-- **`data/metadata.json`**: *(Work in Progress)* Contains rich taxonomy (Class, Order, Family), iNaturalist IDs, and Wikipedia URLs keyed by scientific name.
-- **`cmd/compiler/`**: A build tool that compiles all `[locale].json` and metadata files into flat, highly-optimized CSVs or SQLite seed files designed for fast ingestion by applications like BirdNET-Go.
+- **`data/metadata.json`**: Contains rich taxonomy (Class, Order, Family) fetched from the GBIF Backbone Taxonomy, as well as deterministic Wikipedia URLs, keyed by scientific name.
+- **`cmd/compiler/`**: A build tool that compiles all `[locale].json` and `metadata.json` files into flat, highly-optimized CSVs (`translations.csv` and `metadata.csv`) designed for fast ingestion by applications like BirdNET-Go.
 
 ## For Translators
 
@@ -44,22 +44,35 @@ The compiler tool automatically resolves this mapping. When it runs, if a transl
 
 ## For Developers
 
-### Building the Compiled CSV
+### Building the Compiled CSVs
 
-To compile the JSON files into a flat CSV for application ingest:
+To compile the JSON files into flat CSVs for application ingest:
 
 ```bash
-go run ./cmd/compiler -locales=data/locales -out=build/translations.csv
+go run ./cmd/compiler
 ```
 
-This will generate `build/translations.csv` with the schema: `scientific_name,locale,common_name`. This CSV can be natively embedded in your application for rapid database seeding during startup.
+This will generate two artifacts:
+1. `build/translations.csv` with the schema: `scientific_name,locale,common_name`.
+2. `build/metadata.csv` with the schema: `scientific_name,class,order,family,family_common,wikipedia_url`.
 
-### Bootstrapping from BirdNET V3.0
+These CSVs can be natively embedded in your application for rapid database seeding during startup.
 
-The initial baseline of OpenFauna was bootstrapped from the amazing BirdNET+ V3.0 taxonomy. If you ever need to re-import upstream translations:
-
+### Bootstrapping from Upstream Models
+The initial baseline of OpenFauna was bootstrapped from the amazing BirdNET+ V3.0 taxonomy. If you ever need to re-import upstream BirdNET translations:
 ```bash
 go run ./cmd/bootstrap -taxonomy=/path/to/taxonomy.csv -out=data/locales
+```
+
+To import regional BattyBirdNET translations (from huggingface labels):
+```bash
+go run ./cmd/import-bats
+```
+
+### Fetching Taxonomy Metadata (GBIF)
+The taxonomy tree (Class, Order, Family) is completely CC0 Public Domain. If you add new species, you can automatically fetch their taxonomy from the GBIF Backbone API:
+```bash
+go run ./cmd/fetch-gbif
 ```
 
 ## License and Attribution
