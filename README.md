@@ -42,6 +42,11 @@ Species get reclassified over time (e.g., *Carduelis hornemanni* becomes *Acanth
 ```
 The compiler tool automatically resolves this mapping. When it runs, if a translation exists for `Acanthis hornemanni`, it will automatically inject the exact same translation into the output for `Carduelis hornemanni`.
 
+OpenFauna also includes a tool to automatically generate these mappings for older legacy models (like BirdNET V2.4) by cross-referencing legacy labels with modern common names:
+```bash
+go run ./cmd/auto-alias
+```
+
 ## For Developers
 
 ### Building the Compiled CSVs
