@@ -15,6 +15,7 @@ import (
 func main() {
 	localesDir := flag.String("locales", "data/locales", "Directory containing locale JSON files")
 	outputFile := flag.String("out", "build/translations.csv", "Output CSV file path")
+	aliasesFile := flag.String("aliases", "data/aliases.json", "Path to taxonomic aliases JSON file")
 	flag.Parse()
 
 	// Ensure output directory exists
@@ -60,6 +61,23 @@ func main() {
 		var translations map[string]string
 		if err := json.Unmarshal(data, &translations); err != nil {
 			log.Fatalf("Failed to parse JSON in %s: %v", filePath, err)
+		}
+
+		// Apply aliases if the canonical name is translated
+		if aliasesData, err := os.ReadFile(*aliasesFile); err == nil {
+			var aliases map[string]string
+			if err := json.Unmarshal(aliasesData, &aliases); err == nil {
+				for alias, canonical := range aliases {
+					if strings.HasPrefix(alias, "_") {
+						continue // skip comments
+					}
+					if commonName, ok := translations[canonical]; ok {
+						if _, exists := translations[alias]; !exists {
+							translations[alias] = commonName
+						}
+					}
+				}
+			}
 		}
 
 		// Sort scientific names for deterministic output

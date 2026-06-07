@@ -27,6 +27,19 @@ To contribute a new translation:
 }
 ```
 
+### Taxonomic Aliases
+
+Species get reclassified over time (e.g., *Carduelis hornemanni* becomes *Acanthis hornemanni*). Instead of duplicating common names across all 30+ language files whenever a species gets reclassified, we manage them centrally.
+
+Add reclassifications to `data/aliases.json`:
+```json
+{
+  "Carduelis hornemanni": "Acanthis hornemanni"
+}
+```
+
+The compiler tool automatically resolves this mapping. When it runs, if a translation exists for `Acanthis hornemanni`, it will automatically inject the exact same translation into the output CSV for `Carduelis hornemanni` as well, ensuring seamless compatibility across different models.
+
 ## For Developers
 
 ### Building the Compiled CSV
