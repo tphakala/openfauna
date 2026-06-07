@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type GenusTaxonomy struct {
@@ -24,6 +25,7 @@ type SpeciesMetadata struct {
 	Order        string `json:"order"`
 	Family       string `json:"family"`
 	FamilyCommon string `json:"family_common,omitempty"`
+	WikipediaURL string `json:"wikipedia_url,omitempty"`
 }
 
 func main() {
@@ -45,11 +47,13 @@ func main() {
 
 	for _, info := range genusData.Genera {
 		for _, speciesName := range info.Species {
+			wikiURL := "https://en.wikipedia.org/wiki/" + strings.ReplaceAll(speciesName, " ", "_")
 			metadata[speciesName] = SpeciesMetadata{
 				Class:        info.Class,
 				Order:        info.Order,
 				Family:       info.Family,
 				FamilyCommon: info.FamilyCommon,
+				WikipediaURL: wikiURL,
 			}
 			speciesCount++
 		}

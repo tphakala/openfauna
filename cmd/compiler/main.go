@@ -115,7 +115,7 @@ func main() {
 		metaWriter := csv.NewWriter(outMeta)
 		defer metaWriter.Flush()
 
-		if err := metaWriter.Write([]string{"scientific_name", "class", "order", "family", "family_common"}); err != nil {
+		if err := metaWriter.Write([]string{"scientific_name", "class", "order", "family", "family_common", "wikipedia_url"}); err != nil {
 			log.Fatalf("Failed to write metadata header: %v", err)
 		}
 
@@ -124,6 +124,7 @@ func main() {
 			Order        string `json:"order"`
 			Family       string `json:"family"`
 			FamilyCommon string `json:"family_common"`
+			WikipediaURL string `json:"wikipedia_url"`
 		}
 		if err := json.Unmarshal(metadataData, &metadata); err == nil {
 			var sciNames []string
@@ -134,7 +135,7 @@ func main() {
 
 			for _, sciName := range sciNames {
 				info := metadata[sciName]
-				metaWriter.Write([]string{sciName, info.Class, info.Order, info.Family, info.FamilyCommon})
+				metaWriter.Write([]string{sciName, info.Class, info.Order, info.Family, info.FamilyCommon, info.WikipediaURL})
 			}
 			log.Printf("Successfully compiled %d metadata records into %s", len(metadata), outMetadataFile)
 		}
