@@ -1,3 +1,3 @@
-module git.koti/tphakala/birdnet-i18n
+module github.com/tphakala/openfauna
 
 go 1.26.3

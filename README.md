@@ -1,18 +1,23 @@
-# BirdNET i18n Data
+# OpenFauna
 
-This repository manages internationalization (i18n) data for BirdNET-Go and associated models (like BirdNET V3.0, Perch, BattyBirdNET). It stores species translations in a sparse, merge-friendly format optimized for developer and community contributions.
+**OpenFauna** is a universal species metadata and translation dictionary built for the global bioacoustics and environmental monitoring community. 
 
-## Why this repository exists
+Originally built as a localization layer for [BirdNET-Go](https://github.com/tphakala/birdnet-go), OpenFauna has evolved into a master species encyclopedia that handles biological classification, multi-language common names, and taxonomic aliasing for *any* biological acoustic model (including BirdNET V3, Perch, and custom models like BattyBirdNET).
 
-1. **Merge Conflict Prevention**: Managing thousands of species across 30+ languages in a single CSV file (like BirdNET V3.0's `taxonomy.csv`) guarantees massive merge conflicts. This repository stores translations per-language in discrete JSON files.
-2. **Sparse Data**: Translators often only translate a subset of species (e.g., local birds). Per-language JSON files allow sparse data where you only add keys for the species you know.
-3. **Multi-Model Support**: This repository combines labels from BirdNET V2.4, BirdNET V3.0, custom bat models, and the Perch model into one massive multi-language dictionary.
+## Why OpenFauna?
 
-## Directory Structure
+Machine learning models (like Perch or BirdNET) output numeric indices that map to canonical Scientific Names (e.g., `Class 123 -> Turdus merula`). However, user-facing applications need rich presentation: translated common names, family classifications, photos, and Wikipedia links.
 
-* `data/locales/`: Contains `[locale].json` files. This is the source of truth for translations.
-* `cmd/compiler/`: A build tool that compiles all `[locale].json` files into a single, highly-optimized `translations.csv` format designed for fast ingestion by BirdNET-Go.
-* `cmd/bootstrap/`: A one-time tool used to bootstrap the `data/locales` directory from an existing `taxonomy.csv`.
+OpenFauna decouples the "dumb" AI models from the "smart" presentation layer:
+1. You run inference using any ONNX/TFLite bioacoustics model.
+2. The model outputs a scientific name.
+3. You query OpenFauna for that scientific name to get translations in 30+ languages, taxonomic hierarchy (Order/Family), and external links.
+
+### The Architecture
+- **`data/locales/`**: Discrete JSON files mapping scientific names to translated common names. Managing thousands of species across 30+ languages in a single CSV file guarantees massive merge conflicts. This repository stores translations per-language in merge-friendly, sparse JSON formats.
+- **`data/aliases.json`**: Centralized mapping of taxonomic reclassifications. When a species is renamed, you add the alias here, and it inherits all translations automatically.
+- **`data/metadata.json`**: *(Work in Progress)* Contains rich taxonomy (Class, Order, Family), iNaturalist IDs, and Wikipedia URLs keyed by scientific name.
+- **`cmd/compiler/`**: A build tool that compiles all `[locale].json` and metadata files into flat, highly-optimized CSVs or SQLite seed files designed for fast ingestion by applications like BirdNET-Go.
 
 ## For Translators
 
@@ -29,16 +34,13 @@ To contribute a new translation:
 
 ### Taxonomic Aliases
 
-Species get reclassified over time (e.g., *Carduelis hornemanni* becomes *Acanthis hornemanni*). Instead of duplicating common names across all 30+ language files whenever a species gets reclassified, we manage them centrally.
-
-Add reclassifications to `data/aliases.json`:
+Species get reclassified over time (e.g., *Carduelis hornemanni* becomes *Acanthis hornemanni*). Instead of duplicating common names across all language files, add reclassifications to `data/aliases.json`:
 ```json
 {
   "Carduelis hornemanni": "Acanthis hornemanni"
 }
 ```
-
-The compiler tool automatically resolves this mapping. When it runs, if a translation exists for `Acanthis hornemanni`, it will automatically inject the exact same translation into the output CSV for `Carduelis hornemanni` as well, ensuring seamless compatibility across different models.
+The compiler tool automatically resolves this mapping. When it runs, if a translation exists for `Acanthis hornemanni`, it will automatically inject the exact same translation into the output for `Carduelis hornemanni`.
 
 ## For Developers
 
@@ -50,17 +52,18 @@ To compile the JSON files into a flat CSV for application ingest:
 go run ./cmd/compiler -locales=data/locales -out=build/translations.csv
 ```
 
-This will generate `build/translations.csv` with the schema: `scientific_name,locale,common_name`. This CSV can be natively embedded in BirdNET-Go for rapid database seeding during startup/migration.
+This will generate `build/translations.csv` with the schema: `scientific_name,locale,common_name`. This CSV can be natively embedded in your application for rapid database seeding during startup.
 
-### Bootstrapping from V3.0
+### Bootstrapping from BirdNET V3.0
 
-If you ever need to re-import upstream translations from BirdNET V3.0's massive `taxonomy.csv`:
+The initial baseline of OpenFauna was bootstrapped from the amazing BirdNET+ V3.0 taxonomy. If you ever need to re-import upstream translations:
 
 ```bash
 go run ./cmd/bootstrap -taxonomy=/path/to/taxonomy.csv -out=data/locales
 ```
-Note: Bootstrapping will completely overwrite existing JSON files, so it should only be used to re-sync upstream data or as an initial seed.
 
-## Locale Code Convention
+## License and Attribution
 
-We standardize locale codes to be lowercase with underscores instead of hyphens (e.g., `en_us`, `pt_br`, `zh_cn`) to align with BirdNET-Go's internal locale representation.
+OpenFauna is licensed under the **Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)** license, matching the upstream BirdNET project.
+
+Please see [ATTRIBUTION.md](ATTRIBUTION.md) for required credits to the original BirdNET authors (Cornell Lab of Ornithology and Chemnitz University of Technology) who provided the baseline translation data.
