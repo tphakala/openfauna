@@ -56,6 +56,17 @@ This will generate two artifacts:
 1. `build/translations.csv` with the schema: `scientific_name,locale,common_name`.
 2. `build/metadata.csv` with the schema: `scientific_name,class,order,family,family_common,wikipedia_url`.
 
+## Model Coverage
+
+Currently, OpenFauna provides translation support across the major bioacoustics models:
+
+| Model | Target Species | Supported by OpenFauna | Coverage |
+|---|---|---|---|
+| BirdNET V2.4 | 6,521 | 6,244 | 95.8% |
+| BirdNET V3.0 | 11,560 | 10,741 | 92.9% |
+| Perch V2 | 14,795 | 11,803 | 79.8% |
+| BattyBirdNET | 88 | 87 | 98.9% |
+
 These CSVs can be natively embedded in your application for rapid database seeding during startup.
 
 ### Bootstrapping from Upstream Models
