@@ -23,12 +23,10 @@ These translations are released under the **Creative Commons Attribution-ShareAl
 
 ## 2. Taxonomy Classification Metadata (Class, Order, Family)
 
-The taxonomic metadata containing Class, Order, and Family tree information was derived from two authoritative sources:
+The taxonomic metadata containing Class, Order, and Family tree information is derived entirely from the **GBIF Backbone Taxonomy**.
 
-- **Bird Taxonomy (eBird / Clements Checklist):** Provided by the Cornell Lab of Ornithology. 
-  *License Note:* Data derived from eBird is typically restricted to **Non-commercial use with attribution**. If you intend to use OpenFauna in a commercial application, you must evaluate your usage of the Bird family metadata against the eBird terms of use.
-- **Non-Bird Taxonomy (Insects, Amphibians, Mammals):** Derived from the **GBIF Backbone Taxonomy**.
-  *License Note:* GBIF Backbone Taxonomy is released into the public domain under **CC0 1.0**. (https://doi.org/10.15468/39omei)
+*License Note:* The GBIF Backbone Taxonomy is released into the public domain under **CC0 1.0**. (https://doi.org/10.15468/39omei)
+This means the taxonomic tree data (Class, Order, Family) inside OpenFauna has absolutely no commercial restrictions.
 
 ## 3. External Links & Enrichment
 
@@ -43,4 +41,3 @@ If you use OpenFauna in your application:
 1. You **must** provide attribution to the BirdNET project and the Cornell Lab of Ornithology.
 2. You **must** share any modified translation files under the same CC BY-SA 4.0 license.
 3. You **must not** use the data for prohibited uses outlined in the BirdNET V3.0 terms (e.g., military use, poaching, wildlife exploitation).
-4. You **should** be aware of the non-commercial restrictions placed on the eBird/Clements derived family data if operating commercially.
