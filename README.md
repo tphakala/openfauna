@@ -77,6 +77,16 @@ The `build/metadata.csv` artifact provides a rich taxonomic and external-link la
 
 This metadata allows downstream applications to instantly group detections by taxonomic family, build migration charts, and provide users with direct, accurate links to Wikipedia and iNaturalist to learn more about the species they detect.
 
+### Future Metadata Expansion
+
+The OpenFauna metadata schema is designed to be extensible. We are actively planning to expand the dataset to include:
+
+1. **Curated Thumbnails**: A community-driven, human-curated repository of species thumbnails with standardized aspect ratios and dimensions, optimized for mobile and web UI dashboards.
+2. **Conservation Status**: Integrating IUCN Red List data to highlight endangered or threatened species in detection streams.
+3. **Regional Endemism**: Data mapping species to native geographic continents/regions to improve anomaly detection (e.g., detecting a European bird in North America).
+
+*Note: To keep OpenFauna strictly open-source (CC BY-SA 4.0), we exclusively source taxonomy from CC0 providers like GBIF and iNaturalist Open Data. We do not ingest proprietary eBird or Clements taxonomy due to their non-commercial licensing restrictions.*
+
 ## Model Coverage
 
 Currently, OpenFauna provides translation support across the major bioacoustics models:
