@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -102,4 +101,42 @@ func main() {
 	}
 
 	log.Printf("Successfully compiled %d total translations into %s", totalTranslations, *outputFile)
+
+	// Compile Metadata CSV if available
+	metadataFile := filepath.Join(filepath.Dir(*aliasesFile), "metadata.json")
+	if metadataData, err := os.ReadFile(metadataFile); err == nil {
+		outMetadataFile := filepath.Join(filepath.Dir(*outputFile), "metadata.csv")
+		outMeta, err := os.Create(outMetadataFile)
+		if err != nil {
+			log.Fatalf("Failed to create metadata CSV: %v", err)
+		}
+		defer outMeta.Close()
+
+		metaWriter := csv.NewWriter(outMeta)
+		defer metaWriter.Flush()
+
+		if err := metaWriter.Write([]string{"scientific_name", "class", "order", "family", "family_common"}); err != nil {
+			log.Fatalf("Failed to write metadata header: %v", err)
+		}
+
+		var metadata map[string]struct {
+			Class        string `json:"class"`
+			Order        string `json:"order"`
+			Family       string `json:"family"`
+			FamilyCommon string `json:"family_common"`
+		}
+		if err := json.Unmarshal(metadataData, &metadata); err == nil {
+			var sciNames []string
+			for name := range metadata {
+				sciNames = append(sciNames, name)
+			}
+			sort.Strings(sciNames)
+
+			for _, sciName := range sciNames {
+				info := metadata[sciName]
+				metaWriter.Write([]string{sciName, info.Class, info.Order, info.Family, info.FamilyCommon})
+			}
+			log.Printf("Successfully compiled %d metadata records into %s", len(metadata), outMetadataFile)
+		}
+	}
 }
