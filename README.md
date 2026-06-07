@@ -59,7 +59,23 @@ go run ./cmd/compiler
 
 This will generate two artifacts:
 1. `build/translations.csv` with the schema: `scientific_name,locale,common_name`.
-2. `build/metadata.csv` with the schema: `scientific_name,class,order,family,family_common,wikipedia_url,inaturalist_url`.
+2. `build/metadata.csv` with the schema detailed below.
+
+### Metadata Schema
+
+The `build/metadata.csv` artifact provides a rich taxonomic and external-link layer for every species, designed to be joined with the translation data in your application's database.
+
+| Column | Description | Source |
+|---|---|---|
+| `scientific_name` | The canonical scientific name of the species (Primary Key). | Target Models |
+| `class` | Taxonomic Class (e.g., *Aves*, *Amphibia*). | GBIF Backbone API |
+| `order` | Taxonomic Order (e.g., *Passeriformes*, *Anura*). | GBIF Backbone API |
+| `family` | Taxonomic Family (e.g., *Corvidae*, *Hylidae*). | GBIF Backbone API |
+| `family_common` | The English common name for the taxonomic family. | GBIF Backbone API |
+| `wikipedia_url` | A deterministic link to the species' English Wikipedia article. | Auto-generated |
+| `inaturalist_url` | The authoritative iNaturalist taxon URL. | iNaturalist Open Data S3 Dump |
+
+This metadata allows downstream applications to instantly group detections by taxonomic family, build migration charts, and provide users with direct, accurate links to Wikipedia and iNaturalist to learn more about the species they detect.
 
 ## Model Coverage
 
