@@ -122,6 +122,21 @@ To extract authoritative iNaturalist taxonomy URLs without querying their rate-l
 go run ./cmd/fetch-inaturalist
 ```
 
+### Backfilling Localized Common Names (IOC & GBIF)
+
+Per-locale common names are populated from open, license-compatible sources, never from a model's own (often eBird-derived) label files. `scripts/backfill_v24_open.py` fills the names a model needs but OpenFauna is missing, using the IOC World Bird List Multilingual file (CC BY 3.0) as the primary source and GBIF Backbone vernacular names (CC0) as a supplement. It is additive only and never overwrites a curated entry.
+
+```bash
+# Requires: pip install openpyxl, plus the IOC Multilingual .xlsx (CC BY 3.0):
+#   https://www.worldbirdnames.org/Multiling%20IOC%2015.2.xlsx
+python scripts/backfill_v24_open.py \
+    --ioc /path/to/ioc.xlsx \
+    --labels /path/to/BirdNET_GLOBAL_6K_V2.4_Labels_en_us.txt \
+    --apply
+```
+
+Without `--apply` it runs a dry run and prints a per-locale fill report. Quality filters reject machine-translation artifacts such as wrong-script names, embedded fragments, and packed name lists. After running it, recompile the CSVs with `go run ./cmd/compiler`.
+
 ## License and Attribution
 
 OpenFauna is licensed under the **Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)** license, matching the upstream BirdNET project.
