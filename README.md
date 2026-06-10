@@ -85,7 +85,7 @@ The OpenFauna metadata schema is designed to be extensible. We are actively plan
 2. **Conservation Status**: Integrating IUCN Red List data to highlight endangered or threatened species in detection streams.
 3. **Regional Endemism**: Data mapping species to native geographic continents/regions to improve anomaly detection (e.g., detecting a European bird in North America).
 
-*Note: To keep OpenFauna strictly open-source (CC BY-SA 4.0), we exclusively source taxonomy from CC0 providers like GBIF and iNaturalist Open Data. We do not ingest proprietary eBird or Clements taxonomy due to their non-commercial licensing restrictions.*
+*Note: To keep OpenFauna strictly open-source (CC BY-SA 4.0), we source taxonomy from CC0 providers (GBIF, iNaturalist Open Data) and multilingual common names from the IOC World Bird List (CC BY 3.0), GBIF and Wikidata. We do not ingest proprietary eBird or Clements taxonomy, nor BirdNET's eBird-derived localized label files, due to their non-commercial licensing restrictions.*
 
 ## Model Coverage
 
@@ -93,9 +93,9 @@ Currently, OpenFauna provides translation support across the major bioacoustics 
 
 | Model | Target Species | Supported by OpenFauna | Coverage |
 |---|---|---|---|
-| BirdNET V2.4 | 6,521 | 6,476 | 99.3% |
-| BirdNET V3.0 | 11,560 | 10,806 | 93.5% |
-| Perch V2 | 14,795 | 12,027 | 81.3% |
+| BirdNET V2.4 | 6,521 | 6,521 | 100.0% |
+| BirdNET V3.0 | 11,560 | 10,932 | 94.6% |
+| Perch V2 | 14,795 | 12,580 | 85.0% |
 | BattyBirdNET | 88 | 87 | 98.9% |
 
 These CSVs can be natively embedded in your application for rapid database seeding during startup.

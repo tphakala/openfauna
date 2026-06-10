@@ -1,0 +1,6 @@
+# Serena (symbolic code navigation) project cache
+.serena/
+
+# Python bytecode from maintenance scripts
+__pycache__/
+*.pyc

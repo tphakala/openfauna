@@ -3542,6 +3542,13 @@
     "wikipedia_url": "https://en.wikipedia.org/wiki/Amblycorypha_huasteca",
     "inaturalist_url": "https://www.inaturalist.org/taxa/256584"
   },
+  "Amblycorypha longinicta": {
+    "class": "Insecta",
+    "order": "Orthoptera",
+    "family": "Tettigoniidae",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Amblycorypha_longinicta",
+    "inaturalist_url": "https://www.inaturalist.org/taxa/371385"
+  },
   "Amblycorypha oblongifolia": {
     "class": "Insecta",
     "order": "Orthoptera",
@@ -4735,6 +4742,20 @@
     "family": "Bufonidae",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Anaxyrus_hemiophrys",
     "inaturalist_url": "https://www.inaturalist.org/taxa/64978"
+  },
+  "Anaxyrus houstonensis": {
+    "class": "Amphibia",
+    "order": "Anura",
+    "family": "Bufonidae",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Anaxyrus_houstonensis",
+    "inaturalist_url": "https://www.inaturalist.org/taxa/64979"
+  },
+  "Anaxyrus microscaphus": {
+    "class": "Amphibia",
+    "order": "Anura",
+    "family": "Bufonidae",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Anaxyrus_microscaphus",
+    "inaturalist_url": "https://www.inaturalist.org/taxa/64982"
   },
   "Anaxyrus nelsoni": {
     "class": "Amphibia",
@@ -56305,6 +56326,12 @@
     "wikipedia_url": "https://en.wikipedia.org/wiki/Miogryllus_lineatus",
     "inaturalist_url": "https://www.inaturalist.org/taxa/322910"
   },
+  "Miogryllus saussurei": {
+    "class": "Insecta",
+    "order": "Orthoptera",
+    "family": "Gryllidae",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Miogryllus_saussurei"
+  },
   "Miogryllus verticalis": {
     "class": "Insecta",
     "order": "Orthoptera",
@@ -63978,6 +64005,13 @@
     "family": "Tettigoniidae",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Orchelimum_bullatum",
     "inaturalist_url": "https://www.inaturalist.org/taxa/226527"
+  },
+  "Orchelimum concinnum": {
+    "class": "Insecta",
+    "order": "Orthoptera",
+    "family": "Tettigoniidae",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Orchelimum_concinnum",
+    "inaturalist_url": "https://www.inaturalist.org/taxa/226529"
   },
   "Orchelimum erythrocephalum": {
     "class": "Insecta",
