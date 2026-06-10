@@ -24,7 +24,8 @@ IOC source (download once, pass with --ioc):
   https://www.worldbirdnames.org/Multiling%20IOC%2015.2.xlsx   (Multilingual v15.2, CC BY 3.0)
 
 Usage:
-  python scripts/backfill_v24_open.py --ioc /path/to/ioc.xlsx [--locales is,th,...] [--apply]
+  python scripts/backfill_v24_open.py --ioc /path/to/ioc.xlsx \
+      --labels /path/to/BirdNET_GLOBAL_6K_V2.4_Labels_en_us.txt [--locales is,th,...] [--apply]
 
 Without --apply it runs a dry run and prints the per-locale fill report only.
 """
@@ -39,7 +40,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCALE_DIR = os.path.join(ROOT, "data", "locales")
-LABELS_V24 = "/home/thakala/src/birdnet-go/internal/classifier/data/labels/V2.4/BirdNET_GLOBAL_6K_V2.4_Labels_en_us.txt"
 GBIF_CACHE = "/tmp/openfauna-work/gbif_vern_cache.json"
 
 # OpenFauna locale file -> (IOC column header or None, GBIF ISO-639-3 code or None)
@@ -90,22 +90,23 @@ def save_json(path, obj):
         f.write(json.dumps(obj, indent=2, ensure_ascii=False, sort_keys=True) + "\n")
 
 
-def v24_species():
+def v24_species(labels_path):
     """Canonical V2.4 species set (alias-resolved), excluding noise/sound classes."""
     aliases = load_json(os.path.join(ROOT, "data", "aliases.json"))
     out = []
     seen = set()
-    for line in open(LABELS_V24, encoding="utf-8"):
-        line = line.strip()
-        if not line or "_" not in line:
-            continue
-        sci = line.split("_", 1)[0].strip()
-        if sci.startswith("Noise") or sci == "Unknown" or sci in SOUND_CLASSES:
-            continue
-        canon = aliases.get(sci, sci)
-        if canon not in seen:
-            seen.add(canon)
-            out.append(canon)
+    with open(labels_path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or "_" not in line:
+                continue
+            sci = line.split("_", 1)[0].strip()
+            if sci.startswith("Noise") or sci == "Unknown" or sci in SOUND_CLASSES:
+                continue
+            canon = aliases.get(sci, sci)
+            if canon not in seen:
+                seen.add(canon)
+                out.append(canon)
     return out
 
 
@@ -113,18 +114,21 @@ def load_ioc(path):
     """ioc[scientific_name][column_header] = localized name."""
     import openpyxl
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
-    ws = wb["List"]
-    it = ws.iter_rows(values_only=True)
-    hdr = list(next(it))
-    sci_col = hdr.index("IOC_15.2")
-    col_of = {h: i for i, h in enumerate(hdr) if h}
-    ioc = {}
-    for row in it:
-        sci = row[sci_col]
-        if not sci:
-            continue
-        ioc[str(sci).strip()] = row
-    return ioc, col_of
+    try:
+        ws = wb["List"]
+        it = ws.iter_rows(values_only=True)
+        hdr = list(next(it))
+        sci_col = hdr.index("IOC_15.2")
+        col_of = {h: i for i, h in enumerate(hdr) if h}
+        ioc = {}
+        for row in it:
+            sci = row[sci_col]
+            if not sci:
+                continue
+            ioc[str(sci).strip()] = row
+        return ioc, col_of
+    finally:
+        wb.close()
 
 
 _PAREN_TAIL = re.compile(r"\s*\([^)]*\)\s*$")
@@ -165,8 +169,13 @@ _cache = {}
 
 
 def gbif_vernacular(sci):
-    if sci in _cache:
-        return _cache[sci]
+    """Fetch GBIF vernacular names for one species.
+
+    Returns (sci, {lang: [names]}, ok). ok is False on a network/parse failure so
+    the caller can avoid caching the failure (which would permanently skip the
+    species on later runs). Does not touch the shared cache itself: the caller
+    updates the cache from the main thread, keeping ThreadPoolExecutor use safe.
+    """
     out = {}
     try:
         u = "https://api.gbif.org/v1/species/match?" + urllib.parse.urlencode({"name": sci})
@@ -180,10 +189,9 @@ def gbif_vernacular(sci):
                 nm = (r.get("vernacularName") or "").strip()
                 if lang and nm:
                     out.setdefault(lang, []).append(nm)
+        return sci, out, True
     except Exception:
-        out = {}
-    _cache[sci] = out
-    return out
+        return sci, {}, False
 
 
 def gbif_pick(names, sci, loc):
@@ -201,13 +209,16 @@ def gbif_pick(names, sci, loc):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ioc", default="/tmp/openfauna-work/ioc.xlsx", help="IOC Multilingual .xlsx path")
+    ap.add_argument("--labels", required=True,
+                    help="Path to a BirdNET V2.4 'Scientific_Common' label .txt file (e.g. "
+                         "BirdNET_GLOBAL_6K_V2.4_Labels_en_us.txt); defines the species set to backfill")
     ap.add_argument("--locales", default=",".join(LOCALES), help="comma list of OF locale codes")
     ap.add_argument("--apply", action="store_true", help="write changes (default: dry run)")
     ap.add_argument("--workers", type=int, default=8)
     args = ap.parse_args()
 
     targets = [l for l in args.locales.split(",") if l in LOCALES]
-    species = v24_species()
+    species = v24_species(args.labels)
     print(f"V2.4 canonical species: {len(species)}; target locales: {targets}")
 
     ioc, col_of = load_ioc(args.ioc)
@@ -240,7 +251,9 @@ def main():
     print(f"GBIF lookups needed: {len(need)} species (cache has {len(_cache)})")
     todo = [s for s in need if s not in _cache]
     with ThreadPoolExecutor(max_workers=args.workers) as ex:
-        for i, _ in enumerate(ex.map(gbif_vernacular, todo)):
+        for i, (sci, out, ok) in enumerate(ex.map(gbif_vernacular, todo)):
+            if ok:  # only cache successes; main thread is the sole cache writer
+                _cache[sci] = out
             if i % 100 == 0 and i:
                 print(f"  gbif {i}/{len(todo)}")
     os.makedirs(os.path.dirname(GBIF_CACHE), exist_ok=True)
