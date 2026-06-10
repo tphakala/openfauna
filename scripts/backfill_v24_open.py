@@ -40,7 +40,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCALE_DIR = os.path.join(ROOT, "data", "locales")
-GBIF_CACHE = "/tmp/openfauna-work/gbif_vern_cache.json"
+GBIF_CACHE = os.path.join(os.path.expanduser("~"), ".cache", "openfauna", "gbif_vern_cache.json")
 
 # OpenFauna locale file -> (IOC column header or None, GBIF ISO-639-3 code or None)
 LOCALES = {
@@ -115,7 +115,7 @@ def load_ioc(path):
     import openpyxl
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
     try:
-        ws = wb["List"]
+        ws = wb["List"] if "List" in wb.sheetnames else wb.worksheets[0]
         it = ws.iter_rows(values_only=True)
         hdr = list(next(it))
         sci_col = hdr.index("IOC_15.2")
@@ -180,11 +180,14 @@ def gbif_vernacular(sci):
     try:
         u = "https://api.gbif.org/v1/species/match?" + urllib.parse.urlencode({"name": sci})
         req = urllib.request.Request(u, headers={"User-Agent": "OpenFaunaBot/1.0 (tphakala)"})
-        key = json.load(urllib.request.urlopen(req, timeout=30)).get("usageKey")
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            key = json.load(resp).get("usageKey")
         if key:
             u = f"https://api.gbif.org/v1/species/{key}/vernacularNames?limit=400"
             req = urllib.request.Request(u, headers={"User-Agent": "OpenFaunaBot/1.0 (tphakala)"})
-            for r in json.load(urllib.request.urlopen(req, timeout=30)).get("results", []):
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                results = json.load(resp).get("results", [])
+            for r in results:
                 lang = r.get("language", "")
                 nm = (r.get("vernacularName") or "").strip()
                 if lang and nm:
