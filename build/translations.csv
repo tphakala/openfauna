@@ -19433,10 +19433,10 @@ Tyto alba,bg,Забулена сова
 Tyto aurantia,bg,Златиста забулена сова
 Tyto capensis,bg,Африканска ливадна сова
 Tyto deroepstorffi,bg,Андаманска забулена сова
-Tyto furcata,bg,American Barn Owl
+Tyto furcata,bg,Американска забулена сова
 Tyto glaucops,bg,Еспаньолска забулена сова
 Tyto inexspectata,bg,Ръждиволика забулена сова
-Tyto javanica,bg,Eastern Barn Owl
+Tyto javanica,bg,Ориенталска забулена сова
 Tyto longimembris,bg,Азиатска ливадна сова
 Tyto nigrobrunnea,bg,Кафява забулена сова
 Tyto novaehollandiae,bg,Австралийска забулена сова
@@ -33237,10 +33237,10 @@ Tyto alba,ca,òliba comuna
 Tyto aurantia,ca,òliba daurada
 Tyto capensis,ca,òliba camallarga del Cap
 Tyto deroepstorffi,ca,òliba de les Andaman
-Tyto furcata,ca,American Barn Owl
+Tyto furcata,ca,òliba comuna americana
 Tyto glaucops,ca,òliba de la Hispaniola
 Tyto inexspectata,ca,òliba de Minahassa
-Tyto javanica,ca,Eastern Barn Owl
+Tyto javanica,ca,òliba comuna oriental
 Tyto longimembris,ca,òliba camallarga oriental
 Tyto nigrobrunnea,ca,òliba de Taliabu
 Tyto novaehollandiae,ca,òliba australiana
@@ -47041,10 +47041,10 @@ Tyto alba,cs,sova pálená
 Tyto aurantia,cs,sova zlatavá
 Tyto capensis,cs,sova travní
 Tyto deroepstorffi,cs,sova andamanská
-Tyto furcata,cs,American Barn Owl
+Tyto furcata,cs,sova americká
 Tyto glaucops,cs,sova šedolící
 Tyto inexspectata,cs,sova celebeská
-Tyto javanica,cs,Eastern Barn Owl
+Tyto javanica,cs,sova východní
 Tyto longimembris,cs,sova proměnlivá
 Tyto nigrobrunnea,cs,sova sulská
 Tyto novaehollandiae,cs,sova australská
@@ -74649,7 +74649,7 @@ Tyto alba,da,Slørugle
 Tyto aurantia,da,Gylden Slørugle
 Tyto capensis,da,Kapslørugle
 Tyto deroepstorffi,da,Andamanslørugle
-Tyto furcata,da,American Barn Owl
+Tyto furcata,da,Amerikansk Slørugle
 Tyto glaucops,da,Hispañiola Slørugle
 Tyto inexspectata,da,Minahassaslørugle
 Tyto javanica,da,Australsk Slørugle
@@ -131727,10 +131727,10 @@ Tyto alba,es_ec,Lechuza Campanaria Americana
 Tyto aurantia,es_ec,Lechuza Dorada
 Tyto capensis,es_ec,Lechuza de El Cabo
 Tyto deroepstorffi,es_ec,Lechuza de las Andamán
-Tyto furcata,es_ec,American Barn Owl
+Tyto furcata,es_ec,Lechuza Común Americana
 Tyto glaucops,es_ec,Lechuza de la Española
 Tyto inexspectata,es_ec,Lechuza de Minahassa
-Tyto javanica,es_ec,Eastern Barn Owl
+Tyto javanica,es_ec,Lechuza Común Oriental
 Tyto longimembris,es_ec,Lechuza Patilarga
 Tyto nigrobrunnea,es_ec,Lechuza de Taliabu
 Tyto novaehollandiae,es_ec,Lechuza Australiana
@@ -145527,10 +145527,10 @@ Tyto alba,es_es,Lechuza común
 Tyto aurantia,es_es,Lechuza dorada
 Tyto capensis,es_es,Lechuza de El Cabo
 Tyto deroepstorffi,es_es,Lechuza de las Andamán
-Tyto furcata,es_es,American Barn Owl
+Tyto furcata,es_es,Lechuza común americana
 Tyto glaucops,es_es,Lechuza de La Española
 Tyto inexspectata,es_es,Lechuza de Minahassa
-Tyto javanica,es_es,Eastern Barn Owl
+Tyto javanica,es_es,Lechuza común oriental
 Tyto longimembris,es_es,Lechuza patilarga
 Tyto nigrobrunnea,es_es,Lechuza de Taliabu
 Tyto novaehollandiae,es_es,Lechuza australiana
@@ -159327,10 +159327,10 @@ Tyto alba,es_mx,Lechuza Americana
 Tyto aurantia,es_mx,Lechuza Dorada
 Tyto capensis,es_mx,Lechuza de El Cabo
 Tyto deroepstorffi,es_mx,Lechuza de las Andamán
-Tyto furcata,es_mx,American Barn Owl
+Tyto furcata,es_mx,Lechuza Común Americana
 Tyto glaucops,es_mx,Lechuza de la Española
 Tyto inexspectata,es_mx,Lechuza de Minahassa
-Tyto javanica,es_mx,Eastern Barn Owl
+Tyto javanica,es_mx,Lechuza Común Oriental
 Tyto longimembris,es_mx,Lechuza Patilarga
 Tyto nigrobrunnea,es_mx,Lechuza de Taliabu
 Tyto novaehollandiae,es_mx,Lechuza Australiana
@@ -173127,10 +173127,10 @@ Tyto alba,et,loorkakk
 Tyto aurantia,et,kold-loorkakk
 Tyto capensis,et,rohtla-loorkakk
 Tyto deroepstorffi,et,andamani loorkakk
-Tyto furcata,et,American Barn Owl
+Tyto furcata,et,ameerika loorkakk
 Tyto glaucops,et,kariibi loorkakk
 Tyto inexspectata,et,minahassa loorkakk
-Tyto javanica,et,Eastern Barn Owl
+Tyto javanica,et,kagu-loorkakk
 Tyto longimembris,et,padu-loorkakk
 Tyto nigrobrunnea,et,taliabu loorkakk
 Tyto novaehollandiae,et,lõuna-loorkakk
@@ -200966,10 +200966,10 @@ Tyto alba,fi,tornipöllö
 Tyto aurantia,fi,täplätornipöllö
 Tyto capensis,fi,afrikanruohopöllö
 Tyto deroepstorffi,fi,andamaanientornipöllö
-Tyto furcata,fi,American Barn Owl
+Tyto furcata,fi,amerikantornipöllö
 Tyto glaucops,fi,hispaniolantornipöllö
 Tyto inexspectata,fi,minahassantornipöllö
-Tyto javanica,fi,Eastern Barn Owl
+Tyto javanica,fi,vaaleatornipöllö
 Tyto longimembris,fi,aasianruohopöllö
 Tyto nigrobrunnea,fi,sulantornipöllö
 Tyto novaehollandiae,fi,naamiotornipöllö
@@ -235933,10 +235933,10 @@ Tyto alba,hr,Kukuvija
 Tyto aurantia,hr,novobritanska kukuvija
 Tyto capensis,hr,afrička kukuvija
 Tyto deroepstorffi,hr,Andaman Masked-Owl
-Tyto furcata,hr,American Barn Owl
+Tyto furcata,hr,Američka kukuvija
 Tyto glaucops,hr,antilska kukuvija
 Tyto inexspectata,hr,minahaska kukuvija
-Tyto javanica,hr,Eastern Barn Owl
+Tyto javanica,hr,Istočna kukuvija
 Tyto longimembris,hr,travnjačka kukuvija
 Tyto nigrobrunnea,hr,sulska kukuvija
 Tyto novaehollandiae,hr,velika kukuvija
@@ -269615,7 +269615,7 @@ Tyto alba,ja,メンフクロウ
 Tyto aurantia,ja,ニューブリテンメンフクロウ
 Tyto capensis,ja,ミナミメンフクロウ
 Tyto deroepstorffi,ja,アンダマンメンフクロウ
-Tyto furcata,ja,American Barn Owl
+Tyto furcata,ja,アメリカメンフクロウ
 Tyto glaucops,ja,ヒスパニオラメンフクロウ
 Tyto inexspectata,ja,ミナハサメンフクロウ
 Tyto javanica,ja,トウヨウメンフクロウ
@@ -302645,7 +302645,7 @@ Tyto alba,nl,Kerkuil
 Tyto aurantia,nl,Nieuw-Brittanniëkerkuil
 Tyto capensis,nl,Afrikaanse grasuil
 Tyto deroepstorffi,nl,Andamanenkerkuil
-Tyto furcata,nl,American Barn Owl
+Tyto furcata,nl,Amerikaanse kerkuil
 Tyto glaucops,nl,Hispaniolakerkuil
 Tyto inexspectata,nl,Minahassakerkuil
 Tyto javanica,nl,Oostelijke kerkuil
@@ -357858,10 +357858,10 @@ Tyto alba,pt_pt,Coruja-das-torres
 Tyto aurantia,pt_pt,Golden masked-owl
 Tyto capensis,pt_pt,African grass-owl
 Tyto deroepstorffi,pt_pt,Andaman masked-owl
-Tyto furcata,pt_pt,American Barn Owl
+Tyto furcata,pt_pt,Coruja-das-torres-americana
 Tyto glaucops,pt_pt,Ashy-faced owl
 Tyto inexspectata,pt_pt,Minahasa masked-owl
-Tyto javanica,pt_pt,Eastern Barn Owl
+Tyto javanica,pt_pt,Coruja-das-torres-oriental
 Tyto longimembris,pt_pt,Australasian grass-owl
 Tyto nigrobrunnea,pt_pt,Taliabu masked-owl
 Tyto novaehollandiae,pt_pt,Australian masked-owl
@@ -401926,10 +401926,10 @@ Tyto alba,sr,Kukuvija
 Tyto aurantia,sr,Zlatna maskirana kukuvija
 Tyto capensis,sr,Afrička livadska kukuvija
 Tyto deroepstorffi,sr,Andamanska maskirana kukuvija
-Tyto furcata,sr,American Barn Owl
+Tyto furcata,sr,Američka kukuvija
 Tyto glaucops,sr,Pepeljasta kukuvija
 Tyto inexspectata,sr,Mala sulaveška kukuvija
-Tyto javanica,sr,Eastern Barn Owl
+Tyto javanica,sr,Istočna kukuvija
 Tyto longimembris,sr,Australazijska livadska kukuvija
 Tyto nigrobrunnea,sr,Maskirana kukuvija sa ostrva Taliabu
 Tyto novaehollandiae,sr,Australijska maskirana kukuvija
@@ -431031,10 +431031,10 @@ Tyto alba,tr,Peçeli Baykuş
 Tyto aurantia,tr,Yeni Britanya Peçeli Baykuşu
 Tyto capensis,tr,Afrika Çayır Baykuşu
 Tyto deroepstorffi,tr,Andaman Peçeli Baykuşu
-Tyto furcata,tr,American Barn Owl
+Tyto furcata,tr,Amerikan Peçeli Baykuşu
 Tyto glaucops,tr,Hispanyola Peçeli Baykuşu
 Tyto inexspectata,tr,Minahassa Peçeli Baykuşu
-Tyto javanica,tr,Eastern Barn Owl
+Tyto javanica,tr,Doğu Peçeli Baykuşu
 Tyto longimembris,tr,Doğu Çayır Baykuşu
 Tyto nigrobrunnea,tr,Taliabu Peçeli Baykuşu
 Tyto novaehollandiae,tr,Avustralya Peçeli Baykuşu
@@ -444835,10 +444835,10 @@ Tyto alba,uk,Сипуха крапчаста
 Tyto aurantia,uk,Сипуха новобританська
 Tyto capensis,uk,Сипуха африканська
 Tyto deroepstorffi,uk,Сипуха андаманська
-Tyto furcata,uk,American Barn Owl
+Tyto furcata,uk,Сипуха американська
 Tyto glaucops,uk,Сипуха гаїтійська
 Tyto inexspectata,uk,Сипуха мінагаська
-Tyto javanica,uk,Eastern Barn Owl
+Tyto javanica,uk,Сипуха східна
 Tyto longimembris,uk,Сипуха австралазійська
 Tyto nigrobrunnea,uk,Сипуха тіліабуйська
 Tyto novaehollandiae,uk,Сипуха австралійська
