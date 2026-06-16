@@ -83084,9 +83084,9 @@ Myotis capaccinii,de,Langfußfledermaus
 Myotis chiloensis,de,Chilenisches Mausohr
 Myotis ciliolabrum,de,Nordwestamerikanisches Mausohr
 Myotis crypticus,de,Kryptisches Mausohr
-Myotis dasycneme,de,Myotis dasycneme
-Myotis daubentonii,de,Myotis daubentonii
-Myotis emarginatus,de,Myotis emarginatus
+Myotis dasycneme,de,Teichfledermaus
+Myotis daubentonii,de,Wasserfledermaus
+Myotis emarginatus,de,Wimperfledermaus
 Myotis evotis,de,Langohriges Mausohr
 Myotis fimbriatus,de,Haarige Wasserfledermaus
 Myotis formosus,de,Hodgson-Fledermaus
@@ -83100,9 +83100,9 @@ Myotis lucifugus,de,Kleine Braune Fledermaus
 Myotis macropus,de,Südliche Langfußfledermaus
 Myotis martiniquensis,de,Martinique-Mausohr
 Myotis muricola,de,Philippinisches Mausohr
-Myotis myotis,de,Myotis myotis
-Myotis mystacinus,de,Myotis mystacinus
-Myotis nattereri,de,Myotis nattereri
+Myotis myotis,de,Großes Mausohr
+Myotis mystacinus,de,Kleine Bartfledermaus
+Myotis nattereri,de,Fransenfledermaus
 Myotis nigricans,de,Dunkles Mausohr
 Myotis occultus,de,Arizona-Mausohr
 Myotis oxyotus,de,Gebirgsmausohr
@@ -83543,9 +83543,9 @@ Numenius tenuirostris,de,Dünnschnabel-Brachvogel
 Numida meleagris,de,Helmperlhuhn
 Nyctalus aviator,de,Großer Ostasien-Abendsegler
 Nyctalus azoreum,de,Azoren-Abendsegler
-Nyctalus lasiopterus,de,Nyctalus lasiopterus
-Nyctalus leisleri,de,Nyctalus leisleri
-Nyctalus noctula,de,Nyctalus noctula
+Nyctalus lasiopterus,de,Riesenabendsegler
+Nyctalus leisleri,de,Kleiner Abendsegler
+Nyctalus noctula,de,Großer Abendsegler
 Nyctalus plancyi,de,Chinesischer Abendsegler
 Nyctanassa carcinocatactes,de,Bermuda-Krabbenreiher
 Nyctanassa violacea,de,Krabbenreiher
@@ -84915,11 +84915,11 @@ Pipilo naufragus,de,Bermudagrundammer
 Pipilo ocai,de,Halsband-Grundammer
 Pipistrellus abramus,de,Japanische Zwergfledermaus
 Pipistrellus javanicus,de,Java-Zwergfledermaus
-Pipistrellus kuhlii,de,Pipistrellus kuhlii
-Pipistrellus maderensis,de,Pipistrellus maderensis
-Pipistrellus nathusii,de,Pipistrellus nathusii
-Pipistrellus pipistrellus,de,Pipistrellus pipistrellus
-Pipistrellus pygmaeus,de,Pipistrellus pygmaeus
+Pipistrellus kuhlii,de,Weißrandfledermaus
+Pipistrellus maderensis,de,Madeira-Fledermaus
+Pipistrellus nathusii,de,Rauhautfledermaus
+Pipistrellus pipistrellus,de,Zwergfledermaus
+Pipistrellus pygmaeus,de,Mückenfledermaus
 Pipistrellus tenuis,de,Weißflügelzwergfledermaus
 Pipra aureola,de,Rothaubenpipra
 Pipra fasciicauda,de,Schwanzbindenpipra
@@ -85035,13 +85035,13 @@ Platysteira cyanea,de,Bindenlappenschnäpper
 Platysteira jamesoni,de,Ugandalappenschnäpper
 Platysteira laticincta,de,Bandlappenschnäpper
 Platysteira peltata,de,Schwarzkehl-Lappenschnäpper
-Plecotus auritus,de,Plecotus auritus
+Plecotus auritus,de,Braunes Langohr
 Plecotus austriacus,de,Graues Langohr
 Plecotus gaisleri,de,Gaislers Langohr
 Plecotus kolombatovici,de,Balkan-Langohr
 Plecotus macrobullaris,de,Alpen-Langohr
 Plecotus ognevi,de,Sibirisches Langohr
-Plecotus spec.,de,Plecotus spec.
+Plecotus spec.,de,Unbestimmtes Langohr
 Plectorhyncha lanceolata,de,Strichelhonigfresser
 Plectrophenax hyperboreus,de,Beringschneeammer
 Plectrophenax nivalis,de,Schneeammer
@@ -86276,15 +86276,15 @@ Rhinoceros unicornis,de,Panzernashorn
 Rhinocrypta lanceolata,de,Schopftapaculo
 Rhinolophus acuminatus,de,Spitze Hufeisennase
 Rhinolophus affinis,de,Java-Hufeisennase
-Rhinolophus blasii,de,Rhinolophus blasii
+Rhinolophus blasii,de,Blasius-Hufeisennase
 Rhinolophus chaseni,de,Chasen-Hufeisennase
 Rhinolophus clivosus,de,Geoffroys Hufeisennase
 Rhinolophus creaghi,de,Creagh-Hufeisennase
 Rhinolophus euryale,de,Mittelmeer-Hufeisennase
-Rhinolophus ferrumequinum,de,Rhinolophus ferrumequinum
+Rhinolophus ferrumequinum,de,Große Hufeisennase
 Rhinolophus formosae,de,Taiwanesische Wollige Hufeisennase
 Rhinolophus hildebrandtii,de,Hildebrandts Hufeisennase
-Rhinolophus hipposideros,de,Rhinolophus hipposideros
+Rhinolophus hipposideros,de,Kleine Hufeisennase
 Rhinolophus keyensis,de,Kei-Inseln-Hufeisennase
 Rhinolophus luctus,de,Große Wollhaar-Hufeisennase
 Rhinolophus megaphyllus,de,Östliche Hufeisennase
@@ -87588,7 +87588,7 @@ Tacua speciosa,de,Tacua speciosa
 Tadarida aegyptiaca,de,Ägyptische Bulldoggfledermaus
 Tadarida brasiliensis,de,Mexikanische Bulldoggfledermaus
 Tadarida insignis,de,Ostasiatische Bulldoggfledermaus
-Tadarida teniotis,de,Tadarida teniotis
+Tadarida teniotis,de,Europäische Bulldoggfledermaus
 Tadorna cana,de,Kapgans
 Tadorna cristata,de,Schopfgans
 Tadorna ferruginea,de,Rostgans
@@ -87929,7 +87929,7 @@ Thylogale billardierii,de,Rotbauchfilander
 Thylogale stigmatica,de,Rotbeinfilander
 Thylogale thetis,de,Rothalsfilander
 Thyreonotus corsicus,de,Korsische Schildschrecke
-Thyroptera,de,Thyroptera
+Thyroptera,de,Haftscheibenfledermäuse
 Tiaris olivaceus,de,Goldbrauen-Gimpeltangare
 Tibicina garricola,de,Tibicina garricola
 Tibicina haematodes,de,Weinzwirner
@@ -88449,7 +88449,7 @@ Tyrannus savana,de,Gabelschwanz-Königstyrann
 Tyrannus tyrannus,de,Schieferrücken-Königstyrann
 Tyrannus verticalis,de,Schmalschnabel-Königstyrann
 Tyrannus vociferans,de,Cassinkönigstyrann
-Tyto alba,de,Amerikaschleiereule
+Tyto alba,de,Schleiereule
 Tyto aurantia,de,Goldeule
 Tyto capensis,de,Kapgraseule
 Tyto deroepstorffi,de,Andamanenschleiereule
@@ -88592,7 +88592,7 @@ Vespadelus pumilus,de,Östliche Waldfledermaus
 Vespadelus regulus,de,Südliche Waldfledermaus
 Vespadelus troughtoni,de,Troughton-Waldfledermaus
 Vespadelus vulturnus,de,Kleine Waldfledermaus
-Vespertilio murinus,de,Vespertilio murinus
+Vespertilio murinus,de,Zweifarbfledermaus
 Vidua camerunensis,de,Kamerunwitwe
 Vidua chalybeata,de,Rotfußwitwe
 Vidua codringtoni,de,Sambesiwitwe
