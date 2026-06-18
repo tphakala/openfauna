@@ -1,0 +1,44 @@
+name: Validate data
+
+on:
+  pull_request:
+    paths:
+      - "data/**"
+      - "cmd/**"
+      - "scripts/validate.py"
+      - ".github/workflows/validate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "data/**"
+      - "cmd/**"
+      - "scripts/validate.py"
+      - ".github/workflows/validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Run data-quality checks
+        run: python3 scripts/validate.py
+
+      - uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.2.0
+        with:
+          go-version: "1.26"
+
+      - name: Verify compiled CSVs are in sync
+        run: |
+          go run ./cmd/compiler
+          if [ -n "$(git status --porcelain --untracked-files=all -- build/)" ]; then
+            echo "::error::build/ CSVs are stale. Run 'go run ./cmd/compiler' and commit the result."
+            git --no-pager status --short -- build/
+            exit 1
+          fi
+          echo "Compiled CSVs are in sync."

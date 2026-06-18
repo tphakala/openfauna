@@ -1,0 +1,17 @@
+{
+  "_comment": "Accepted scientific-name placeholders: locale entries where the value equals the scientific name while base 'en' has a real common name. These have no established native common name (or are pending a verified translation). The validator fails on any NEW shadowing entry not listed here. Remove entries as they get proper native names.",
+  "allow": {
+    "cs": [
+      "Melidectes torquatus"
+    ],
+    "es_es": [
+      "Amazona diadema",
+      "Amazona festiva",
+      "Amazona lilacina",
+      "Amazona tucumana",
+      "Batis molitor",
+      "Batis pririt",
+      "Curruca sarda"
+    ]
+  }
+}

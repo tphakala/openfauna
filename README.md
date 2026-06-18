@@ -61,6 +61,24 @@ This will generate two artifacts:
 1. `build/translations.csv` with the schema: `scientific_name,locale,common_name`.
 2. `build/metadata.csv` with the schema detailed below.
 
+### Validating the Data
+
+A static validator runs a set of deterministic, network-free checks over the
+locale files, `aliases.json` and `metadata.json`:
+
+```bash
+python3 scripts/validate.py
+```
+
+It checks JSON structure (sorted keys, trailing newline), alias integrity (no
+scientific name is both a full entry and an alias), scientific-name
+placeholders that would shadow a real English common name, the lowercase naming
+convention for `fi`/`sv`/`no` species names, and stray em/en dashes. It exits
+non-zero on any problem, and runs automatically on pull requests via
+`.github/workflows/validate.yml` (which also verifies the compiled CSVs are in
+sync). When a species genuinely has no native common name in a locale, list it
+in `data/validation/shadow_allowlist.json` so the placeholder check accepts it.
+
 ### Metadata Schema
 
 The `build/metadata.csv` artifact provides a rich taxonomic and external-link layer for every species, designed to be joined with the translation data in your application's database.
