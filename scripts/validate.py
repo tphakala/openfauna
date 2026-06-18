@@ -40,6 +40,8 @@ LOCALE_DIR = os.path.join(ROOT, "data", "locales")
 ALIASES_FILE = os.path.join(ROOT, "data", "aliases.json")
 METADATA_FILE = os.path.join(ROOT, "data", "metadata.json")
 SHADOW_ALLOWLIST = os.path.join(ROOT, "data", "validation", "shadow_allowlist.json")
+CURATED_FILE = os.path.join(ROOT, "data", "curated_names.json")
+ECHO_BASELINE = os.path.join(ROOT, "data", "validation", "english_echo_baseline.json")
 
 # Locales whose vernacular species names use a lowercase initial. Verified
 # against the national authorities (Kotus/Luomus, Spakradet/Artdatabanken,
@@ -245,7 +247,92 @@ def check_dashes(report: Report) -> None:
         report.ok("dashes", "no em/en dashes in any common-name value")
 
 
-CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes")
+def english_echo_counts(en: dict) -> dict:
+    """Per-locale count of entries whose value equals the English common name
+    verbatim (an untranslated English fallback). en's own real names are the
+    reference; scientific-name shadows are excluded (the shadowing check owns
+    those)."""
+    en_real = {k: v for k, v in en.items()
+               if isinstance(v, str) and v.strip() and v.strip().lower() != k.lower()}
+    counts: dict[str, int] = {}
+    for path in locale_paths():
+        loc = locale_name(path)
+        if loc.startswith("en"):
+            continue
+        n = 0
+        for key, value in load_json(path).items():
+            if not isinstance(value, str):
+                continue
+            ev = en_real.get(key)
+            if ev is not None and value.strip() == ev.strip() and value.strip().lower() != key.lower():
+                n += 1
+        counts[loc] = n
+    return counts
+
+
+def check_english_echo(report: Report, en: dict) -> None:
+    """Guard against new English fallbacks. A non-English locale value equal to the
+    English common name is an untranslated placeholder; thousands remain for obscure
+    species with no open-source name in the locale, which is acceptable, so this is a
+    no-regression gate: each locale's count must not exceed the committed baseline in
+    data/validation/english_echo_baseline.json. Refresh the baseline after a backfill
+    that legitimately lowers the counts (python3 scripts/validate.py --write-echo-baseline)."""
+    counts = english_echo_counts(en)
+    if not os.path.exists(ECHO_BASELINE):
+        report.fail("english_echo", [
+            f"baseline {os.path.relpath(ECHO_BASELINE, ROOT)} is missing; the no-regression "
+            "gate cannot run. Create it with: python3 scripts/validate.py --write-echo-baseline"])
+        return
+    baseline = load_json(ECHO_BASELINE).get("counts", {})
+    problems: list[str] = []
+    for loc in sorted(counts):
+        base = baseline.get(loc)
+        if base is None:
+            problems.append(f"{loc}: {counts[loc]} English-fallback names but no baseline entry; "
+                            "refresh the baseline (python3 scripts/validate.py --write-echo-baseline)")
+        elif counts[loc] > base:
+            problems.append(f"{loc}: {counts[loc]} English-fallback names, up from baseline {base} "
+                            f"(+{counts[loc] - base}); translate them or revert")
+    if problems:
+        report.fail("english_echo", problems)
+    else:
+        report.ok("english_echo", f"no locale exceeds its English-fallback baseline "
+                  f"({sum(counts.values())} total)")
+
+
+def check_curated(report: Report, en: dict) -> None:
+    """Every data/curated_names.json entry must appear verbatim in its locale file.
+    The file holds hand-verified, reviewer-checked names (e.g. the issue #11 bat
+    fixes); requiring an exact match locks them against silent regression. To change
+    one, update curated_names.json in the same commit. An exact match also sidesteps
+    the loanword case (es Orcinus orca "Orca", pt Herpailurus "Jaguarundi"), where the
+    correct localized name legitimately equals the English name."""
+    if not os.path.exists(CURATED_FILE):
+        report.fail("curated", [
+            f"{os.path.relpath(CURATED_FILE, ROOT)} is missing; the curated-name regression "
+            "gate cannot run. It is a required, version-controlled data file."])
+        return
+    curated = load_json(CURATED_FILE).get("names", {})
+    cache: dict[str, dict] = {}
+    problems: list[str] = []
+    for sci, locs in curated.items():
+        for loc, expected in locs.items():
+            path = os.path.join(LOCALE_DIR, f"{loc}.json")
+            if loc not in cache:
+                cache[loc] = load_json(path) if os.path.exists(path) else {}
+            cur = cache[loc].get(sci)
+            if not isinstance(cur, str) or not cur.strip():
+                problems.append(f"{loc}: {sci!r} curated name is missing from the locale file")
+            elif cur != expected:
+                problems.append(f"{loc}: {sci!r} is {cur!r} but curated_names.json says {expected!r}")
+    if problems:
+        report.fail("curated", problems)
+    else:
+        n = sum(len(v) for v in curated.values())
+        report.ok("curated", f"{n} curated names intact across locales")
+
+
+CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated")
 
 
 def main() -> int:
@@ -253,7 +340,25 @@ def main() -> int:
     parser.add_argument("--skip", action="append", default=[], choices=CHECKS,
                         help="skip a named check (repeatable)")
     parser.add_argument("--quiet", action="store_true", help="only print failures")
+    parser.add_argument("--write-echo-baseline", action="store_true",
+                        help="record current per-locale English-fallback counts as the "
+                             "baseline and exit (run after a legitimate backfill)")
     args = parser.parse_args()
+
+    if args.write_echo_baseline:
+        en = load_json(os.path.join(LOCALE_DIR, "en.json"))
+        counts = english_echo_counts(en)
+        doc = {
+            "_comment": "Per-locale count of values still equal to the English common name "
+                        "(untranslated fallback). check_english_echo fails CI if any locale "
+                        "exceeds its count here. Lower these by backfilling real translations, "
+                        "then refresh with: python3 scripts/validate.py --write-echo-baseline",
+            "counts": dict(sorted(counts.items())),
+        }
+        with open(ECHO_BASELINE, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")
+        print(f"wrote {ECHO_BASELINE} ({sum(counts.values())} echoes across {len(counts)} locales)")
+        return 0
 
     report = Report(args.quiet)
 
@@ -279,6 +384,10 @@ def main() -> int:
         check_casing(report, en, meta)
     if "dashes" not in args.skip:
         check_dashes(report)
+    if "english_echo" not in args.skip:
+        check_english_echo(report, en)
+    if "curated" not in args.skip:
+        check_curated(report, en)
 
     if report.failures:
         print(f"\nFAILED: {report.failures} problem(s) found.")

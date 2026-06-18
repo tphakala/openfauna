@@ -1,0 +1,268 @@
+{
+  "_comment": "GBIF/Wikidata vernacular candidates rejected (group/family names, wrong-language, malformed) or corrected (spelling/accent/proper-noun) during a per-language QA review. Keyed by Wikidata language code; applies to all OpenFauna locales sharing that language. Consumed by scripts/backfill_native.py.",
+  "reject": {
+    "bg": [
+      "Lutra cinerea"
+    ],
+    "ca": [
+      "Lutra cinerea"
+    ],
+    "cs": [
+      "Idionycteris phyllotis",
+      "Laephotis capensis",
+      "Neotamias rufus"
+    ],
+    "cy": [
+      "Heteroxolmis dominicana"
+    ],
+    "da": [
+      "Lutra cinerea",
+      "Petaurista grandis"
+    ],
+    "de": [
+      "Aegotheles terborghi",
+      "Apalis stronachi",
+      "Callosciurus concolor",
+      "Cheiromeles parvidens",
+      "Conepatus amazonicus",
+      "Dasypus fenestratus",
+      "Dicaeum rhodopygiale",
+      "Eleutherodactylus jamesdixoni",
+      "Mandrillus leucophaeus",
+      "Melanophryniscus diabolicus",
+      "Melogale subaurantiaca",
+      "Myotis pilosatibialis",
+      "Pogoniulus uropygialis",
+      "Ramphocinclus sanctaeluciae",
+      "Sula brewsteri",
+      "Zosterops kasaicus"
+    ],
+    "es": [
+      "Alouatta ululata",
+      "Ateles marginatus",
+      "Atilax paludinosus",
+      "Callicebus personatus",
+      "Conepatus amazonicus",
+      "Dasypus fenestratus",
+      "Dasyurus maculatus",
+      "Diclidurus ingens",
+      "Duellmanohyla legleri",
+      "Eleutherodactylus jamesdixoni",
+      "Formicarius destructus",
+      "Homo sapiens",
+      "Lasionycteris noctivagans",
+      "Lontra annectens",
+      "Lutra cinerea",
+      "Melanophryniscus diabolicus",
+      "Melogale subaurantiaca",
+      "Miopithecus ogouensis",
+      "Myotis martiniquensis",
+      "Myotis muricola",
+      "Otospermophilus douglasii",
+      "Physeter macrocephalus",
+      "Proceratophrys boiei",
+      "Sundasciurus robinsoni",
+      "Tragelaphus scriptus",
+      "Vitreorana parvula"
+    ],
+    "et": [
+      "Anthus japonicus",
+      "Ardea coromanda",
+      "Larus mongolicus",
+      "Lutra cinerea",
+      "Sula brewsteri"
+    ],
+    "fi": [
+      "Aegotheles terborghi",
+      "Apalis stronachi",
+      "Botaurus dubius",
+      "Cacajao ucayalii",
+      "Callosciurus concolor",
+      "Caprimulgus ritae",
+      "Cecropis melanocrissus",
+      "Conepatus amazonicus",
+      "Corvus sierramadrensis",
+      "Dicaeum rhodopygiale",
+      "Formicarius destructus",
+      "Larus mongolicus",
+      "Lasiurus seminolus",
+      "Lontra annectens",
+      "Meliphaga imitatrix",
+      "Melogale subaurantiaca",
+      "Myiarchus flavidior",
+      "Philander vossi",
+      "Pogoniulus uropygialis",
+      "Sundasciurus robinsoni",
+      "Symposiachrus nigrotectus",
+      "Zosterops kasaicus"
+    ],
+    "fr": [
+      "Eleutherodactylus jamesdixoni",
+      "Hypsugo alaschanicus",
+      "Hypsugo stubbei",
+      "Myotis fimbriatus",
+      "Petaurista grandis"
+    ],
+    "hr": [
+      "Ardea coromanda"
+    ],
+    "lt": [
+      "Apalis stronachi",
+      "Ardea coromanda",
+      "Butorides atricapilla",
+      "Callosciurus concolor",
+      "Cecropis rufula",
+      "Coracina guillemardi",
+      "Dicaeum rhodopygiale",
+      "Formicarius destructus",
+      "Lutra cinerea",
+      "Melanocharis piperata",
+      "Myiarchus flavidior",
+      "Sula brewsteri",
+      "Zosterops kasaicus"
+    ],
+    "nl": [
+      "Cheiromeles parvidens",
+      "Myotis punicus",
+      "Myotis velifer",
+      "Petaurista grandis"
+    ],
+    "pl": [
+      "Rousettus amplexicaudatus"
+    ],
+    "pt": [
+      "Aepyornis maximus",
+      "Formicarius destructus",
+      "Lutra cinerea",
+      "Myiarchus flavidior",
+      "Petaurista grandis",
+      "Phyllomedusa distincta",
+      "Pogoniulus uropygialis",
+      "Rhinolophus blasii"
+    ],
+    "ro": [
+      "Pan paniscus"
+    ],
+    "ru": [
+      "Aegotheles terborghi",
+      "Apalis stronachi",
+      "Butorides atricapilla",
+      "Cacajao ucayalii",
+      "Callosciurus concolor",
+      "Conepatus amazonicus",
+      "Dicaeum rhodopygiale",
+      "Dinornis robustus",
+      "Duellmanohyla legleri",
+      "Eleutherodactylus jamesdixoni",
+      "Formicarius destructus",
+      "Geocrinia sparsiflora",
+      "Glis persicus",
+      "Hypsugo alaschanicus",
+      "Hypsugo stubbei",
+      "Kannabateomys amblyonyx",
+      "Lontra annectens",
+      "Melanocharis piperata",
+      "Melanophryniscus diabolicus",
+      "Melogale subaurantiaca",
+      "Monticola erythronotus",
+      "Myiarchus flavidior",
+      "Philander vossi",
+      "Pogoniulus uropygialis",
+      "Ramphocinclus sanctaeluciae",
+      "Stiphrornis mabirae",
+      "Sula brewsteri",
+      "Sundasciurus robinsoni",
+      "Zosterops kasaicus"
+    ],
+    "sk": [
+      "Rhinophrynus dorsalis"
+    ],
+    "sr": [
+      "Lutra cinerea"
+    ],
+    "sv": [
+      "Cacajao ucayalii",
+      "Lutra cinerea",
+      "Petaurista grandis",
+      "Sapajus cay"
+    ],
+    "tr": [
+      "Lutra cinerea"
+    ],
+    "uk": [
+      "Lutra cinerea"
+    ],
+    "zh": [
+      "Callosciurus concolor",
+      "Conepatus amazonicus",
+      "Eleutherodactylus jamesdixoni",
+      "Lontra annectens",
+      "Nidirana shyhhuangi",
+      "Sundasciurus robinsoni"
+    ]
+  },
+  "fix": {
+    "cy": {
+      "Zoothera aurea": "Brych Gwyn"
+    },
+    "de": {
+      "Diclidurus ingens": "Große Gespenstfledermaus",
+      "Falsistrellus tasmaniensis": "Östliche Scheinzwergfledermaus",
+      "Hesperoptenus tickelli": "Tickell-Scheinbreitflügel",
+      "Lasiurus villosissimus": "Südamerika-Haarschwanzfledermaus",
+      "Ozimops kitcheneri": "Südwestliche Bulldogfledermaus",
+      "Pteronotus fulvus": "Thomas-Naktrückenfledermaus",
+      "Scotorepens orion": "Östliche Breitnasenfledermaus"
+    },
+    "es": {
+      "Apis cerana": "Abeja Melífera Asiática",
+      "Bubalus bubalis": "Búfalo Arni",
+      "Callosciurus notatus": "Ardilla Oriental",
+      "Cormura brevirostris": "Murciélago alienvainado de Wagner",
+      "Dendrohyrax validus": "Damán Arborícola Oriental",
+      "Lynx pardinus": "Lince Ibérico",
+      "Pipistrellus kuhlii": "Murciélago de Borde Claro",
+      "Tadarida teniotis": "Murciélago Rabudo"
+    },
+    "fr": {
+      "Cheiromeles parvidens": "Chéiromèle à dents courtes",
+      "Cheiromeles torquatus": "Chéiromèle nu",
+      "Ctenomys torquatus": "Tuco-tuco à collier",
+      "Dactylomys dactylinus": "Coro-coro d'Amazonie",
+      "Hypsugo pulveratus": "Vespère de Chine",
+      "Leptonycteris yerbabuenae": "Petit Leptonyctère",
+      "Miniopterus fuliginosus": "Minioptère fuligineux",
+      "Myotis oxyotus": "Murin à oreilles effilées",
+      "Myotis pilosatibialis": "Murin à pattes velues",
+      "Myotis vivesi": "Murin pêcheur",
+      "Neotoma macrotis": "Néotoma à oreilles longues",
+      "Ochotona alpina": "Pika de l'Altaï",
+      "Potorous tridactylus": "Potorou à long nez",
+      "Pteronotus mesoamericanus": "Ptéronote d'Amérique Centrale",
+      "Pteropus scapulatus": "Roussette à collier",
+      "Rhinolophus affinis": "Rhinolophe de Horsfield",
+      "Rhinolophus monoceros": "Rhinolophe unicorne",
+      "Rhinolophus sinicus": "Rhinolophe de Chine",
+      "Saccolaimus saccolaimus": "Taphien de Temminck",
+      "Saimiri macrodon": "Saimiri de l'Équateur",
+      "Uromys caudimaculatus": "Uromys à queue nue"
+    },
+    "ja": {
+      "Aepyornis maximus": "エピオルニス"
+    },
+    "lt": {
+      "Crocidura russula": "Paprastasis baltadantis kirstukas"
+    },
+    "nl": {
+      "Aepyceros melampus": "rooibok"
+    },
+    "pt": {
+      "Nyctereutes procyonoides": "Cão-mapache",
+      "Panthera leo": "Leão",
+      "Panthera onca": "Onça",
+      "Saguinus midas": "Sagui",
+      "Saguinus mystax": "Sagui-de-bigode"
+    }
+  },
+  "reject_names": {}
+}

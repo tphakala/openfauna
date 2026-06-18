@@ -1,0 +1,1034 @@
+{
+  "_comment": "Manually researched and cross-verified common names, used by scripts/backfill_native.py with top priority (over IOC/GBIF/Wikidata). Each entry was checked against the target-language Wikipedia, national mammal/bat checklists, Wikidata P1843 and GBIF. Genus Pipistrellus was added because GBIF/Catalogue of Life returns fabricated names for several of these bats (a translated genus word plus a latinized epithet, e.g. 'Pipistrelle abramusi'), which automated backfill must not apply. Casing follows each locale's existing convention.",
+  "names": {
+    "Artibeus lituratus": {
+      "fr": "Artibée rayée",
+      "de": "Großer Fruchtvampir",
+      "it": "Grande artibeo"
+    },
+    "Austronomus australis": {
+      "fr": "Tadaride australe",
+      "de": "Weißstreifen-Bulldoggfledermaus",
+      "it": "Molosso striscia bianca",
+      "cs": "tadarida bělopruhá",
+      "pl": "molosek białopręgi",
+      "fi": "australiandoggilepakko"
+    },
+    "Balantiopteryx plicata": {
+      "es": "Murciélago gris de saco",
+      "it": "Pipistrello ali a sacco grigio",
+      "nl": "Grijze Zakvleugelvleermuis",
+      "pl": "worecznik szary",
+      "fi": "harmaapussilepakko"
+    },
+    "Centronycteris centralis": {
+      "fr": "Centronyctère de Thomas",
+      "de": "Thomas-Spornscheidenschwanz",
+      "es": "Murciélago greñudo de saco",
+      "it": "Pipistrello irsuto di Thomas",
+      "pl": "kudłatek powolny"
+    },
+    "Centronycteris maximiliani": {
+      "fr": "Centronyctère de Maximilian",
+      "de": "Spornscheidenschwanz",
+      "nl": "Ruigharige Vleermuis",
+      "pl": "kudłatek dziuplowy"
+    },
+    "Chalinolobus dwyeri": {
+      "fr": "Chalinolobe de Dwyer",
+      "pl": "mrocznik wielkouchy",
+      "fi": "mustaperhoslepakko"
+    },
+    "Chalinolobus gouldii": {
+      "fr": "Chalinolobe de Gould",
+      "it": "Vespertilio di Gould",
+      "pl": "mrocznik duży",
+      "fi": "australianperhoslepakko"
+    },
+    "Chalinolobus morio": {
+      "fr": "Chalinolobe chocolat",
+      "pl": "mrocznik czekoladowy"
+    },
+    "Chalinolobus neocaledonicus": {
+      "de": "Neukaledonien-Lappenfledermaus",
+      "pl": "mrocznik nowokaledoński"
+    },
+    "Chalinolobus nigrogriseus": {
+      "fr": "Chalinolobe cendré",
+      "de": "Schwarzgraue Lappenfledermaus",
+      "pl": "mrocznik siwy"
+    },
+    "Chalinolobus picatus": {
+      "fr": "Chalinolobe pie",
+      "de": "Kleine Lappenfledermaus",
+      "pl": "mrocznik łaciaty",
+      "fi": "pikkuperhoslepakko"
+    },
+    "Chalinolobus tuberculatus": {
+      "fr": "Chalinolobe de Nouvelle-Zélande",
+      "de": "Neuseeland-Lappenfledermaus",
+      "pl": "mrocznik nowozelandzki",
+      "fi": "uudenseelanninperhoslepakko"
+    },
+    "Cheiromeles parvidens": {
+      "fr": "Chiromèle à dents courtes",
+      "pl": "nagusek sulaweski"
+    },
+    "Cormura brevirostris": {
+      "fr": "Cormure des souches",
+      "de": "Kastanienbraune Sackflügelfledermaus",
+      "es": "Murciélago envainado de Wagner",
+      "nl": "Kastanjebruine Zakvleugelvleermuis",
+      "pl": "kasztanik krótkopyski",
+      "fi": "kastanjapussilepakko"
+    },
+    "Corynorhinus townsendii": {
+      "fr": "Oreillard de Townsend",
+      "de": "Townsend-Langohr",
+      "it": "Orecchione di Townsend",
+      "cs": "netopýr townsendův",
+      "pl": "bryłonosek północnoamerykański",
+      "fi": "amerikankorvayökkö"
+    },
+    "Cynomops greenhalli": {
+      "fr": "Cynomope de Greenhall",
+      "de": "Greenhall-Bulldogfledermaus",
+      "es": "Murciélago de cola libre buchipálido",
+      "pl": "psioliczek leśny",
+      "fi": "brasilianpikkuhännäkkö"
+    },
+    "Cynomops mastivus": {
+      "fr": "Grand Cynomope",
+      "de": "Thomas-Bulldogfledermaus"
+    },
+    "Cynomops mexicanus": {
+      "de": "Mexiko-Bulldogfledermaus",
+      "es": "Murciélago cara de perro",
+      "pl": "psioliczek meksykański",
+      "fr": "Cynomope du Mexique"
+    },
+    "Cynomops planirostris": {
+      "fr": "Cynomope à ventre blanc",
+      "de": "Amazonas-Bulldoggfledermaus",
+      "pl": "psioliczek płaskolicy"
+    },
+    "Cynopterus sphinx": {
+      "fr": "Cynoptère à nez court",
+      "de": "Indischer Kurznasenflughund",
+      "it": "Pipistrello muso corto maggiore",
+      "nl": "Kortneusvleerhond",
+      "pl": "krótkonosek sfinksowy"
+    },
+    "Diclidurus ingens": {
+      "fr": "Grande Dame blanche",
+      "de": "Grosse Gespenstfledermaus",
+      "pl": "duszek duży",
+      "fi": "isovalkolepakko"
+    },
+    "Emballonura monticola": {
+      "fr": "Petite Emballonure",
+      "de": "Malaiische Freischwanzfledermaus",
+      "cs": "netopýr pochvoocasý",
+      "pl": "upiór górski",
+      "fi": "malaijientuppihäntä"
+    },
+    "Euderma maculatum": {
+      "fr": "Oreillard maculé",
+      "de": "Gefleckte Fledermaus",
+      "it": "Orecchione maculato",
+      "cs": "netopýr skvrnitý"
+    },
+    "Eumops auripendulus": {
+      "fr": "Eumope des palmiers",
+      "de": "Schwarzkappen-Bulldoggfledermaus",
+      "pl": "czapeczkowiec czarny"
+    },
+    "Eumops bonariensis": {
+      "es": "Moloso orejas anchas pardo",
+      "pl": "czapeczkowiec karłowaty"
+    },
+    "Eumops ferox": {
+      "fr": "Eumope féroce",
+      "de": "Wilde Bulldoggfledermaus",
+      "es": "Murciélago con bonete",
+      "pl": "czapeczkowiec karaibski"
+    },
+    "Eumops floridanus": {
+      "fr": "Eumope de Floride",
+      "de": "Florida-Bulldoggfledermaus",
+      "pl": "czapeczkowiec florydzki"
+    },
+    "Eumops glaucinus": {
+      "fr": "Eumope de Wagner",
+      "de": "Wagner-Bulldoggfledermaus",
+      "es": "Murciélago de cola libre grande pechigris",
+      "pl": "czapeczkowiec haremowy",
+      "fi": "hoikkahilkkahännäkkö"
+    },
+    "Eumops perotis": {
+      "de": "Westliche Bulldoggfledermaus",
+      "nl": "Mutsvleermuis",
+      "pl": "czapeczkowiec uszaty"
+    },
+    "Falsistrellus tasmaniensis": {
+      "fr": "Falsistrelle de Tasmanie",
+      "de": "Östliche Scheinzwergfledermaus",
+      "it": "Falsistrello orientale",
+      "pl": "nibykarlik tasmański"
+    },
+    "Herpailurus yagouaroundi": {
+      "pt": "Jaguarundi"
+    },
+    "Hesperoptenus tickelli": {
+      "fr": "Sérotine de Tickell",
+      "de": "Tickell-Scheinbreitflügel",
+      "cs": "netopýr tickellův",
+      "pl": "zmroczek żółtawy",
+      "fi": "intianlehvästölepakko"
+    },
+    "Hipposideros diadema": {
+      "de": "Diadem-Rundblattnase",
+      "nl": "Maleise bladneusvleermuis",
+      "pl": "płatkonos diademowy"
+    },
+    "Hipposideros galeritus": {
+      "fr": "Phyllorhine de Cantor",
+      "de": "Cantor-Rundblattnase"
+    },
+    "Hipposideros gentilis": {
+      "fr": "Phyllorhine d’Andersen",
+      "de": "Andersen-Rundblattnase"
+    },
+    "Histiotus montanus": {
+      "fr": "Sérotine des montagnes",
+      "de": "Kleine Großohrfledermaus",
+      "pl": "żaglouch górski",
+      "fi": "kolumbiankorvalepakko"
+    },
+    "Hypsugo alaschanicus": {
+      "de": "Alaschan-Zwergfledermaus",
+      "it": "Pipistrello di Alashan",
+      "pl": "przymroczek mongolski"
+    },
+    "Hypsugo pulveratus": {
+      "fr": "Vespère de Chine",
+      "de": "China-Zwergfledermaus",
+      "cs": "netopýr čínský",
+      "pl": "przymroczek chiński",
+      "fi": "kiinanpiippa"
+    },
+    "Laephotis capensis": {
+      "fr": "Pipistrelle du Cap",
+      "de": "Kap-Zwergfledermaus",
+      "pl": "afrokarlik przylądkowy",
+      "fi": "afrikanserotiini"
+    },
+    "Lasionycteris noctivagans": {
+      "fr": "Chauve-souris argentée",
+      "de": "Silberhaarfledermaus",
+      "it": "Pipistrello dai peli argentati"
+    },
+    "Lasiurus blossevillii": {
+      "fr": "Chauve-souris rousse de l'Ouest",
+      "de": "Blosseville-Haarschwanzfledermaus",
+      "pl": "kosmatnik samotny"
+    },
+    "Lasiurus frantzii": {
+      "fr": "Lasiure de Frantzius",
+      "de": "Wüsten-Haarschwanzfledermaus",
+      "es": "Murciélago rojo",
+      "it": "Vespertilio rosso del deserto"
+    },
+    "Lasiurus seminolus": {
+      "de": "Südstaaten-Rotfledermaus",
+      "cs": "netopýr seminolský",
+      "pl": "kosmatnik seminolski"
+    },
+    "Lasiurus semotus": {
+      "fr": "Lasiure d'Hawai",
+      "de": "Hawaii-Haarschwanzfledermaus",
+      "nl": "Hawaiiaanse grijze vleermuis"
+    },
+    "Lasiurus varius": {
+      "fr": "Lasiure du Chili",
+      "de": "Zimtrote Fledermaus",
+      "es": "Murciélago peludo rojo",
+      "pl": "kosmatnik cynamonowy"
+    },
+    "Lasiurus villosissimus": {
+      "fr": "Lasiure du Paraguay",
+      "de": "Südamerika-Haarschwanzfledermaus"
+    },
+    "Lasiurus xanthinus": {
+      "de": "Westliche Gelbfledermaus"
+    },
+    "Leptonycteris yerbabuenae": {
+      "fr": "Petit Leptonyctère",
+      "de": "Kleine Mexikanische Blütenfledermaus",
+      "es": "Murciélago magueyero menor",
+      "nl": "Kleine bladneusvleermuis",
+      "pl": "smukłonosek mały"
+    },
+    "Macrotus californicus": {
+      "fr": "Macrote de Californie",
+      "de": "Kalifornische Großohrblattnase",
+      "es": "Murciélago orejón californiano"
+    },
+    "Miniopterus australis": {
+      "fr": "Minioptère australasien",
+      "de": "Kleine Australische Langflügelfledermaus",
+      "pl": "podkasaniec zgiętoskrzydły"
+    },
+    "Miniopterus fraterculus": {
+      "fr": "Minioptère d’Afrique australe",
+      "pl": "podkasaniec braterski"
+    },
+    "Miniopterus fuliginosus": {
+      "fr": "Minioptère fuligineux",
+      "pl": "podkasaniec okopcony"
+    },
+    "Miniopterus maghrebensis": {
+      "it": "Miniottero maghrebino",
+      "fr": "Minioptère du Maghreb",
+      "es": "Murciélago de cueva magrebí"
+    },
+    "Miniopterus natalensis": {
+      "fr": "Minioptère de Natal",
+      "de": "Natal-Langflügelfledermaus",
+      "pl": "podkasaniec natalski"
+    },
+    "Miniopterus orianae": {
+      "fr": "Minioptère d'Oriana",
+      "de": "Australische Langflügelfledermaus"
+    },
+    "Molossus alvarezi": {
+      "fr": "Molosse d'Alvarez",
+      "de": "Alvarez-Samtfledermaus",
+      "es": "Murciélago mastín de Alvarez",
+      "pl": "molos jukatański"
+    },
+    "Molossus currentium": {
+      "de": "Bonda-Samtfledermaus",
+      "pl": "molos tajemniczy"
+    },
+    "Molossus nigricans": {
+      "es": "Murciélago mastín negro"
+    },
+    "Mops ansorgei": {
+      "pl": "molosek sawannowy",
+      "fi": "partatöyhtöhännäkkö"
+    },
+    "Mops jobensis": {
+      "fr": "Tadaride de Miller",
+      "pl": "molosek fałdousty",
+      "fi": "uuden-guineantöyhtöhännäkkö"
+    },
+    "Mops midas": {
+      "de": "Midas-Bulldoggfledermaus",
+      "pl": "mops jednobarwny",
+      "fi": "isohännäkkö"
+    },
+    "Mops plicatus": {
+      "it": "Molosso dalle labbra rugose",
+      "pl": "molosek pomarszczony",
+      "fi": "intiantöyhtöhännäkkö",
+      "fr": "Tadaride à nez plissé"
+    },
+    "Mops pumilus": {
+      "fr": "Tadaride des Seychelles",
+      "es": "Murciélago Rabudo Tropical Chico",
+      "it": "Molosso delle Seychelles",
+      "pl": "molosek drobny"
+    },
+    "Mormoops blainvillei": {
+      "de": "Antillen-Kinnblattfledermaus"
+    },
+    "Mormopterus kalinowskii": {
+      "fr": "Molosse de Kalinowski",
+      "pl": "goblinek kalinowskiego",
+      "fi": "perunpeikkohännäkkö",
+      "es": "Murciélago de Kalinowski"
+    },
+    "Murina bicolor": {
+      "fr": "Murine bicolore",
+      "pl": "tubonos dwubarwny"
+    },
+    "Myotis atacamensis": {
+      "fr": "Murin d'Atacama",
+      "de": "Atacama-Mausohr",
+      "cs": "netopýr atakamaský",
+      "pl": "nocek atakamski",
+      "fi": "atacamansiippa"
+    },
+    "Myotis austroriparius": {
+      "de": "Südöstliches Mausohr",
+      "pl": "nocek nadwodny",
+      "fi": "karvavarvassiippa"
+    },
+    "Myotis californicus": {
+      "fr": "Vespertilion de Californie",
+      "de": "Kalifornisches Mausohr",
+      "cs": "netopýr kalifornský",
+      "pl": "nocek kalifornijski",
+      "fi": "kaliforniansiippa",
+      "it": "Vespertilio della California"
+    },
+    "Myotis chiloensis": {
+      "fr": "Murin du Chili",
+      "de": "Chilenisches Mausohr",
+      "es": "Murcielaguito chileno",
+      "cs": "netopýr chilský",
+      "pl": "nocek chilijski"
+    },
+    "Myotis ciliolabrum": {
+      "pl": "nocek rzęsowargi"
+    },
+    "Myotis crypticus": {
+      "fr": "Murin cryptique",
+      "de": "Kryptisches Mausohr",
+      "es": "Murciélago ratonero críptico"
+    },
+    "Myotis evotis": {
+      "fr": "Vespertilion à longues oreilles",
+      "cs": "netopýr montereyský",
+      "pl": "nocek długouchy",
+      "fi": "pitkäkorvasiippa"
+    },
+    "Myotis fimbriatus": {
+      "de": "Haarige Wasserfledermaus",
+      "pl": "nocek chiński"
+    },
+    "Myotis formosus": {
+      "fr": "Murin de Hodgson",
+      "de": "Hodgson-Fledermaus"
+    },
+    "Myotis grisescens": {
+      "de": "Graues Mausohr",
+      "cs": "netopýr hnědošedý",
+      "pl": "nocek szary",
+      "fi": "harmaasiippa"
+    },
+    "Myotis hasseltii": {
+      "fr": "Murin de Hasselt",
+      "pl": "nocek wielkozębny",
+      "fi": "bengalinsiippa"
+    },
+    "Myotis horsfieldii": {
+      "fr": "Murin de Horsfield",
+      "de": "Horsfield-Langfußfledermaus",
+      "cs": "netopýr horsfieldův",
+      "pl": "nocek orientalny",
+      "fi": "eteläaasiansiippa"
+    },
+    "Myotis keaysi": {
+      "fr": "Murin de Keays",
+      "de": "Haarfüßiges Mausohr"
+    },
+    "Myotis laniger": {
+      "fr": "Murin laineux",
+      "de": "Chinesische Wasserfledermaus",
+      "pl": "nocek nadbrzeżny"
+    },
+    "Myotis leibii": {
+      "pl": "nocek małostopy",
+      "fi": "kääpiöruskosiippa"
+    },
+    "Myotis macropus": {
+      "fr": "Murin de Gould",
+      "de": "Südliche Langfußfledermaus",
+      "pl": "nocek wielkonogi"
+    },
+    "Myotis martiniquensis": {
+      "de": "Martinique-Mausohr",
+      "cs": "netopýr martiniqujský",
+      "pl": "nocek martynikański",
+      "fi": "martiniquensiippa"
+    },
+    "Myotis muricola": {
+      "fi": "muurisiippa"
+    },
+    "Myotis nigricans": {
+      "fr": "Murin noirâtre"
+    },
+    "Myotis occultus": {
+      "fr": "Murin de Hollister",
+      "de": "Arizona-Mausohr",
+      "es": "Miotis de Arizona",
+      "pl": "nocek arizoński",
+      "fi": "arizonansiippa"
+    },
+    "Myotis oxyotus": {
+      "de": "Gebirgsmausohr",
+      "nl": "Bergplatsnuitvleermuis",
+      "pl": "nocek andyjski",
+      "fi": "vuorisiippa",
+      "fr": "Murin à oreilles effilées"
+    },
+    "Myotis pilosatibialis": {
+      "fr": "Murin à pattes velues",
+      "de": "Nördliches Haarfüßiges Mausohr"
+    },
+    "Myotis punicus": {
+      "fr": "Murin du Maghreb",
+      "pl": "nocek punicki"
+    },
+    "Myotis riparius": {
+      "fr": "Murin des ruisseaux",
+      "de": "Ufermausohr"
+    },
+    "Myotis septentrionalis": {
+      "fr": "Vespertilion nordique",
+      "pl": "nocek północny"
+    },
+    "Myotis sodalis": {
+      "de": "Indiana-Mausohr",
+      "cs": "netopýr společenský",
+      "pl": "nocek towarzyski",
+      "fi": "luolasiippa"
+    },
+    "Myotis thysanodes": {
+      "de": "Nordamerikanische Fransenfledermaus",
+      "cs": "netopýr třásnitý",
+      "pl": "nocek frędzlowaty",
+      "fi": "amerikanripsisiippa"
+    },
+    "Myotis velifer": {
+      "de": "Höhlenmausohr",
+      "cs": "netopýr jeskynní",
+      "pl": "nocek jaskiniowy",
+      "fi": "sonoransiippa"
+    },
+    "Myotis vivesi": {
+      "de": "Fischfressendes Mausohr",
+      "es": "Murciélago pescador",
+      "nl": "Visetende vleermuis",
+      "pl": "nocek rybożerny",
+      "fi": "kalastajasiippa",
+      "fr": "Murin pêcheur"
+    },
+    "Myotis volans": {
+      "cs": "netopýr srstnatý",
+      "pl": "nocek długonogi",
+      "fi": "pitkäjalkasiippa"
+    },
+    "Myotis yumanensis": {
+      "pl": "nocek wodny",
+      "fi": "yumansiippa"
+    },
+    "Myotis zenatius": {
+      "fr": "Murin zenati",
+      "es": "Murciélago Ratonero Gris Norteafricano"
+    },
+    "Neogale felipei": {
+      "uk": "ласка колумбійська"
+    },
+    "Neogale frenata": {
+      "ca": "mostela de cua llarga"
+    },
+    "Nyctalus aviator": {
+      "fr": "Noctule aviatrice",
+      "de": "Großer Ostasien-Abendsegler",
+      "it": "Nottola giapponese",
+      "cs": "netopýr ptačí",
+      "pl": "borowiec ptasi",
+      "fi": "kiinanisolepakko"
+    },
+    "Nyctalus plancyi": {
+      "fr": "Noctule de Chine",
+      "de": "Chinesischer Abendsegler",
+      "pl": "borowiec chiński"
+    },
+    "Nycticeius humeralis": {
+      "de": "Schwarzschulter-Abendsegler",
+      "it": "Pipistrello crepuscolare americano",
+      "cs": "netopýr krátkouchý",
+      "pl": "wieczorek leśny",
+      "fi": "amerikanleveänenä"
+    },
+    "Nyctinomops femorosaccus": {
+      "de": "Taschen-Freischwanzfledermaus",
+      "pl": "ogoniak kieszeniasty",
+      "fi": "hiirihännäkkö"
+    },
+    "Nyctinomops laticaudatus": {
+      "fr": "Nyctinomope des rochers",
+      "de": "Breitohrfledermaus",
+      "pl": "ogoniak szerokouchy"
+    },
+    "Nyctinomops macrotis": {
+      "de": "Große Freischwanzfledermaus",
+      "pl": "ogoniak duży",
+      "fi": "isohiirihännäkkö"
+    },
+    "Nyctophilus nebulosus": {
+      "fr": "Nyctophile nébuleux",
+      "de": "Neukaledonien-Langohr",
+      "pl": "nocolubek nowokaledoński"
+    },
+    "Orcinus orca": {
+      "es": "Orca"
+    },
+    "Ozimops kitcheneri": {
+      "fr": "Tadaride de Kitchener",
+      "de": "Südwestliche Bulldoggfledermaus"
+    },
+    "Ozimops planiceps": {
+      "fr": "Tadaride de Sydney",
+      "pl": "goblinek płaskogłowy",
+      "fi": "eteläaustralianhännäkkö"
+    },
+    "Ozimops ridei": {
+      "fr": "Tadaride de Ride",
+      "es": "Pequeño murciélago oriental de cola libre"
+    },
+    "Parastrellus hesperus": {
+      "de": "Westliche Amerikanische Zwergfledermaus",
+      "it": "Pipistrello dei Canyon",
+      "pl": "karlikowiec kalifornijski",
+      "fi": "amerikanaavikkopiippa"
+    },
+    "Perimyotis subflavus": {
+      "de": "Östliche Amerikanische Zwergfledermaus",
+      "it": "Pipistrello tricolore",
+      "cs": "netopýr žlutavý",
+      "pl": "karlicznik florydzki",
+      "fi": "amerikanpiippa"
+    },
+    "Peropteryx kappleri": {
+      "fr": "Grand Péroptère",
+      "pl": "psinek większy",
+      "fi": "isokoiro"
+    },
+    "Peropteryx macrotis": {
+      "fr": "Péroptère des cavernes",
+      "nl": "Kokerstaart vleermuis",
+      "pl": "psinek mniejszy",
+      "fi": "pikkukoiro"
+    },
+    "Peropteryx trinitatis": {
+      "fr": "Petit Péroptère",
+      "es": "Murciélago perro de Trinidad",
+      "pl": "psinek karaibski"
+    },
+    "Pipistrellus abramus": {
+      "fr": "Pipistrelle japonaise",
+      "de": "Japanische Zwergfledermaus",
+      "nl": "Japanse dwergvleermuis",
+      "cs": "netopýr mandžuský",
+      "pl": "karlik japoński",
+      "it": "Pipistrello giapponese"
+    },
+    "Pipistrellus javanicus": {
+      "fr": "Pipistrelle de Java",
+      "de": "Java-Zwergfledermaus",
+      "nl": "Javaanse dwergvleermuis",
+      "pl": "karlik jawajski"
+    },
+    "Pipistrellus kuhlii": {
+      "fr": "Pipistrelle de Kuhl",
+      "de": "Weißrandfledermaus",
+      "es": "Murciélago de borde claro",
+      "it": "Pipistrello albolimbato",
+      "nl": "Kuhls dwergvleermuis",
+      "pl": "karlik średni"
+    },
+    "Pipistrellus maderensis": {
+      "fr": "Pipistrelle de Madère",
+      "es": "Murciélago de Madeira",
+      "it": "Pipistrello di Madera",
+      "pl": "karlik maderski",
+      "fi": "madeiranpiippa"
+    },
+    "Pipistrellus nathusii": {
+      "fr": "Pipistrelle de Nathusius",
+      "de": "Rauhautfledermaus",
+      "es": "Murciélago de Nathusius",
+      "it": "Pipistrello di Nathusius",
+      "nl": "Ruige dwergvleermuis",
+      "cs": "netopýr parkový",
+      "pl": "karlik większy",
+      "fi": "pikkulepakko"
+    },
+    "Pipistrellus pipistrellus": {
+      "fr": "Pipistrelle commune",
+      "de": "Zwergfledermaus",
+      "it": "Pipistrello nano",
+      "nl": "Gewone dwergvleermuis",
+      "cs": "netopýr hvízdavý",
+      "pl": "karlik malutki",
+      "fi": "vaivaislepakko"
+    },
+    "Pipistrellus pygmaeus": {
+      "fr": "Pipistrelle pygmée",
+      "de": "Mückenfledermaus",
+      "es": "Murciélago de Cabrera",
+      "nl": "Kleine dwergvleermuis",
+      "cs": "netopýr nejmenší",
+      "pl": "karlik drobny",
+      "fi": "kääpiölepakko"
+    },
+    "Pipistrellus tenuis": {
+      "fr": "Pipistrelle grêle",
+      "cs": "netopýr mrňavý",
+      "pl": "karlik delikatny",
+      "it": "Pipistrello pigmeo indiano"
+    },
+    "Plecotus gaisleri": {
+      "es": "Murciélago Orejudo Norteafricano",
+      "it": "Orecchione di Gaisler",
+      "pl": "gacek afrykański"
+    },
+    "Plecotus kolombatovici": {
+      "fr": "Oreillard des Balkans",
+      "de": "Balkan-Langohr",
+      "es": "Murciélago orejudo de Kolombatovic",
+      "it": "Orecchione di Kolombatovic",
+      "nl": "Balkangrootoorvleermuis",
+      "pl": "gacek bałkański"
+    },
+    "Plecotus macrobullaris": {
+      "de": "Alpen-Langohr",
+      "es": "Orejudo Alpino",
+      "it": "Orecchione alpino",
+      "pl": "gacek alpejski"
+    },
+    "Plecotus ognevi": {
+      "fr": "Oreillard d'Ognev",
+      "it": "Orecchione di Ognev",
+      "cs": "uchašan ognevův",
+      "pl": "gacek amurski"
+    },
+    "Pteronotus alitonus": {
+      "de": "Amazonas-Schnurrbartfledermaus"
+    },
+    "Pteronotus davyi": {
+      "fr": "Ptéronote de Davy",
+      "de": "Davy-Nacktrückenfledermaus",
+      "nl": "Kleine kaalrugvleermuis"
+    },
+    "Pteronotus fulvus": {
+      "fr": "Ptéronote fauve",
+      "de": "Thomas-Nacktrückenfledermaus"
+    },
+    "Pteronotus mesoamericanus": {
+      "fr": "Ptéronote d'Amérique Centrale",
+      "de": "Mittelamerika-Schnurrbartfledermaus",
+      "es": "Murciélago bigotudo mesoamericano"
+    },
+    "Pteronotus quadridens": {
+      "fr": "Ptéronote fuligineux",
+      "de": "Rußige Schnurrbartfledermaus",
+      "es": "Murciélago Bigotudo Menor",
+      "cs": "netopýr pyskatý",
+      "pl": "wąsoliczek okopcony"
+    },
+    "Pteronotus rubiginosus": {
+      "fr": "Ptéronote rubigineux",
+      "es": "Murciélago bigotudo común de Wagner"
+    },
+    "Pteropus alecto": {
+      "fr": "Renard volant noir",
+      "de": "Schwarzer Flughund",
+      "es": "Zorro Volador Negro",
+      "it": "Volpe volante nera",
+      "pl": "rudawka żałobna"
+    },
+    "Pteropus conspicillatus": {
+      "fr": "Renard volant à lunettes",
+      "de": "Brillenflughund",
+      "es": "Zorro Volador De Anteojos",
+      "it": "Volpe volante dagli occhiali",
+      "cs": "kaloň zlatotýlý",
+      "pl": "rudawka okularowa",
+      "fi": "rillilenkko"
+    },
+    "Pteropus dasymallus": {
+      "de": "Ryukyu-Flughund",
+      "es": "Zorro Volador De Ryu-kyu",
+      "it": "Volpe volante delle Ryukyu",
+      "pl": "rudawka figowa"
+    },
+    "Pteropus hypomelanus": {
+      "fr": "Roussette hypomélane",
+      "cs": "kaloň pobřežní",
+      "pl": "rudawka zmienna"
+    },
+    "Pteropus scapulatus": {
+      "fr": "Petit renard volant",
+      "de": "Kleiner Roter Flughund",
+      "es": "Zorro Volador de Queensland",
+      "it": "Piccola volpe volante rossa",
+      "pl": "rudawka eukaliptusowa",
+      "fi": "vaeltajalenkko"
+    },
+    "Pteropus seychellensis": {
+      "de": "Seychellen-Flughund",
+      "es": "Zorro Volador De Las Seychelles",
+      "it": "Volpe volante delle Seychelles",
+      "cs": "kaloň seychelský",
+      "pl": "rudawka seszelska"
+    },
+    "Pteropus tonganus": {
+      "de": "Tonga-Flughund",
+      "nl": "Tongavleerhond"
+    },
+    "Rattus fuscipes": {
+      "fr": "Rat du bush",
+      "de": "Australische Buschratte",
+      "it": "Ratto dei cespugli australiano",
+      "pl": "szczur zaroślowy",
+      "fi": "pensasrotta"
+    },
+    "Rattus lutreolus": {
+      "fr": "Rat des marais",
+      "de": "Australische Sumpfratte",
+      "it": "Ratto australiano di palude",
+      "pl": "szczur błotny"
+    },
+    "Rhinolophus acuminatus": {
+      "fr": "Rhinolophe acuminé",
+      "cs": "vrápenec špičatý",
+      "pl": "podkowiec szpiczasty",
+      "fi": "indonesianherkko"
+    },
+    "Rhinolophus affinis": {
+      "fr": "Rhinolophe intermédiaire",
+      "de": "Java-Hufeisennase",
+      "cs": "vrápenec prostřední",
+      "fi": "aasianherkko"
+    },
+    "Rhinolophus chaseni": {
+      "fr": "Rhinolophe de Chasen",
+      "de": "Chasen-Hufeisennase"
+    },
+    "Rhinolophus creaghi": {
+      "fr": "Rhinolophe de Creagh",
+      "de": "Creagh-Hufeisennase",
+      "cs": "vrápenec creaghův",
+      "pl": "podkowiec sundajski",
+      "fi": "borneonisoherkko"
+    },
+    "Rhinolophus formosae": {
+      "fr": "Rhinolophe de Formose",
+      "de": "Taiwanesische Wollige Hufeisennase",
+      "it": "Ferro di cavallo di Taiwan maggiore",
+      "pl": "podkowiec tajwański"
+    },
+    "Rhinolophus hildebrandtii": {
+      "fr": "Rhinolophe de Hildebrandt"
+    },
+    "Rhinolophus keyensis": {
+      "fr": "Rhinolophe insulaire",
+      "cs": "vrápenec keyenský",
+      "pl": "podkowiec indonezyjski",
+      "fi": "molukkienherkko"
+    },
+    "Rhinolophus luctus": {
+      "fr": "Grand rhinolophe laineux",
+      "pl": "podkowiec wełnisty"
+    },
+    "Rhinolophus megaphyllus": {
+      "fr": "Rhinolophe à grande feuille",
+      "de": "Östliche Hufeisennase",
+      "cs": "vrápenec australský",
+      "pl": "podkowiec wschodni",
+      "fi": "australianherkko"
+    },
+    "Rhinolophus monoceros": {
+      "fr": "Rhinolophe unicorne",
+      "it": "Ferro di cavallo di Taiwan minore",
+      "pl": "podkowiec jednorogi",
+      "fi": "taiwaninherkko"
+    },
+    "Rhinolophus refulgens": {
+      "fr": "Rhinolophe irisé",
+      "de": "Glänzende Hufeisennase"
+    },
+    "Rhinolophus rouxii": {
+      "fr": "Rhinolophe de Roux"
+    },
+    "Rhinolophus sedulus": {
+      "fr": "Rhinolophe diligent",
+      "de": "Kleine Wollige Hufeisennase",
+      "cs": "vrápenec sarawacký",
+      "pl": "podkowiec sarawaski",
+      "fi": "mustaherkko"
+    },
+    "Rhinolophus simulator": {
+      "fr": "Rhinolophe de brousse",
+      "cs": "vrápenec savanový",
+      "pl": "podkowiec jaskiniowy",
+      "fi": "ruskokuveherkko"
+    },
+    "Rhinolophus sinicus": {
+      "fr": "Rhinolophe de Chine",
+      "de": "Chinesische Hufeisennase",
+      "pl": "podkowiec chiński"
+    },
+    "Rhinolophus swinnyi": {
+      "fr": "Rhinolophe de Swinny",
+      "cs": "vrápenec swinnyův",
+      "pl": "podkowiec deszczowy",
+      "fi": "zimbabwenherkko"
+    },
+    "Rhinolophus trifoliatus": {
+      "fr": "Rhinolophe à trèfle",
+      "de": "Dreiblatt-Hufeisennase",
+      "cs": "vrápenec jetelový",
+      "pl": "podkowiec trójlistny",
+      "fi": "pitkäkarvaherkko"
+    },
+    "Rhinopoma cystops": {
+      "fr": "Petit rhinopome",
+      "es": "Murciélago de cola de ratón egipcio",
+      "it": "Pipistrello coda di topo egiziano",
+      "pl": "brodawkonos afrykański"
+    },
+    "Rousettus amplexicaudatus": {
+      "fr": "Roussette de Geoffroy",
+      "de": "Geoffroys Flughund",
+      "it": "Rossetto di Geoffroy",
+      "cs": "kaloň ovíjivý",
+      "fi": "uuden-guineanronkko"
+    },
+    "Rousettus leschenaultii": {
+      "fr": "Roussette de Leschenault",
+      "cs": "kaloň leschenaultův"
+    },
+    "Rousettus madagascariensis": {
+      "fr": "Roussette de Madagascar",
+      "de": "Madagaskar-Höhlenflughund",
+      "it": "Rossetto del Madagascar"
+    },
+    "Saccolaimus flaviventris": {
+      "fr": "Taphien à ventre jaune",
+      "de": "Australische Taschenfledermaus",
+      "pl": "sakiewnik żółtobrzuchy",
+      "fi": "haukkalepakko"
+    },
+    "Saccolaimus peli": {
+      "fr": "Saccolaime de Pel",
+      "pl": "sakiewnik afrykański"
+    },
+    "Saccolaimus saccolaimus": {
+      "de": "Nacktrücken-Taschenfledermaus",
+      "nl": "Kleine Grafvleermuis"
+    },
+    "Saccopteryx canescens": {
+      "fr": "Saccoptère givré",
+      "de": "Graue Zweistreifenfledermaus",
+      "es": "Murcielaguito de tirantes amazónico",
+      "pl": "kieszennik siwy"
+    },
+    "Saccopteryx gymnura": {
+      "fr": "Saccoptère à queue nue",
+      "de": "Amazonas-Zweistreifenfledermaus",
+      "cs": "netopýr žlázokřídlý",
+      "pl": "kieszennik amazoński",
+      "fi": "amazoninaaltoselkä"
+    },
+    "Saccopteryx leptura": {
+      "nl": "Kleine tweestrepige Zakvleermuis",
+      "pl": "kieszennik cienkoogonowy"
+    },
+    "Scotophilus dinganii": {
+      "de": "Gelbbäuchige Hausfledermaus",
+      "es": "Murciélago Amarillo Africano",
+      "pl": "ciemnolubek afrykański"
+    },
+    "Scotophilus heathii": {
+      "fr": "Scotophile de Heath",
+      "de": "Große Asiatische Hausfledermaus"
+    },
+    "Scotophilus kuhlii": {
+      "de": "Kleine Asiatische Hausfledermaus",
+      "it": "Pipistrello giallo asiatico minore"
+    },
+    "Scotophilus nigrita": {
+      "de": "Riesen-Hausfledermaus",
+      "pl": "ciemnolubek czarniawy"
+    },
+    "Scotorepens balstoni": {
+      "fr": "Sérotine de Balston",
+      "de": "Westliche Breitnasenfledermaus",
+      "cs": "netopýr balstonův",
+      "pl": "szerokonosek australijski",
+      "fi": "leveänenälepakko"
+    },
+    "Scotorepens orion": {
+      "de": "Östliche Breitnasenfledermaus",
+      "pl": "szerokonosek wschodni"
+    },
+    "Sorex fumeus": {
+      "fr": "Musaraigne fuligineuse",
+      "de": "Villa-Spitzmaus",
+      "nl": "Rookspitsmuis",
+      "cs": "rejsek kouřový",
+      "pl": "ryjówka okopcona",
+      "fi": "savupäästäinen"
+    },
+    "Sorex pacificus": {
+      "fr": "Musaraigne du Pacifique",
+      "de": "Pazifische Spitzmaus",
+      "nl": "Pacifische spitsmuis"
+    },
+    "Tadarida aegyptiaca": {
+      "fr": "Tadaride d'Égypte",
+      "de": "Ägyptische Bulldoggfledermaus",
+      "pl": "molosek egipski",
+      "fi": "egyptindoggilepakko"
+    },
+    "Tadarida insignis": {
+      "fr": "Tadaride d’Asie",
+      "cs": "tadarida východoasijská",
+      "pl": "molosek znaczony"
+    },
+    "Taphozous melanopogon": {
+      "fr": "Taphien à barbe noire",
+      "de": "Schwarzbart-Grabfledermaus",
+      "it": "Pipistrello delle tombe dalla barba nera",
+      "pl": "grobownik czarnobrody",
+      "fi": "aasianhautalepakko"
+    },
+    "Tylonycteris fulvida": {
+      "fr": "Vespertilion fauve",
+      "nl": "Kleinkopbamboevleermuis"
+    },
+    "Vespadelus darlingtoni": {
+      "fr": "Vespertilion de Darlington",
+      "de": "Große Waldfledermaus",
+      "it": "Vespertilio di foresta maggiore",
+      "pl": "lasomroczek duży"
+    },
+    "Vespadelus finlaysoni": {
+      "de": "Finlayson-Höhlenfledermaus",
+      "pl": "lasomroczek skalisty"
+    },
+    "Vespadelus pumilus": {
+      "fr": "Petit Vespertilion",
+      "de": "Östliche Waldfledermaus",
+      "cs": "netopýr australský",
+      "pl": "lasomroczek dziuplowy",
+      "fi": "australianmustaserotiini"
+    },
+    "Vespadelus regulus": {
+      "de": "Südliche Waldfledermaus",
+      "it": "Vespertilio di foresta meridionale",
+      "pl": "lasomroczek królewski"
+    },
+    "Vespadelus troughtoni": {
+      "fr": "Vespertilion de Troughton",
+      "de": "Troughton-Waldfledermaus",
+      "pl": "lasomroczek leśny"
+    },
+    "Vespadelus vulturnus": {
+      "fr": "Vespertilion sylvestre",
+      "de": "Kleine Waldfledermaus",
+      "it": "Vespertilio di foresta minore",
+      "pl": "lasomroczek mały"
+    },
+    "Zosterops aldabrensis": {
+      "fi": "aldabranrilli"
+    }
+  }
+}
