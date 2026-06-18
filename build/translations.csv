@@ -21357,7 +21357,7 @@ Batis occulta,ca,batis de l'Àfrica occidental
 Batis orientalis,ca,batis de l'Àfrica oriental
 Batis perkeo,ca,batis menuda
 Batis poensis,ca,batis de Bioko
-Batis pririt,ca,batis pririt
+Batis pririt,ca,Batis de Vieillot
 Batis senegalensis,ca,batis del Senegal
 Batis soror,ca,batis pàl·lida
 Batrachostomus affinis,ca,podarg de Blyth
@@ -28220,7 +28220,7 @@ Niltava grandis,ca,niltava grossa
 Niltava macgrigoriae,ca,niltava de McGrigor
 Niltava oatesi,ca,niltava ventre-rogenca
 Niltava sumatrana,ca,niltava de Sumatra
-Niltava sundara,ca,niltava sundara
+Niltava sundara,ca,Niltava panxa-rogenc
 Niltava vivida,ca,niltava de Taiwan
 Ninox affinis,ca,nínox de les Andaman
 Ninox albifacies,ca,nínox rialler
@@ -105103,7 +105103,7 @@ Amaurospiza concolor,es,Semillero Azul
 Amaurospiza moesta,es,Semillero Negruzco
 Amazilia luciae,es,Amazilia Hondureña
 Amazilia rutila,es,Amazilia Canela
-Amazilia tzacatl,es,Amazilia Tzacatl
+Amazilia tzacatl,es,Colibrí cola rojiza
 Amazilia yucatanensis,es,Amazilia Yucateca
 Amazilis amazilia,es,Amazilia Costeña
 Amazona aestiva,es,Amazona Frentiazul
@@ -105119,7 +105119,7 @@ Amazona collaria,es,Amazona Jamaicana Piquiclara
 Amazona diadema,es,Amazona Diadema
 Amazona dufresniana,es,Amazona Cariazul
 Amazona farinosa,es,Amazona Harinosa
-Amazona festiva,es,Amazona Festiva
+Amazona festiva,es,Amazona festiva sureña
 Amazona finschi,es,Amazona Guayabera
 Amazona guildingii,es,Amazona de San Vicente
 Amazona imperialis,es,Amazona Imperial
@@ -105131,7 +105131,7 @@ Amazona ochrocephala,es,Amazona Real
 Amazona oratrix,es,Amazona Cabecigualda
 Amazona pretrei,es,Amazona Charao
 Amazona rhodocorytha,es,Amazona Coronirroja
-Amazona tucumana,es,Amazona Tucumana
+Amazona tucumana,es,Loro alisero
 Amazona ventralis,es,Amazona de la Española
 Amazona versicolor,es,Amazona de Santa Lucía
 Amazona vinacea,es,Amazona Vinosa
@@ -105628,7 +105628,7 @@ Aramides ypecaha,es,Cotara Ipacaá
 Aramidopsis plateni,es,Rascón de Platen
 Aramus guarauna,es,Carrao
 Aratinga auricapillus,es,Aratinga Testadorada
-Aratinga jandaya,es,Aratinga Jandaya
+Aratinga jandaya,es,Cotorra jandaya
 Aratinga maculata,es,Aratinga Pechisulfúrea
 Aratinga nenday,es,Aratinga Ñanday
 Aratinga solstitialis,es,Aratinga Sol
@@ -105906,7 +105906,7 @@ Atlapetes semirufus,es,Atlapetes Semirrufo
 Atlapetes taczanowskii,es,Atlapetes de Taczanowskii
 Atlapetes terborghi,es,Atlapetes de Vilcabamba
 Atlapetes tibialis,es,Cerquero Musliamarillo
-Atlapetes tricolor,es,Atlapetes Tricolor
+Atlapetes tricolor,es,Matorralero tricolor
 Atrapsalta audax,es,Adelaide Black Squeaker
 Atrapsalta collina,es,Sandstone Squeaker
 Atrapsalta corticina,es,Bark Squeaker
@@ -117109,7 +117109,7 @@ Tangara cyanoventris,es,Tangara Ventriazul
 Tangara desmaresti,es,Tangara de Desmarest
 Tangara dowii,es,Tangara Caripinta
 Tangara fastuosa,es,Tangara Sietecolores
-Tangara florida,es,Tangara Florida
+Tangara florida,es,Tangara esmeralda
 Tangara fucosa,es,Tangara Nuquiverde
 Tangara gyrola,es,Tangara Cabecibaya
 Tangara icterocephala,es,Tangara Goliplateada
@@ -117124,7 +117124,7 @@ Tangara rufigenis,es,Tangara Carirrufa
 Tangara schrankii,es,Tangara de Schrank
 Tangara seledon,es,Tangara Arcoiris
 Tangara vassorii,es,Tangara Azulinegra
-Tangara velia,es,Tangara Velia
+Tangara velia,es,Tangara lomiopalina
 Tangara xanthocephala,es,Tangara Coronigualda
 Tanna abdominalis,es,Tanna abdominalis
 Tanna infuscata,es,Tanna infuscata
@@ -118925,7 +118925,7 @@ Amazona collaria,es_ec,Amazona Jamaicana Piquiclara
 Amazona diadema,es_ec,Amazona de Diadema
 Amazona dufresniana,es_ec,Loro Cariazul
 Amazona farinosa,es_ec,Amazona Harinosa
-Amazona festiva,es_ec,Amazona Festiva
+Amazona festiva,es_ec,Amazona Festiva Sureña
 Amazona finschi,es_ec,Amazona Guayabera
 Amazona guildingii,es_ec,Amazona de San Vicente
 Amazona imperialis,es_ec,Amazona Imperial
@@ -119434,7 +119434,7 @@ Aramides ypecaha,es_ec,Ipacaá
 Aramidopsis plateni,es_ec,Rascón de Platen
 Aramus guarauna,es_ec,Carrao
 Aratinga auricapillus,es_ec,Aratinga Testadorada
-Aratinga jandaya,es_ec,Aratinga Jandaya
+Aratinga jandaya,es_ec,Cotorra Jandaya
 Aratinga maculata,es_ec,Aratinga Pechisulfúrea
 Aratinga nenday,es_ec,Ñanday
 Aratinga solstitialis,es_ec,Aratinga Sol
@@ -146527,7 +146527,7 @@ Amazona collaria,es_mx,Amazona Jamaicana Piquiclara
 Amazona diadema,es_mx,Loro Brasileño
 Amazona dufresniana,es_mx,Amazona Cariazul
 Amazona farinosa,es_mx,Loro Corona Azul
-Amazona festiva,es_mx,Amazona Festiva
+Amazona festiva,es_mx,Amazona Festiva Sureña
 Amazona finschi,es_mx,Loro Corona Lila
 Amazona guildingii,es_mx,Amazona de San Vicente
 Amazona imperialis,es_mx,Amazona Imperial
@@ -146539,7 +146539,7 @@ Amazona ochrocephala,es_mx,Amazona Real
 Amazona oratrix,es_mx,Loro Cabeza Amarilla
 Amazona pretrei,es_mx,Amazona Charao
 Amazona rhodocorytha,es_mx,Amazona Coronirroja
-Amazona tucumana,es_mx,Amazona Tucumana
+Amazona tucumana,es_mx,Loro Alisero
 Amazona ventralis,es_mx,Amazona de la Española
 Amazona versicolor,es_mx,Amazona de Santa Lucía
 Amazona vinacea,es_mx,Amazona Vinosa
@@ -147036,7 +147036,7 @@ Aramides ypecaha,es_mx,Cotara Ipacaá
 Aramidopsis plateni,es_mx,Rascón de Platen
 Aramus guarauna,es_mx,Carrao
 Aratinga auricapillus,es_mx,Aratinga Testadorada
-Aratinga jandaya,es_mx,Aratinga Jandaya
+Aratinga jandaya,es_mx,Cotorra Jandaya
 Aratinga maculata,es_mx,Aratinga Pechisulfúrea
 Aratinga nenday,es_mx,Perico Ñanday
 Aratinga solstitialis,es_mx,Aratinga Sol
@@ -147314,7 +147314,7 @@ Atlapetes semirufus,es_mx,Atlapetes Semirrufo
 Atlapetes taczanowskii,es_mx,Atlapetes de Taczanowskii
 Atlapetes terborghi,es_mx,Atlapetes de Vilcabamba
 Atlapetes tibialis,es_mx,Cerquero Musliamarillo
-Atlapetes tricolor,es_mx,Atlapetes Tricolor
+Atlapetes tricolor,es_mx,Matorralero Tricolor
 Atrapsalta audax,es_mx,Adelaide Black Squeaker
 Atrapsalta collina,es_mx,Sandstone Squeaker
 Atrapsalta corticina,es_mx,Bark Squeaker
@@ -158513,7 +158513,7 @@ Tangara cyanoventris,es_mx,Tangara Ventriazul
 Tangara desmaresti,es_mx,Tangara de Desmarest
 Tangara dowii,es_mx,Tangara Caripinta
 Tangara fastuosa,es_mx,Tangara Sietecolores
-Tangara florida,es_mx,Tangara Florida
+Tangara florida,es_mx,Tangara Esmeralda
 Tangara fucosa,es_mx,Tangara Nuquiverde
 Tangara gyrola,es_mx,Tangara Cabecibaya
 Tangara icterocephala,es_mx,Tangara Goliplateada
@@ -158528,7 +158528,7 @@ Tangara rufigenis,es_mx,Tangara Carirrufa
 Tangara schrankii,es_mx,Tangara de Schrank
 Tangara seledon,es_mx,Tangara Arcoiris
 Tangara vassorii,es_mx,Tangara Azulinegra
-Tangara velia,es_mx,Tangara Velia
+Tangara velia,es_mx,Tangara Lomiopalina
 Tangara xanthocephala,es_mx,Tangara Coronigualda
 Tanna abdominalis,es_mx,Tanna abdominalis
 Tanna infuscata,es_mx,Tanna infuscata
@@ -159516,7 +159516,7 @@ Vireo brevipennis,es_mx,Vireo Pizarra
 Vireo caribaeus,es_mx,Vireo de San Andrés
 Vireo carmioli,es_mx,Vireo Aliamarillo
 Vireo cassinii,es_mx,Vireo de Cassin
-Vireo chivi,es_mx,Vireo Chivi
+Vireo chivi,es_mx,Chiví
 Vireo crassirostris,es_mx,Vireo Piquigrueso
 Vireo flavifrons,es_mx,Vireo Garganta Amarilla
 Vireo flavoviridis,es_mx,Vireo Verdeamarillo
@@ -203874,7 +203874,7 @@ Chalinolobus morio,fr,Chocolate Wattled Bat
 Chalinolobus neocaledonicus,fr,Chalinolobe néo-calédonien
 Chalinolobus nigrogriseus,fr,Hoary Wattled Bat
 Chalinolobus picatus,fr,Little Pied Bat
-Chalinolobus tuberculatus,fr,Chalinolobus Tuberculatus
+Chalinolobus tuberculatus,fr,Chalinolobe de Nouvelle-Zélande
 Chalybura buffonii,fr,Colibri de Buffon
 Chalybura urochrysia,fr,Colibri à queue bronzée
 Chamaea fasciata,fr,Cama brune
@@ -251698,9 +251698,9 @@ Erythropitta dohertyi,it,Pitta delle Sula
 Erythropitta erythrogaster,it,Pitta panciarossa
 Erythropitta granatina,it,Pitta granata
 Erythropitta ussheri,it,Pitta testanera
-Erythrura hyperythra,it,Erythrura Hyperythra
+Erythrura hyperythra,it,Diamante pettofulvo
 Erythrura trichroa,it,Diamante facciazzurra
-Erythrura tricolor,it,Erythrura Tricolor
+Erythrura tricolor,it,Diamante tricolore
 Esacus magnirostris,it,Esacus giganteus
 Esacus recurvirostris,it,Occhione maggiore
 Estrilda astrild,it,Astrilde di Sant'Elena
@@ -253303,8 +253303,8 @@ Morococcyx erythropygus,it,Cuculo terragnolo minore
 Morphnarchus princeps,it,Poiana barrata
 Morphnus guianensis,it,Aquila crestata
 Morus bassanus,it,Sula
-Morus capensis,it,morus capensis
-Morus serrator,it,morus serrator
+Morus capensis,it,Sula del Capo
+Morus serrator,it,Sula australiana
 Motacilla aguimp,it,Ballerina nera africana
 Motacilla alba,it,Ballerina bianca
 Motacilla capensis,it,Ballerina del Capo
@@ -254480,8 +254480,8 @@ Poecilotriccus plumbeiceps,it,Pigliamosche todo facciaocra
 Poecilotriccus ruficeps,it,Tiranno todo caporossiccio
 Poecilotriccus russatus,it,Pigliamosche todo rossicico
 Poecilotriccus sylvia,it,Pigliamosche todo testardesia
-Poephila cincta,it,Poephila Cincta
-Poephila personata,it,Poephila Personata
+Poephila cincta,it,Diamante golanera
+Poephila personata,it,Diamante mascherato
 Pogoniulus atroflavus,it,Barbettino culorosso
 Pogoniulus bilineatus,it,Barbettino groppagialla
 Pogoniulus chrysoconus,it,Barbettino frontegialla
@@ -256101,7 +256101,7 @@ Turnix suscitator,it,Quaglia tridattila barrata
 Turnix sylvaticus,it,Quaglia tridattila
 Turnix varius,it,Quaglia tridattila pittata
 Turtur abyssinicus,it,Tortora boschereccia becconero
-Turtur afer,it,Turtur Afer
+Turtur afer,it,Tortora macchiata di blu
 Turtur brehmeri,it,Tortora boschereccia testazzurra
 Turtur chalcospilos,it,Tortora boschereccia macchiesmeraldo
 Turtur tympanistria,it,Tortora tamburina
@@ -256267,7 +256267,7 @@ Xenoglaux loweryi,it,Civetta baffuta
 Xenopipo atronitens,it,Manachino nero
 Xenopirostris damii,it,Vanga di Van Dam
 Xenopirostris polleni,it,Vanga di Pollen
-Xenopirostris xenopirostris,it,Xenopirostris Xenopirostris
+Xenopirostris xenopirostris,it,Vanga di Lafresnaye
 Xenops minutus,it,Xenope disadorno
 Xenops rutilans,it,Xenope striato
 Xenops tenuirostris,it,Xenope beccosottile
@@ -359349,7 +359349,7 @@ Vanellus spinosus,ro,Nagâț sudic
 Vanellus vanellus,ro,nagâț
 Vehicle,ro,Vehicul
 Vehicle_horn_and_car_horn_and_honking,ro,Claxonul vehiculului și claxonul mașinii și claxonul
-Vespa crabro,ro,vespa crabro
+Vespa crabro,ro,Gărgăun
 Vespertilio murinus,ro,Liliac bicolor
 Vicugna vicugna,ro,Vicuña
 Vombatus ursinus,ro,vombat comun

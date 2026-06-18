@@ -46,6 +46,7 @@ import os
 import re
 import sys
 import time
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -130,6 +131,43 @@ _GENUS_LABEL = re.compile(r"(属|亜?科|族|\bsspp?\.?\b|\bspp?\.$)")
 
 def is_rank_label(name):
     return bool(_GENUS_LABEL.search(name))
+
+
+def _ascii_fold(s):
+    return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
+
+
+def _lev(a, b):
+    if a == b:
+        return 0
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        for j, cb in enumerate(b, 1):
+            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca != cb)))
+        prev = cur
+    return prev[-1]
+
+
+def is_sci_echo(name, sci):
+    """True when a candidate is really just the scientific name in disguise: a
+    leftover bracket fragment, or within a small edit distance of the binomial
+    (catches a misspelled genus + epithet like 'Paradoxorni unicolor' or
+    '(ara) ararauna', without rejecting genuine names that merely start with the
+    genus word such as 'Tangara esmeralda')."""
+    if any(ch in name for ch in "()[]"):
+        return True
+    a = " ".join(re.sub(r"[^a-z ]", " ", _ascii_fold(name.lower())).split())
+    b = " ".join(re.sub(r"[^a-z ]", " ", _ascii_fold(sci.lower())).split())
+    return _lev(a, b) <= 2
+
+
+# Specific (scientific name, locale) candidates rejected after manual review: the
+# GBIF vernacular is the wrong language for the slot (e.g. an English name offered
+# for French). Kept here so the reason is documented and the run stays reproducible.
+SKIP = {
+    ("Galago moholi", "fr"),   # GBIF "Mohol galago" is English, not French
+}
 
 
 def load_json(path):
@@ -411,7 +449,9 @@ def main():
                 pick = wd_pick(wv.get(wdl, []), sci, loc)
                 if pick:
                     name, source = pick, "Wikidata"
-            if not name or is_rank_label(name):
+            if not name or is_rank_label(name) or is_sci_echo(name, sci):
+                continue
+            if (sci, loc) in SKIP:
                 continue
             name = clean_name(name, loc)
             # Curated-safe: only write over a shadow (value == scientific name,
