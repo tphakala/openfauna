@@ -55477,7 +55477,7 @@ Myotis chiloensis,cy,Chilean myotis
 Myotis ciliolabrum,cy,Western Small-footed Myotis
 Myotis crypticus,cy,Cryptic Myotis
 Myotis dasycneme,cy,pond bat
-Myotis daubentonii,cy,Myotis daubentonii
+Myotis daubentonii,cy,Ystlum y dŵr
 Myotis emarginatus,cy,Geoffroy's Bat
 Myotis evotis,cy,Long-eared Myotis
 Myotis fimbriatus,cy,Fringed Long-footed Myotis
@@ -55492,9 +55492,9 @@ Myotis lucifugus,cy,Little Brown Bat
 Myotis macropus,cy,Southern Myotis
 Myotis martiniquensis,cy,Schwartz's myotis
 Myotis muricola,cy,Whiskered Myotis
-Myotis myotis,cy,Myotis myotis
-Myotis mystacinus,cy,Myotis mystacinus
-Myotis nattereri,cy,Myotis nattereri
+Myotis myotis,cy,Ystlum clustlydan mawr
+Myotis mystacinus,cy,Ystlum barfog
+Myotis nattereri,cy,Ystlum Natterer
 Myotis nigricans,cy,Black Myotis
 Myotis occultus,cy,Arizona Myotis
 Myotis oxyotus,cy,montane myotis
@@ -55935,8 +55935,8 @@ Numida meleagris,cy,Iâr gini helmog
 Nyctalus aviator,cy,Birdlike Noctule
 Nyctalus azoreum,cy,Azores Noctule
 Nyctalus lasiopterus,cy,Giant Noctule
-Nyctalus leisleri,cy,Nyctalus leisleri
-Nyctalus noctula,cy,Nyctalus noctula
+Nyctalus leisleri,cy,Ystlum Leisler
+Nyctalus noctula,cy,Ystlum mawr
 Nyctalus plancyi,cy,Chinese Noctule
 Nyctanassa carcinocatactes,cy,Bermuda Night Heron
 Nyctanassa violacea,cy,Yellow-crowned Night Heron
@@ -57039,7 +57039,7 @@ Phoenicurus phoenicurus,cy,Tingoch
 Phoenicurus schisticeps,cy,Tingoch gyddfwyn
 Pholia sharpii,cy,Drudwen Sharpe
 Pholidoptera aptera,cy,Alpine Dark Bush-cricket
-Pholidoptera griseoaptera,cy,Pholidoptera griseoaptera
+Pholidoptera griseoaptera,cy,Criced y llwyni tywyll
 Pholidornis rushiae,cy,Cwyrbig cwta
 Phonipara canora,cy,Twinc gwair Ciwba
 Phonygammus keraudrenii,cy,Trumpet Manucode
@@ -57308,9 +57308,9 @@ Pipistrellus abramus,cy,Japanese Pipistrelle
 Pipistrellus javanicus,cy,Javan pipistrelle
 Pipistrellus kuhlii,cy,Kuhl's pipistrelle
 Pipistrellus maderensis,cy,Madeira pipistrelle
-Pipistrellus nathusii,cy,Pipistrellus nathusii
-Pipistrellus pipistrellus,cy,Pipistrellus pipistrellus
-Pipistrellus pygmaeus,cy,Pipistrellus pygmaeus
+Pipistrellus nathusii,cy,Ystlum Nathusius
+Pipistrellus pipistrellus,cy,Ystlum lleiaf
+Pipistrellus pygmaeus,cy,Ystlum lleiaf meinlais
 Pipistrellus tenuis,cy,least pipistrelle
 Pipra aureola,cy,Manacin pen gwaetgoch
 Pipra fasciicauda,cy,Manacin cynffonresog
@@ -57426,8 +57426,8 @@ Platysteira cyanea,cy,Llygad-dagell gyddf-frown
 Platysteira jamesoni,cy,Llygad-dagell Jameson
 Platysteira laticincta,cy,Llygad-dagell Bamenda
 Platysteira peltata,cy,Llygad-dagell torchog
-Plecotus auritus,cy,Plecotus auritus
-Plecotus austriacus,cy,Plecotus austriacus
+Plecotus auritus,cy,Ystlum hirglust
+Plecotus austriacus,cy,Ystlum hirglust llwyd
 Plecotus gaisleri,cy,Gaisler's long-eared bat
 Plecotus kolombatovici,cy,Kolombatovic's long-eared bat
 Plecotus macrobullaris,cy,Mountain Long-eared Bat
@@ -58671,10 +58671,10 @@ Rhinolophus chaseni,cy,Indochinese Horseshoe Bat
 Rhinolophus clivosus,cy,Geoffroy's horseshoe bat
 Rhinolophus creaghi,cy,Creagh's horseshoe bat
 Rhinolophus euryale,cy,Mediterranean horseshoe bat
-Rhinolophus ferrumequinum,cy,Rhinolophus ferrumequinum
+Rhinolophus ferrumequinum,cy,Ystlum pedol mwyaf
 Rhinolophus formosae,cy,Formosan Woolly Horseshoe Bat
 Rhinolophus hildebrandtii,cy,Hildebrandt's horseshoe bat
-Rhinolophus hipposideros,cy,Rhinolophus hipposideros
+Rhinolophus hipposideros,cy,Ystlum pedol lleiaf
 Rhinolophus keyensis,cy,insular horseshoe bat
 Rhinolophus luctus,cy,Woolly Horseshoe Bat
 Rhinolophus megaphyllus,cy,Eastern Horseshoe Bat
@@ -59394,11 +59394,11 @@ Snowornis subalaris,cy,Piha cynffonlwyd
 Somateria fischeri,cy,Hwyaden fwythblu sbectolog
 Somateria mollissima,cy,Hwyaden Fwythblu
 Somateria spectabilis,cy,Hwyaden fwythblu'r Gogledd
-Sorex araneus,cy,Sorex araneus
+Sorex araneus,cy,Llyg cyffredin
 Sorex coronatus,cy,Crowned Shrew
 Sorex fumeus,cy,Smoky Shrew
 Sorex hoyi,cy,American Pygmy Shrew
-Sorex minutus,cy,Sorex minutus
+Sorex minutus,cy,Llyg lleiaf
 Sorex pacificus,cy,Pacific Shrew
 Sorex trowbridgii,cy,Trowbridge's Shrew
 Sotalia guianensis,cy,Guyana Dolphin
@@ -60183,7 +60183,7 @@ Tettigettula pygmea,cy,Tettigettula pygmea
 Tettigonia cantans,cy,Upland Green Bush-cricket
 Tettigonia caudata,cy,Eastern Green Bush-cricket
 Tettigonia orientalis,cy,Japanese Green Bush-Cricket
-Tettigonia viridissima,cy,Tettigonia viridissima
+Tettigonia viridissima,cy,Criced gwyrdd mawr
 Thainycteris torquata,cy,Necklace Sprite
 Thalassarche bulleri,cy,Albatros Buller
 Thalassarche carteri,cy,Albatros ffroenfelyn India
@@ -60982,7 +60982,7 @@ Vespadelus pumilus,cy,Eastern Forest Bat
 Vespadelus regulus,cy,Southern Forest Bat
 Vespadelus troughtoni,cy,Eastern Cave Bat
 Vespadelus vulturnus,cy,Little Forest Bat
-Vespertilio murinus,cy,Vespertilio murinus
+Vespertilio murinus,cy,Ystlum deuliw
 Vidua camerunensis,cy,Cameroon Indigobird
 Vidua chalybeata,cy,Wida pentref
 Vidua codringtoni,cy,Green Indigobird
@@ -104288,7 +104288,7 @@ Gerygone igata,en_uk,Grey Gerygone
 Grallaria griseonucha,en_uk,Grey-naped Antpitta
 Grallaria rufocinerea,en_uk,Bicoloured Antpitta
 Granatellus sallaei,en_uk,Grey-throated Chat
-Gryllus assimilis,en_uk,Gryllus assimilis
+Gryllus assimilis,en_uk,Jamaican field cricket
 Gygis alba,en_uk,White Tern
 Gymnobucco bonapartei,en_uk,Grey-throated Barbet
 Gymnopithys bicolor,en_uk,Bicoloured Antbird
@@ -104371,12 +104371,12 @@ Myiozetetes granadensis,en_uk,Grey-capped Flycatcher
 Myornis senilis,en_uk,Ash-coloured Tapaculo
 Myotis bechsteinii,en_uk,Bechstein's bat
 Myotis brandtii,en_uk,Brandt's bat
-Myotis dasycneme,en_uk,Myotis dasycneme
-Myotis daubentonii,en_uk,Myotis daubentonii
-Myotis emarginatus,en_uk,Myotis emarginatus
-Myotis myotis,en_uk,Myotis myotis
-Myotis mystacinus,en_uk,Myotis mystacinus
-Myotis nattereri,en_uk,Myotis nattereri
+Myotis dasycneme,en_uk,Pond bat
+Myotis daubentonii,en_uk,Daubenton's bat
+Myotis emarginatus,en_uk,Geoffroy's bat
+Myotis myotis,en_uk,Greater mouse-eared bat
+Myotis mystacinus,en_uk,Whiskered bat
+Myotis nattereri,en_uk,Natterer's bat
 Myrmecocichla monticola,en_uk,Mountain Wheatear
 Myrmelastes schistaceus,en_uk,Slate-coloured Antbird
 Myrmotherula menetriesii,en_uk,Grey Antwren
@@ -104389,8 +104389,8 @@ Nonnula frontalis,en_uk,Grey-cheeked Nunlet
 Nucifraga caryocatactes,en_uk,Spotted Nutcracker
 Numenius minutus,en_uk,Little Whimbrel
 Numenius phaeopus,en_uk,Whimbrel
-Nyctalus leisleri,en_uk,Nyctalus leisleri
-Nyctalus noctula,en_uk,Nyctalus noctula
+Nyctalus leisleri,en_uk,Leisler's bat
+Nyctalus noctula,en_uk,Noctule bat
 Ocyceros birostris,en_uk,Indian Grey Hornbill
 Ocyceros gingalensis,en_uk,Sri Lanka Grey Hornbill
 Ocyceros griseus,en_uk,Malabar Grey Hornbill
@@ -104436,7 +104436,7 @@ Pernis ptilorhynchus,en_uk,Crested Honey-buzzard
 Phaethornis griseogularis,en_uk,Grey-chinned Hermit
 Phalaropus fulicarius,en_uk,Grey Phalarope
 Phasianus colchicus,en_uk,Common Pheasant
-Pholidoptera griseoaptera,en_uk,Pholidoptera griseoaptera
+Pholidoptera griseoaptera,en_uk,Dark bush-cricket
 Phrygilus gayi,en_uk,Grey-hooded Sierra Finch
 Phyllastrephus cerviniventris,en_uk,Grey-olive Greenbul
 Phyllomyias griseocapilla,en_uk,Grey-capped Tyrannulet
@@ -104449,15 +104449,15 @@ Piaya cayana,en_uk,Squirrel Cuckoo
 Pica pica,en_uk,Common Magpie
 Picumnus granadensis,en_uk,Greyish Piculet
 Picus canus,en_uk,Grey-headed Woodpecker
-Pipistrellus kuhlii,en_uk,Pipistrellus kuhlii
-Pipistrellus nathusii,en_uk,Pipistrellus nathusii
-Pipistrellus pipistrellus,en_uk,Pipistrellus pipistrellus
-Pipistrellus pygmaeus,en_uk,Pipistrellus pygmaeus
+Pipistrellus kuhlii,en_uk,Kuhl's pipistrelle
+Pipistrellus nathusii,en_uk,Nathusius's pipistrelle
+Pipistrellus pipistrellus,en_uk,Common pipistrelle
+Pipistrellus pygmaeus,en_uk,Soprano pipistrelle
 Piprites griseiceps,en_uk,Grey-headed Piprites
 Piranga bidentata,en_uk,Flame-coloured Tanager
 Platysmurus leucopterus,en_uk,Black Magpie
-Plecotus auritus,en_uk,Plecotus auritus
-Plecotus austriacus,en_uk,Plecotus austriacus
+Plecotus auritus,en_uk,Brown long-eared bat
+Plecotus austriacus,en_uk,Grey long-eared bat
 Plecotus spec.,en_uk,Plecotus spec.
 Ploceus bicolor,en_uk,Forest Weaver
 Pluvialis apricaria,en_uk,European Golden Plover
@@ -104499,8 +104499,8 @@ Rattus norvegicus,en_uk,Brown rat
 Remiz consobrinus,en_uk,Chinese Penduline Tit
 Remiz coronatus,en_uk,White-crowned Penduline Tit
 Remiz pendulinus,en_uk,Eurasian Penduline Tit
-Rhinolophus ferrumequinum,en_uk,Rhinolophus ferrumequinum
-Rhinolophus hipposideros,en_uk,Rhinolophus hipposideros
+Rhinolophus ferrumequinum,en_uk,Greater horseshoe bat
+Rhinolophus hipposideros,en_uk,Lesser horseshoe bat
 Rhipidura albiscapa,en_uk,Grey Fantail
 Rhytipterna simplex,en_uk,Greyish Mourner
 Riparia chinensis,en_uk,Grey-throated Martin
@@ -104519,8 +104519,8 @@ Serinus pusillus,en_uk,Red-fronted Serin
 Setophaga nigrescens,en_uk,Black-throated Grey Warbler
 Setophaga petechia,en_uk,Yellow Warbler
 Snowornis subalaris,en_uk,Grey-tailed Piha
-Sorex araneus,en_uk,Sorex araneus
-Sorex minutus,en_uk,Sorex minutus
+Sorex araneus,en_uk,Common shrew
+Sorex minutus,en_uk,Pygmy shrew
 Spizella pallida,en_uk,Clay-coloured Sparrow
 Sporophila intermedia,en_uk,Grey Seedeater
 Sporophila schistacea,en_uk,Slate-coloured Seedeater
@@ -104549,7 +104549,7 @@ Tangara inornata,en_uk,Plain-coloured Tanager
 Telophorus bocagei,en_uk,Grey-green Bushshrike
 Telophorus viridis,en_uk,Four-coloured Bushshrike
 Tesia cyaniventer,en_uk,Grey-bellied Tesia
-Tettigonia viridissima,en_uk,Tettigonia viridissima
+Tettigonia viridissima,en_uk,Great green bush-cricket
 Tettigoniidea,en_uk,Tettigoniidea
 Thamnophilus murinus,en_uk,Mouse-coloured Antshrike
 Thamnophilus nigrocinereus,en_uk,Blackish-grey Antshrike
@@ -104582,7 +104582,7 @@ Upupa epops,en_uk,Eurasian Hoopoe
 Uria aalge,en_uk,Common Guillemot
 Uria lomvia,en_uk,Brünnich's Guillemot
 Vanellus cinereus,en_uk,Grey-headed Lapwing
-Vespertilio murinus,en_uk,Vespertilio murinus
+Vespertilio murinus,en_uk,Parti-coloured bat
 Vidua funerea,en_uk,Variable Indigobird
 Vireo vicinior,en_uk,Grey Vireo
 Xenerpestes singularis,en_uk,Equatorial Greytail
@@ -104623,39 +104623,39 @@ Myotis austroriparius,en_us,Southeastern myotis
 Myotis bechsteinii,en_us,Bechstein's bat
 Myotis californicus,en_us,California myotis
 Myotis ciliolabrum,en_us,Western small-footed myotis
-Myotis dasycneme,en_us,Myotis dasycneme
-Myotis daubentonii,en_us,Myotis daubentonii
-Myotis emarginatus,en_us,Myotis emarginatus
-Myotis evotis,en_us,Myotis evotis
-Myotis grisescens,en_us,Myotis grisescens
-Myotis leibii,en_us,Myotis leibii
-Myotis lucifugus,en_us,Myotis lucifugus
-Myotis myotis,en_us,Myotis myotis
-Myotis mystacinus,en_us,Myotis mystacinus
-Myotis nattereri,en_us,Myotis nattereri
-Myotis septentrionalis,en_us,Myotis septentrionalis
-Myotis sodalis,en_us,Myotis sodalis
-Myotis thysanodes,en_us,Myotis thysanodes
-Myotis velifer,en_us,Myotis velifer
-Myotis volans,en_us,Myotis volans
-Myotis yumanensis,en_us,Myotis yumanensis
-Nyctalus leisleri,en_us,Nyctalus leisleri
-Nyctalus noctula,en_us,Nyctalus noctula
-Nycticeius humeralis,en_us,Nycticeius humeralis
-Nyctinomops femorosaccus,en_us,Nyctinomops femorosaccus
-Nyctinomops macrotis,en_us,Nyctinomops macrotis
-Parastrellus hesperus,en_us,Parastrellus hesperus
-Perimyotis subflavus,en_us,Perimyotis subflavus
-Pipistrellus kuhlii,en_us,Pipistrellus kuhlii
-Pipistrellus nathusii,en_us,Pipistrellus nathusii
-Pipistrellus pipistrellus,en_us,Pipistrellus pipistrellus
-Pipistrellus pygmaeus,en_us,Pipistrellus pygmaeus
-Plecotus auritus,en_us,Plecotus auritus
-Rhinolophus ferrumequinum,en_us,Rhinolophus ferrumequinum
-Rhinolophus hipposideros,en_us,Rhinolophus hipposideros
-Tadarida brasiliensis,en_us,Tadarida brasiliensis
+Myotis dasycneme,en_us,Pond bat
+Myotis daubentonii,en_us,Daubenton's bat
+Myotis emarginatus,en_us,Geoffroy's bat
+Myotis evotis,en_us,Long-eared myotis
+Myotis grisescens,en_us,Gray bat
+Myotis leibii,en_us,Eastern small-footed myotis
+Myotis lucifugus,en_us,Little brown bat
+Myotis myotis,en_us,Greater mouse-eared bat
+Myotis mystacinus,en_us,Whiskered bat
+Myotis nattereri,en_us,Natterer's bat
+Myotis septentrionalis,en_us,Northern long-eared bat
+Myotis sodalis,en_us,Indiana bat
+Myotis thysanodes,en_us,Fringed myotis
+Myotis velifer,en_us,Cave myotis
+Myotis volans,en_us,Long-legged myotis
+Myotis yumanensis,en_us,Yuma myotis
+Nyctalus leisleri,en_us,Leisler's bat
+Nyctalus noctula,en_us,Noctule bat
+Nycticeius humeralis,en_us,Evening bat
+Nyctinomops femorosaccus,en_us,Pocketed free-tailed bat
+Nyctinomops macrotis,en_us,Big free-tailed bat
+Parastrellus hesperus,en_us,Canyon bat
+Perimyotis subflavus,en_us,Tricolored bat
+Pipistrellus kuhlii,en_us,Kuhl's pipistrelle
+Pipistrellus nathusii,en_us,Nathusius's pipistrelle
+Pipistrellus pipistrellus,en_us,Common pipistrelle
+Pipistrellus pygmaeus,en_us,Soprano pipistrelle
+Plecotus auritus,en_us,Brown long-eared bat
+Rhinolophus ferrumequinum,en_us,Greater horseshoe bat
+Rhinolophus hipposideros,en_us,Lesser horseshoe bat
+Tadarida brasiliensis,en_us,Mexican free-tailed bat
 Tettigoniidea,en_us,Tettigoniidea
-Vespertilio murinus,en_us,Vespertilio murinus
+Vespertilio murinus,en_us,Parti-colored bat
 audiomoth,en_us,audiomoth
 background,en_us,background
 bird,en_us,bird
@@ -112557,9 +112557,9 @@ Myotis capaccinii,es,Murciélago ratonero patudo
 Myotis chiloensis,es,Murcielaguito chileno
 Myotis ciliolabrum,es,Mioto de patas pequeñas occidental
 Myotis crypticus,es,Cryptic Myotis
-Myotis dasycneme,es,Myotis dasycneme
-Myotis daubentonii,es,Myotis daubentonii
-Myotis emarginatus,es,Myotis emarginatus
+Myotis dasycneme,es,Murciélago ratonero lagunero
+Myotis daubentonii,es,Murciélago ratonero ribereño
+Myotis emarginatus,es,Murciélago ratonero pardo
 Myotis evotis,es,Mioto orejudo occidental
 Myotis fimbriatus,es,Fringed Long-footed Myotis
 Myotis formosus,es,Hodgson's Bat
@@ -112573,9 +112573,9 @@ Myotis lucifugus,es,Mioto lucífugo
 Myotis macropus,es,Southern Myotis
 Myotis martiniquensis,es,Schwartz's myotis
 Myotis muricola,es,Ratonero de Gray
-Myotis myotis,es,Myotis myotis
-Myotis mystacinus,es,Myotis mystacinus
-Myotis nattereri,es,Myotis nattereri
+Myotis myotis,es,Murciélago ratonero grande
+Myotis mystacinus,es,Murciélago ratonero bigotudo
+Myotis nattereri,es,Murciélago ratonero de Natterer
 Myotis nigricans,es,Murciélago negro
 Myotis occultus,es,Miotis de Arizona
 Myotis oxyotus,es,Murciélago vespertino montano
@@ -113016,9 +113016,9 @@ Numenius tenuirostris,es,Zarapito Fino
 Numida meleagris,es,Pintada Común
 Nyctalus aviator,es,Birdlike Noctule
 Nyctalus azoreum,es,Nóctulo de las Azores
-Nyctalus lasiopterus,es,Nyctalus lasiopterus
-Nyctalus leisleri,es,Nyctalus leisleri
-Nyctalus noctula,es,Nyctalus noctula
+Nyctalus lasiopterus,es,Nóctulo grande
+Nyctalus leisleri,es,Nóctulo pequeño
+Nyctalus noctula,es,Nóctulo común
 Nyctalus plancyi,es,Chinese Noctule
 Nyctanassa carcinocatactes,es,Martinete de las Bermudas
 Nyctanassa violacea,es,Martinete Coronado
@@ -114388,11 +114388,11 @@ Pipilo naufragus,es,Toquí de las Bermudas
 Pipilo ocai,es,Toquí Acollarado
 Pipistrellus abramus,es,Japanese Pipistrelle
 Pipistrellus javanicus,es,Javan pipistrelle
-Pipistrellus kuhlii,es,Pipistrellus kuhlii
-Pipistrellus maderensis,es,Pipistrellus maderensis
-Pipistrellus nathusii,es,Pipistrellus nathusii
-Pipistrellus pipistrellus,es,Pipistrellus pipistrellus
-Pipistrellus pygmaeus,es,Pipistrellus pygmaeus
+Pipistrellus kuhlii,es,Murciélago de borde claro
+Pipistrellus maderensis,es,Murciélago de Madeira
+Pipistrellus nathusii,es,Murciélago de Nathusius
+Pipistrellus pipistrellus,es,Murciélago enano
+Pipistrellus pygmaeus,es,Murciélago de Cabrera
 Pipistrellus tenuis,es,least pipistrelle
 Pipra aureola,es,Saltarín Cabecinaranja
 Pipra fasciicauda,es,Saltarín Naranja
@@ -115749,15 +115749,15 @@ Rhinoceros unicornis,es,Rinoceronte Indio
 Rhinocrypta lanceolata,es,Gallito Copetón
 Rhinolophus acuminatus,es,acuminate horseshoe bat
 Rhinolophus affinis,es,Intermediate Horseshoe Bat
-Rhinolophus blasii,es,Rhinolophus blasii
+Rhinolophus blasii,es,Murciélago de herradura de Blasius
 Rhinolophus chaseni,es,Indochinese Horseshoe Bat
 Rhinolophus clivosus,es,Murciélago Africano de Herradura
 Rhinolophus creaghi,es,Creagh's horseshoe bat
 Rhinolophus euryale,es,murciélago mediterráneo de herradura
-Rhinolophus ferrumequinum,es,Rhinolophus ferrumequinum
+Rhinolophus ferrumequinum,es,Murciélago grande de herradura
 Rhinolophus formosae,es,Formosan Woolly Horseshoe Bat
 Rhinolophus hildebrandtii,es,Hildebrandt's horseshoe bat
-Rhinolophus hipposideros,es,Rhinolophus hipposideros
+Rhinolophus hipposideros,es,Murciélago pequeño de herradura
 Rhinolophus keyensis,es,insular horseshoe bat
 Rhinolophus luctus,es,Woolly Horseshoe Bat
 Rhinolophus megaphyllus,es,Eastern Horseshoe Bat
@@ -117061,7 +117061,7 @@ Tacua speciosa,es,Chicharra Arlequín
 Tadarida aegyptiaca,es,Murciélago Rabudo Africano
 Tadarida brasiliensis,es,Murciélago cola de ratón de Brasil
 Tadarida insignis,es,East Asian Free-tailed Bat
-Tadarida teniotis,es,Tadarida teniotis
+Tadarida teniotis,es,Murciélago rabudo
 Tadorna cana,es,Tarro Sudafricano
 Tadorna cristata,es,Tarro Crestado
 Tadorna ferruginea,es,Tarro Canelo
@@ -118066,7 +118066,7 @@ Vespadelus pumilus,es,Eastern Forest Bat
 Vespadelus regulus,es,Southern Forest Bat
 Vespadelus troughtoni,es,Eastern Cave Bat
 Vespadelus vulturnus,es,Little Forest Bat
-Vespertilio murinus,es,Vespertilio murinus
+Vespertilio murinus,es,Murciélago bicolor
 Vidua camerunensis,es,Viuda Camerunesa
 Vidua chalybeata,es,Viuda Senegalesa
 Vidua codringtoni,es,Viuda Verdosa
@@ -118733,7 +118733,7 @@ Agapornis lilianae,es_ec,Inseparable de Nyasa
 Agapornis nigrigenis,es_ec,Inseparable Cachetón
 Agapornis personatus,es_ec,Inseparable Cabecinegro
 Agapornis pullarius,es_ec,Inseparable Carirrojo
-Agapornis roseicollis,es_ec,Agapornis roseicollis
+Agapornis roseicollis,es_ec,Inseparable de Namibia
 Agapornis swindernianus,es_ec,Inseparable Acollarado
 Agapornis taranta,es_ec,Inseparable Abisinio
 Agelaioides badius,es_ec,Músico
@@ -132701,7 +132701,7 @@ Amaurospiza concolor,es_es,Semillero azul
 Amaurospiza moesta,es_es,Semillero negruzco
 Amazilia luciae,es_es,Amazilia hondureña
 Amazilia rutila,es_es,Amazilia canela
-Amazilia tzacatl,es_es,Amazilia tzacatl
+Amazilia tzacatl,es_es,Amazilia colirrufa
 Amazilia yucatanensis,es_es,Amazilia yucateca
 Amazilis amazilia,es_es,Amazilia costeña
 Amazona aestiva,es_es,Amazona frentiazul
@@ -133226,7 +133226,7 @@ Aramides ypecaha,es_es,Cotara ipacaá
 Aramidopsis plateni,es_es,Rascón de Platen
 Aramus guarauna,es_es,Carrao
 Aratinga auricapillus,es_es,Aratinga testadorada
-Aratinga jandaya,es_es,Aratinga jandaya
+Aratinga jandaya,es_es,Cotorra jandaya
 Aratinga maculata,es_es,Aratinga pechisulfúrea
 Aratinga nenday,es_es,Aratinga ñanday
 Aratinga solstitialis,es_es,Aratinga sol
@@ -133504,7 +133504,7 @@ Atlapetes semirufus,es_es,Atlapetes semirrufo
 Atlapetes taczanowskii,es_es,Atlapetes de Taczanowskii
 Atlapetes terborghi,es_es,Atlapetes de Vilcabamba
 Atlapetes tibialis,es_es,Cerquero musliamarillo
-Atlapetes tricolor,es_es,Atlapetes tricolor
+Atlapetes tricolor,es_es,Matorralero tricolor
 Atrapsalta audax,es_es,Adelaide Black Squeaker
 Atrapsalta collina,es_es,Sandstone Squeaker
 Atrapsalta corticina,es_es,Bark Squeaker
@@ -144703,7 +144703,7 @@ Tangara cyanoventris,es_es,Tangara ventriazul
 Tangara desmaresti,es_es,Tangara de Desmarest
 Tangara dowii,es_es,Tangara caripinta
 Tangara fastuosa,es_es,Tangara sietecolores
-Tangara florida,es_es,Tangara florida
+Tangara florida,es_es,Tangara esmeralda
 Tangara fucosa,es_es,Tangara nuquiverde
 Tangara gyrola,es_es,Tangara cabecibaya
 Tangara icterocephala,es_es,Tangara goliplateada
@@ -144718,7 +144718,7 @@ Tangara rufigenis,es_es,Tangara carirrufa
 Tangara schrankii,es_es,Tangara de Schrank
 Tangara seledon,es_es,Tangara arcoiris
 Tangara vassorii,es_es,Tangara azulinegra
-Tangara velia,es_es,Tangara velia
+Tangara velia,es_es,Tangara culiopalina
 Tangara xanthocephala,es_es,Tangara coronigualda
 Tanna abdominalis,es_es,Tanna abdominalis
 Tanna infuscata,es_es,Tanna infuscata
@@ -209413,9 +209413,9 @@ Myotis capaccinii,fr,Murin de Capaccini
 Myotis chiloensis,fr,Chilean myotis
 Myotis ciliolabrum,fr,Vespertilion pygmée de l'Ouest
 Myotis crypticus,fr,Murin cryptique
-Myotis dasycneme,fr,Myotis dasycneme
-Myotis daubentonii,fr,Myotis daubentonii
-Myotis emarginatus,fr,Myotis emarginatus
+Myotis dasycneme,fr,Murin des marais
+Myotis daubentonii,fr,Murin de Daubenton
+Myotis emarginatus,fr,Murin à oreilles échancrées
 Myotis evotis,fr,Vespertilion à longues oreilles
 Myotis fimbriatus,fr,Fringed Long-footed Myotis
 Myotis formosus,fr,Hodgson's Bat
@@ -209429,9 +209429,9 @@ Myotis lucifugus,fr,Petite chauve-souris brune
 Myotis macropus,fr,Southern Myotis
 Myotis martiniquensis,fr,Murin de la Martinique
 Myotis muricola,fr,Murin de Gray
-Myotis myotis,fr,Myotis myotis
-Myotis mystacinus,fr,Myotis mystacinus
-Myotis nattereri,fr,Myotis nattereri
+Myotis myotis,fr,Grand murin
+Myotis mystacinus,fr,Murin à moustaches
+Myotis nattereri,fr,Murin de Natterer
 Myotis nigricans,fr,Murin noirâtre
 Myotis occultus,fr,Arizona Myotis
 Myotis oxyotus,fr,montane myotis
@@ -209872,9 +209872,9 @@ Numenius tenuirostris,fr,Courlis à bec grêle
 Numida meleagris,fr,Pintade de Numidie
 Nyctalus aviator,fr,Birdlike Noctule
 Nyctalus azoreum,fr,Noctule des Açores
-Nyctalus lasiopterus,fr,Nyctalus lasiopterus
-Nyctalus leisleri,fr,Nyctalus leisleri
-Nyctalus noctula,fr,Nyctalus noctula
+Nyctalus lasiopterus,fr,Grande noctule
+Nyctalus leisleri,fr,Noctule de Leisler
+Nyctalus noctula,fr,Noctule commune
 Nyctalus plancyi,fr,Chinese Noctule
 Nyctanassa carcinocatactes,fr,Bihoreau des Bermudes
 Nyctanassa violacea,fr,Bihoreau violacé
@@ -211244,11 +211244,11 @@ Pipilo naufragus,fr,Tohi des Bermudes
 Pipilo ocai,fr,Tohi à collier
 Pipistrellus abramus,fr,Japanese Pipistrelle
 Pipistrellus javanicus,fr,Javan pipistrelle
-Pipistrellus kuhlii,fr,Pipistrellus kuhlii
-Pipistrellus maderensis,fr,Pipistrellus maderensis
-Pipistrellus nathusii,fr,Pipistrellus nathusii
-Pipistrellus pipistrellus,fr,Pipistrellus pipistrellus
-Pipistrellus pygmaeus,fr,Pipistrellus pygmaeus
+Pipistrellus kuhlii,fr,Pipistrelle de Kuhl
+Pipistrellus maderensis,fr,Pipistrelle de Madère
+Pipistrellus nathusii,fr,Pipistrelle de Nathusius
+Pipistrellus pipistrellus,fr,Pipistrelle commune
+Pipistrellus pygmaeus,fr,Pipistrelle pygmée
 Pipistrellus tenuis,fr,least pipistrelle
 Pipra aureola,fr,Manakin auréole
 Pipra fasciicauda,fr,Manakin à queue barrée
@@ -212605,15 +212605,15 @@ Rhinoceros unicornis,fr,Rhinocéros Indien
 Rhinocrypta lanceolata,fr,Tourco huppé
 Rhinolophus acuminatus,fr,Acuminate horseshoe bat
 Rhinolophus affinis,fr,Intermediate Horseshoe Bat
-Rhinolophus blasii,fr,Rhinolophus blasii
+Rhinolophus blasii,fr,Rhinolophe de Blasius
 Rhinolophus chaseni,fr,Indochinese Horseshoe Bat
 Rhinolophus clivosus,fr,Rhinolophe de Cretzschmar
 Rhinolophus creaghi,fr,Creagh's horseshoe bat
 Rhinolophus euryale,fr,Rhinolophe euryale
-Rhinolophus ferrumequinum,fr,Rhinolophus ferrumequinum
+Rhinolophus ferrumequinum,fr,Grand rhinolophe
 Rhinolophus formosae,fr,Formosan woolly horseshoe bat
 Rhinolophus hildebrandtii,fr,Rhinolophus hildebrandti
-Rhinolophus hipposideros,fr,Rhinolophus hipposideros
+Rhinolophus hipposideros,fr,Petit rhinolophe
 Rhinolophus keyensis,fr,Insular horseshoe bat
 Rhinolophus luctus,fr,Grand rhinolophe laineux
 Rhinolophus megaphyllus,fr,Eastern Horseshoe Bat
@@ -213917,7 +213917,7 @@ Tacua speciosa,fr,Tacua speciosa
 Tadarida aegyptiaca,fr,Tadaride d'Égypte
 Tadarida brasiliensis,fr,Molosse du Brésil
 Tadarida insignis,fr,East Asian Free-tailed Bat
-Tadarida teniotis,fr,Tadarida teniotis
+Tadarida teniotis,fr,Molosse de Cestoni
 Tadorna cana,fr,Tadorne à tête grise
 Tadorna cristata,fr,Tadorne de Corée
 Tadorna ferruginea,fr,Tadorne casarca
@@ -214922,7 +214922,7 @@ Vespadelus pumilus,fr,Eastern forest bat
 Vespadelus regulus,fr,Southern forest bat
 Vespadelus troughtoni,fr,Eastern cave bat
 Vespadelus vulturnus,fr,Little forest bat
-Vespertilio murinus,fr,Vespertilio murinus
+Vespertilio murinus,fr,Sérotine bicolore
 Vidua camerunensis,fr,Combassou du Cameroun
 Vidua chalybeata,fr,Combassou du Sénégal
 Vidua codringtoni,fr,Combassou de Codrington
@@ -253435,12 +253435,12 @@ Myotis alcathoe,it,Vespertilio di Alcathoe
 Myotis bechsteinii,it,Vespertilio di Bechstein
 Myotis brandtii,it,Vespertilio di Brandt
 Myotis capaccinii,it,Vespertilio di Capaccini
-Myotis dasycneme,it,Myotis dasycneme
-Myotis daubentonii,it,Myotis daubentonii
-Myotis emarginatus,it,Myotis emarginatus
-Myotis myotis,it,Myotis myotis
-Myotis mystacinus,it,Myotis mystacinus
-Myotis nattereri,it,Myotis nattereri
+Myotis dasycneme,it,Vespertilio dasicneme
+Myotis daubentonii,it,Vespertilio di Daubenton
+Myotis emarginatus,it,Vespertilio smarginato
+Myotis myotis,it,Vespertilio maggiore
+Myotis mystacinus,it,Vespertilio mustacchino
+Myotis nattereri,it,Vespertilio di Natterer
 Myrmeciza longipes,it,Formichiere panciabianca
 Myrmecocichla aethiops,it,Sassicola mangiaformiche del nord
 Myrmecocichla arnotti,it,Sassicolo nero testabianca
@@ -253607,9 +253607,9 @@ Numenius minutus,it,Chiurlo nano
 Numenius phaeopus,it,Chiurlo piccolo
 Numenius tahitiensis,it,Chiurlo setoloso
 Numida meleagris,it,Faraona
-Nyctalus lasiopterus,it,Nyctalus lasiopterus
-Nyctalus leisleri,it,Nyctalus leisleri
-Nyctalus noctula,it,Nyctalus noctula
+Nyctalus lasiopterus,it,Nottola gigante
+Nyctalus leisleri,it,Nottola di Leisler
+Nyctalus noctula,it,Nottola comune
 Nyctanassa violacea,it,Nitticora violacea
 Nyctibius aethereus,it,Nittibio codalunga
 Nyctibius bracteatus,it,Nittibio rossiccio
@@ -254317,11 +254317,11 @@ Pipilo chlorurus,it,Touì codaverde
 Pipilo erythrophthalmus,it,Tòui fianchirossi
 Pipilo maculatus,it,Touì macchiato
 Pipilo ocai,it,Touì dal collare
-Pipistrellus kuhlii,it,Pipistrellus kuhlii
-Pipistrellus maderensis,it,Pipistrellus maderensis
-Pipistrellus nathusii,it,Pipistrellus nathusii
-Pipistrellus pipistrellus,it,Pipistrellus pipistrellus
-Pipistrellus pygmaeus,it,Pipistrellus pygmaeus
+Pipistrellus kuhlii,it,Pipistrello albolimbato
+Pipistrellus maderensis,it,Pipistrello di Madera
+Pipistrellus nathusii,it,Pipistrello di Nathusius
+Pipistrellus pipistrellus,it,Pipistrello nano
+Pipistrellus pygmaeus,it,Pipistrello soprano
 Pipra aureola,it,Manachino caposcarlatto
 Pipra fasciicauda,it,Manachino codafasciata
 Pipra filicauda,it,Manachino codafili
@@ -254972,9 +254972,9 @@ Rhinella atacamensis,it,Chaunus atacamensis
 Rhinella granulosa,it,Chaunus granulosus
 Rhinella icterica,it,Chaunus ictericus
 Rhinocrypta lanceolata,it,Gallito crestato
-Rhinolophus blasii,it,Rhinolophus blasii
-Rhinolophus ferrumequinum,it,Rhinolophus ferrumequinum
-Rhinolophus hipposideros,it,Rhinolophus hipposideros
+Rhinolophus blasii,it,Rinolofo di Blasius
+Rhinolophus ferrumequinum,it,Rinolofo maggiore
+Rhinolophus hipposideros,it,Rinolofo minore
 Rhinoplax vigil,it,Bucero dall'elmo
 Rhinopomastus cyanomelas,it,Becco a scimitarra comune
 Rhinortha chlorophaea,it,Malcoa di Raffles
@@ -255650,7 +255650,7 @@ Tachyspiza novaehollandiae,it,Astore grigio
 Tachyspiza soloensis,it,Astore della Cina
 Tachyspiza trinotata,it,Astore codamacchiata
 Tachyspiza virgata,it,Besra
-Tadarida teniotis,it,Tadarida teniotis
+Tadarida teniotis,it,Molosso di Cestoni
 Tadorna cana,it,Casarca del Sudafrica
 Tadorna ferruginea,it,Casarca
 Tadorna tadorna,it,volpoca
@@ -256186,7 +256186,7 @@ Veniliornis passerinus,it,Picchio minore
 Veniliornis spilogaster,it,Picchio macchiebianche
 Vermivora chrysoptera,it,Parula alidorate
 Vermivora cyanoptera,it,Parula aliazzurre
-Vespertilio murinus,it,Vespertilio murinus
+Vespertilio murinus,it,Serotino bicolore
 Vidua chalybeata,it,Vedova dei villaggi
 Vidua fischeri,it,Vedova codapaglia
 Vidua funerea,it,Vedova variabile
@@ -410361,8 +410361,8 @@ Myotis capaccinii,sv,Långfingrad fladdermus
 Myotis chiloensis,sv,Chilean myotis
 Myotis ciliolabrum,sv,Western Small-footed Myotis
 Myotis crypticus,sv,Cryptic Myotis
-Myotis dasycneme,sv,Myotis dasycneme
-Myotis daubentonii,sv,Myotis daubentonii
+Myotis dasycneme,sv,Dammfladdermus
+Myotis daubentonii,sv,Vattenfladdermus
 Myotis emarginatus,sv,Wimperfladdermus
 Myotis evotis,sv,Long-eared Myotis
 Myotis fimbriatus,sv,Fringed Long-footed Myotis
@@ -410377,9 +410377,9 @@ Myotis lucifugus,sv,Little Brown Bat
 Myotis macropus,sv,Southern Myotis
 Myotis martiniquensis,sv,Schwartz's myotis
 Myotis muricola,sv,Whiskered Myotis
-Myotis myotis,sv,Myotis myotis
-Myotis mystacinus,sv,Myotis mystacinus
-Myotis nattereri,sv,Myotis nattereri
+Myotis myotis,sv,Större musöra
+Myotis mystacinus,sv,Mustaschfladdermus
+Myotis nattereri,sv,Fransfladdermus
 Myotis nigricans,sv,Black Myotis
 Myotis occultus,sv,Arizona Myotis
 Myotis oxyotus,sv,montane myotis
@@ -410821,8 +410821,8 @@ Numida meleagris,sv,hjälmpärlhöna
 Nyctalus aviator,sv,Birdlike Noctule
 Nyctalus azoreum,sv,Azores Noctule
 Nyctalus lasiopterus,sv,Jättefladdermus
-Nyctalus leisleri,sv,Nyctalus leisleri
-Nyctalus noctula,sv,Nyctalus noctula
+Nyctalus leisleri,sv,Mindre brunfladdermus
+Nyctalus noctula,sv,Större brunfladdermus
 Nyctalus plancyi,sv,Chinese Noctule
 Nyctanassa carcinocatactes,sv,bermudanatthäger
 Nyctanassa violacea,sv,gulkronad natthäger
@@ -412192,11 +412192,11 @@ Pipilo naufragus,sv,bermudasnårsparv
 Pipilo ocai,sv,halsbandssnårsparv
 Pipistrellus abramus,sv,Japanese Pipistrelle
 Pipistrellus javanicus,sv,Javan pipistrelle
-Pipistrellus kuhlii,sv,Pipistrellus kuhlii
+Pipistrellus kuhlii,sv,Parkpipistrell
 Pipistrellus maderensis,sv,Madeirafladdermus
-Pipistrellus nathusii,sv,Pipistrellus nathusii
-Pipistrellus pipistrellus,sv,Pipistrellus pipistrellus
-Pipistrellus pygmaeus,sv,Pipistrellus pygmaeus
+Pipistrellus nathusii,sv,Trollfladdermus
+Pipistrellus pipistrellus,sv,Sydpipistrell
+Pipistrellus pygmaeus,sv,Dvärgpipistrell
 Pipistrellus tenuis,sv,least pipistrelle
 Pipra aureola,sv,flammanakin
 Pipra fasciicauda,sv,bandstjärtad manakin
@@ -412312,7 +412312,7 @@ Platysteira cyanea,sv,purpurstrupigt fliköga
 Platysteira jamesoni,sv,kongofliköga
 Platysteira laticincta,sv,bamendafliköga
 Platysteira peltata,sv,svartstrupigt fliköga
-Plecotus auritus,sv,Plecotus auritus
+Plecotus auritus,sv,Långörad fladdermus
 Plecotus austriacus,sv,grålångöra
 Plecotus gaisleri,sv,Gaisler's long-eared bat
 Plecotus kolombatovici,sv,Kolombatovic's long-eared bat
@@ -415870,7 +415870,7 @@ Vespadelus pumilus,sv,Eastern Forest Bat
 Vespadelus regulus,sv,Eptesicus regulus
 Vespadelus troughtoni,sv,Eastern Cave Bat
 Vespadelus vulturnus,sv,Eptesicus vulturnus
-Vespertilio murinus,sv,Vespertilio murinus
+Vespertilio murinus,sv,Gråskimlig fladdermus
 Vidua camerunensis,sv,fonioänka
 Vidua chalybeata,sv,byänka
 Vidua codringtoni,sv,zambeziänka
