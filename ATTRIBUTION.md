@@ -32,8 +32,10 @@ This means the taxonomic tree data (Class, Order, Family) inside OpenFauna has a
 
 As OpenFauna expands to include external identifiers and links, those data points are sourced directly from public, open-access databases:
 
-- **Wikipedia**: Article URLs and text snippets are sourced from Wikipedia and are licensed under the Creative Commons Attribution-ShareAlike License (CC BY-SA).
+- **Wikidata**: Each species' Wikipedia link is stored as a language-agnostic Wikidata QID (CC0 1.0) that the consumer resolves to the reader's language at render time. Wikidata is also the source of the curated-media image references (the P18 image claim).
+- **Wikipedia**: Article content reached through the Wikidata QID is licensed under the Creative Commons Attribution-ShareAlike License (CC BY-SA).
 - **iNaturalist**: Species identifiers and taxonomies map to the iNaturalist open taxonomy. Any thumbnails or photos retrieved using these IDs must be individually verified for open-source (CC) licensing on the iNaturalist platform.
+- **Wikimedia Commons**: Curated species images for non-bird taxa are referenced by their stable Commons filename. Each image stores its own license (only Creative Commons or public-domain images are ingested) plus creator and rights-holder attribution; no image bytes are stored and no raw CDN URL is baked in.
 
 ## 4. Localized Common Names (IOC World Bird List, GBIF & Wikidata)
 

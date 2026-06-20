@@ -34,6 +34,7 @@ import json
 import os
 import re
 import sys
+from urllib.parse import urlparse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCALE_DIR = os.path.join(ROOT, "data", "locales")
@@ -41,6 +42,7 @@ ALIASES_FILE = os.path.join(ROOT, "data", "aliases.json")
 METADATA_FILE = os.path.join(ROOT, "data", "metadata.json")
 SOURCES_FILE = os.path.join(ROOT, "data", "sources.json")
 MEDIA_SOURCES_FILE = os.path.join(ROOT, "data", "media_sources.json")
+MEDIA_FILE = os.path.join(ROOT, "data", "media.json")
 SHADOW_ALLOWLIST = os.path.join(ROOT, "data", "validation", "shadow_allowlist.json")
 CURATED_FILE = os.path.join(ROOT, "data", "curated_names.json")
 ECHO_BASELINE = os.path.join(ROOT, "data", "validation", "english_echo_baseline.json")
@@ -108,7 +110,7 @@ class Report:
 def check_structure(report: Report) -> None:
     problems: list[str] = []
     files = locale_paths() + [ALIASES_FILE, METADATA_FILE, SOURCES_FILE,
-                              MEDIA_SOURCES_FILE, SHADOW_ALLOWLIST]
+                              MEDIA_SOURCES_FILE, MEDIA_FILE, SHADOW_ALLOWLIST]
     for path in files:
         rel = os.path.relpath(path, ROOT)
         try:
@@ -389,7 +391,64 @@ def check_media_sources(report: Report) -> None:
         report.ok("media_sources", f"{len(sources)} media sources valid")
 
 
-CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated", "sources", "media_sources")
+def check_media(report: Report) -> None:
+    """data/media.json items must each name a known media source, carry a
+    non-empty id, and carry a mandatory URI license. Mirrors
+    dataset.ValidateMedia so the Python gate and the Go compiler agree."""
+    try:
+        media = load_json(MEDIA_FILE)
+    except (json.JSONDecodeError, FileNotFoundError) as exc:
+        report.fail("media", [f"cannot load media.json: {exc}"])
+        return
+    try:
+        sources = load_json(MEDIA_SOURCES_FILE)
+    except (json.JSONDecodeError, FileNotFoundError) as exc:
+        report.fail("media", [f"cannot load media_sources.json: {exc}"])
+        return
+    if not isinstance(media, dict):
+        report.fail("media", ["media.json: root is not an object"])
+        return
+    problems: list[str] = []
+    count = 0
+    for name, items in media.items():
+        if not isinstance(items, list):
+            problems.append(f"{name}: value is not a list")
+            continue
+        for i, item in enumerate(items):
+            count += 1
+            if not isinstance(item, dict):
+                problems.append(f"{name}[{i}]: item is not an object")
+                continue
+            # Mirror Go's dataset.ValidateMedia, where source/id/license are typed
+            # strings: require a string here too, so a null or non-string value is
+            # rejected rather than coerced (str(None) == "None" would slip through),
+            # and a list source cannot raise TypeError in the membership test.
+            src = item.get("source")
+            if not isinstance(src, str) or not src.strip():
+                problems.append(f"{name}[{i}]: empty source")
+            elif src not in sources:
+                problems.append(f"{name}[{i}]: unknown source {src!r}")
+            media_id = item.get("id")
+            if not isinstance(media_id, str) or not media_id.strip():
+                problems.append(f"{name}[{i}]: empty id")
+            # Match Go's isLicenseURI: an absolute http(s) URI with a host. A bare
+            # "https://" (no host) must fail here too, or it would pass the Python
+            # gate but break the Go compiler.
+            lic = item.get("license")
+            if isinstance(lic, str):
+                parsed_lic = urlparse(lic.strip())
+                lic_ok = parsed_lic.scheme in ("http", "https") and bool(parsed_lic.netloc)
+            else:
+                lic_ok = False
+            if not lic_ok:
+                problems.append(f"{name}[{i}]: license must be a URI")
+    if problems:
+        report.fail("media", problems)
+    else:
+        report.ok("media", f"{count} media item(s) valid")
+
+
+CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated", "sources", "media_sources", "media")
 
 
 def main() -> int:
@@ -449,6 +508,8 @@ def main() -> int:
         check_sources(report)
     if "media_sources" not in args.skip:
         check_media_sources(report)
+    if "media" not in args.skip:
+        check_media(report)
 
     if report.failures:
         print(f"\nFAILED: {report.failures} problem(s) found.")

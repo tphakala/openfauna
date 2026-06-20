@@ -92,10 +92,11 @@ it in `data/validation/shadow_allowlist.json` so the placeholder check accepts i
 The `build/metadata.jsonl` artifact provides a rich taxonomic and external-link layer for every species, one JSON object per line, designed for streaming ingestion and joining with the translation data. Each line carries a `scientific_name`, a nested `taxonomy` object, a `links` map, and an optional `media` array:
 
 ```json
-{"scientific_name":"Aquila chrysaetos","taxonomy":{"class":"Aves","order":"Accipitriformes","family":"Accipitridae","family_common":""},"links":{"inaturalist":{"id":"5074"},"wikipedia":{"id":"Aquila_chrysaetos"}}}
+{"scientific_name":"Aquila chrysaetos","taxonomy":{"class":"Aves","order":"Accipitriformes","family":"Accipitridae","family_common":""},"links":{"inaturalist":{"id":"5074"},"wikipedia":{"id":"Q41181"}}}
+{"scientific_name":"Vulpes vulpes","taxonomy":{"class":"Mammalia","order":"Carnivora","family":"Canidae","family_common":""},"links":{"inaturalist":{"id":"42069"},"wikipedia":{"id":"Q8332"}},"media":[{"source":"wikimedia","id":"Fox at the British Wildlife Centre, Newchapel, Surrey - geograph.org.uk - 2221750.jpg","format":"image/jpeg","width":1865,"height":2802,"aspect_ratio":0.67,"orientation":"portrait","license":"https://creativecommons.org/licenses/by-sa/2.0","creator":"Peter Trimming","rightsHolder":"Peter Trimming"}]}
 ```
 
-`taxonomy` carries `class`/`order`/`family`/`family_common` (GBIF Backbone). `links` is keyed by source id; each entry stores a stable `id` (and an optional `url` override), which the consumer turns into a URL at render time using the matching `data/sources.json` template (so a link can resolve to the reader's language). `media` (populated separately) holds curated image references with license and attribution. Storing ids rather than baked URLs is what lets a new source be added as data only.
+`taxonomy` carries `class`/`order`/`family`/`family_common` (GBIF Backbone). `links` is keyed by source id; each entry stores a stable `id` (and an optional `url` override), which the consumer turns into a URL at render time using the matching `data/sources.json` template (so a link can resolve to the reader's language). The Wikipedia `id` is a language-agnostic Wikidata QID that the registry template resolves to the reader's language via `Special:GoToLinkedPage`; the roughly 13% of species that have no confident QID keep a `url` override pointing at the English article, so Wikipedia coverage stays complete. `media` holds curated, CC-clean image references (license, attribution, dimensions, aspect ratio) for non-bird taxa, by Commons filename, with the thumbnail URL derived at render time. Storing ids rather than baked URLs is what lets a new source be added as data only.
 
 The presentation of each source lives once in the registries:
 
@@ -107,9 +108,9 @@ The presentation of each source lives once in the registries:
 
 ### Future Metadata Expansion
 
-The OpenFauna metadata schema is designed to be extensible. The `links` registry already makes a new external link source a data-only addition. Planned next:
+The OpenFauna metadata schema is designed to be extensible. The `links` registry already makes a new external link source a data-only addition. Landed: language-agnostic Wikidata QID Wikipedia links, and the `media` array seeded with CC-clean Wikimedia Commons images for non-bird taxa (stable Commons filename plus license, attribution, dimensions, and aspect ratio, aligned to Audubon Core, with URLs derived at render time). Planned next:
 
-1. **Curated Media**: The `media` array carries human-curated species images as stable provider ids plus license, attribution, dimensions, and aspect ratio (aligned to Audubon Core), with URLs derived at render time. Focused first on non-bird taxa.
+1. **Broader Curated Media**: extend media to iNaturalist Open Data sources, add hand-curated portrait/landscape pairs, and widen non-bird coverage beyond the first Wikimedia P18 pass.
 2. **Conservation Status**: Integrating IUCN Red List data to highlight endangered or threatened species in detection streams.
 3. **Regional Endemism**: Data mapping species to native geographic continents/regions to improve anomaly detection (e.g., detecting a European bird in North America).
 
@@ -149,6 +150,12 @@ To extract authoritative iNaturalist taxonomy URLs without querying their rate-l
 ```bash
 go run ./cmd/fetch-inaturalist
 ```
+
+To upgrade each Wikipedia link from an English article title to a language-agnostic Wikidata QID (cross-checking the enwiki sitelink against the P225 taxon-name SPARQL lookup) and to seed CC-clean Wikimedia Commons images for non-bird taxa from the Wikidata P18 claim:
+```bash
+go run ./cmd/fetch-wikidata
+```
+It updates `data/metadata.json` and `data/media.json` in place and writes a cross-check report to `data/validation/wikidata_report.json`. Re-running is safe: links that already carry a QID are skipped, and any species without a confident QID keeps its working English-title fallback. Use `--limit N` for a bounded pilot run and `--skip-media` to resolve QIDs only.
 
 ### Backfilling Localized Common Names (IOC & GBIF)
 

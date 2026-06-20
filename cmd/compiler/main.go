@@ -44,6 +44,17 @@ func main() {
 		log.Fatalf("Failed to read locales directory: %v", err)
 	}
 
+	// Load the alias map once; it is identical for every locale. A malformed
+	// aliases file is fatal rather than silently dropping every alias.
+	var aliases map[string]string
+	if aliasesData, err := os.ReadFile(*aliasesFile); err == nil {
+		if err := json.Unmarshal(aliasesData, &aliases); err != nil {
+			log.Fatalf("Failed to parse %s: %v", *aliasesFile, err)
+		}
+	} else if !os.IsNotExist(err) {
+		log.Fatalf("Failed to read %s: %v", *aliasesFile, err)
+	}
+
 	var totalTranslations int
 
 	for _, file := range files {
@@ -64,19 +75,14 @@ func main() {
 			log.Fatalf("Failed to parse JSON in %s: %v", filePath, err)
 		}
 
-		// Apply aliases if the canonical name is translated
-		if aliasesData, err := os.ReadFile(*aliasesFile); err == nil {
-			var aliases map[string]string
-			if err := json.Unmarshal(aliasesData, &aliases); err == nil {
-				for alias, canonical := range aliases {
-					if strings.HasPrefix(alias, "_") {
-						continue // skip comments
-					}
-					if commonName, ok := translations[canonical]; ok {
-						if _, exists := translations[alias]; !exists {
-							translations[alias] = commonName
-						}
-					}
+		// Apply aliases if the canonical name is translated.
+		for alias, canonical := range aliases {
+			if strings.HasPrefix(alias, "_") {
+				continue // skip comments
+			}
+			if commonName, ok := translations[canonical]; ok {
+				if _, exists := translations[alias]; !exists {
+					translations[alias] = commonName
 				}
 			}
 		}
@@ -125,6 +131,16 @@ func main() {
 	}
 	if err := dataset.ValidateMediaSources(mediaSrcs); err != nil {
 		log.Fatalf("Invalid media sources registry: %v", err)
+	}
+	media, err := dataset.LoadMedia(filepath.Join(dataDir, "media.json"))
+	if err != nil {
+		log.Fatalf("Failed to load media: %v", err)
+	}
+	if err := dataset.ValidateMedia(media, mediaSrcs); err != nil {
+		log.Fatalf("Invalid media: %v", err)
+	}
+	if unknown := dataset.MergeMedia(recs, media); len(unknown) > 0 {
+		log.Printf("Warning: %d media entries reference unknown species and were dropped: %v", len(unknown), unknown)
 	}
 
 	if err := dataset.EmitJSONL(filepath.Join(buildDir, "metadata.jsonl"), recs); err != nil {

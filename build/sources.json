@@ -15,6 +15,6 @@
     "name": "Wikipedia",
     "order": 10,
     "icon": "wikipedia",
-    "url": "https://en.wikipedia.org/wiki/{id}"
+    "url": "https://www.wikidata.org/wiki/Special:GoToLinkedPage/{lang}wiki/{id}"
   }
 }
