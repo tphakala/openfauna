@@ -39,6 +39,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCALE_DIR = os.path.join(ROOT, "data", "locales")
 ALIASES_FILE = os.path.join(ROOT, "data", "aliases.json")
 METADATA_FILE = os.path.join(ROOT, "data", "metadata.json")
+SOURCES_FILE = os.path.join(ROOT, "data", "sources.json")
+MEDIA_SOURCES_FILE = os.path.join(ROOT, "data", "media_sources.json")
 SHADOW_ALLOWLIST = os.path.join(ROOT, "data", "validation", "shadow_allowlist.json")
 CURATED_FILE = os.path.join(ROOT, "data", "curated_names.json")
 ECHO_BASELINE = os.path.join(ROOT, "data", "validation", "english_echo_baseline.json")
@@ -105,7 +107,8 @@ class Report:
 
 def check_structure(report: Report) -> None:
     problems: list[str] = []
-    files = locale_paths() + [ALIASES_FILE, METADATA_FILE, SHADOW_ALLOWLIST]
+    files = locale_paths() + [ALIASES_FILE, METADATA_FILE, SOURCES_FILE,
+                              MEDIA_SOURCES_FILE, SHADOW_ALLOWLIST]
     for path in files:
         rel = os.path.relpath(path, ROOT)
         try:
@@ -332,7 +335,61 @@ def check_curated(report: Report, en: dict) -> None:
         report.ok("curated", f"{n} curated names intact across locales")
 
 
-CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated")
+def check_sources(report: Report) -> None:
+    """data/sources.json must give every link source a name and a url template
+    that contains the {id} placeholder, so the consumer can build a link."""
+    try:
+        sources = load_json(SOURCES_FILE)
+    except (json.JSONDecodeError, FileNotFoundError) as exc:
+        report.fail("sources", [f"cannot load sources.json: {exc}"])
+        return
+    if not isinstance(sources, dict):
+        report.fail("sources", ["sources.json: root is not an object"])
+        return
+    problems: list[str] = []
+    for key, src in sources.items():
+        if not isinstance(src, dict):
+            problems.append(f"{key}: entry is not an object")
+            continue
+        if not src.get("name"):
+            problems.append(f"{key}: empty name")
+        url = src.get("url", "")
+        if not isinstance(url, str) or "{id}" not in url:
+            problems.append(f"{key}: url missing {{id}} placeholder")
+    if problems:
+        report.fail("sources", problems)
+    else:
+        report.ok("sources", f"{len(sources)} link sources valid")
+
+
+def check_media_sources(report: Report) -> None:
+    """data/media_sources.json must give every media source a name and a thumb
+    template that contains the {id} placeholder, mirroring check_sources."""
+    try:
+        sources = load_json(MEDIA_SOURCES_FILE)
+    except (json.JSONDecodeError, FileNotFoundError) as exc:
+        report.fail("media_sources", [f"cannot load media_sources.json: {exc}"])
+        return
+    if not isinstance(sources, dict):
+        report.fail("media_sources", ["media_sources.json: root is not an object"])
+        return
+    problems: list[str] = []
+    for key, src in sources.items():
+        if not isinstance(src, dict):
+            problems.append(f"{key}: entry is not an object")
+            continue
+        if not src.get("name"):
+            problems.append(f"{key}: empty name")
+        thumb = src.get("thumb", "")
+        if not isinstance(thumb, str) or "{id}" not in thumb:
+            problems.append(f"{key}: thumb missing {{id}} placeholder")
+    if problems:
+        report.fail("media_sources", problems)
+    else:
+        report.ok("media_sources", f"{len(sources)} media sources valid")
+
+
+CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated", "sources", "media_sources")
 
 
 def main() -> int:
@@ -388,6 +445,10 @@ def main() -> int:
         check_english_echo(report, en)
     if "curated" not in args.skip:
         check_curated(report, en)
+    if "sources" not in args.skip:
+        check_sources(report)
+    if "media_sources" not in args.skip:
+        check_media_sources(report)
 
     if report.failures:
         print(f"\nFAILED: {report.failures} problem(s) found.")

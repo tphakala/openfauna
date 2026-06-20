@@ -11,15 +11,9 @@ import (
 	"strings"
 	"sync"
 	"time"
-)
 
-type SpeciesMetadata struct {
-	Class        string `json:"class"`
-	Order        string `json:"order"`
-	Family       string `json:"family"`
-	FamilyCommon string `json:"family_common,omitempty"`
-	WikipediaURL string `json:"wikipedia_url,omitempty"`
-}
+	"github.com/tphakala/openfauna/internal/dataset"
+)
 
 type GBIFResponse struct {
 	Class  string `json:"class"`
@@ -35,7 +29,7 @@ func main() {
 		log.Fatalf("Failed to read %s: %v", metadataPath, err)
 	}
 
-	var metadata map[string]SpeciesMetadata
+	var metadata map[string]dataset.SpeciesRecord
 	if err := json.Unmarshal(data, &metadata); err != nil {
 		log.Fatalf("Failed to parse metadata: %v", err)
 	}
@@ -95,32 +89,28 @@ func main() {
 	wg.Wait()
 	log.Printf("Successfully fetched data for %d genera from GBIF", len(genusData))
 
-	// 3. Update metadata
-	for species, meta := range metadata {
+	// 3. Update metadata taxonomy
+	for species, rec := range metadata {
+		rec.Taxonomy.FamilyCommon = "" // Always clear proprietary eBird family-common names
 		parts := strings.Split(species, " ")
 		if len(parts) > 0 {
 			genus := parts[0]
 			if gbif, ok := genusData[genus]; ok {
-				meta.Class = gbif.Class
-				meta.Order = gbif.Order
-				meta.Family = gbif.Family
-				meta.FamilyCommon = "" // Clear proprietary eBird common names
-				metadata[species] = meta
+				rec.Taxonomy.Class = gbif.Class
+				rec.Taxonomy.Order = gbif.Order
+				rec.Taxonomy.Family = gbif.Family
 			}
 		}
+		metadata[species] = rec
 	}
 
 	// 4. Save back
-	outFile, err := os.Create(metadataPath)
+	buf, err := dataset.MarshalJSON(metadata)
 	if err != nil {
-		log.Fatalf("Failed to create %s: %v", metadataPath, err)
-	}
-	defer outFile.Close()
-
-	encoder := json.NewEncoder(outFile)
-	encoder.SetIndent("", "  ")
-	if err := encoder.Encode(metadata); err != nil {
 		log.Fatalf("Failed to encode metadata: %v", err)
+	}
+	if err := os.WriteFile(metadataPath, buf, 0o644); err != nil {
+		log.Fatalf("Failed to create %s: %v", metadataPath, err)
 	}
 
 	log.Println("Metadata successfully overwritten with pure GBIF (CC0) data!")

@@ -6,16 +6,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-)
 
-type Metadata struct {
-	Class          string `json:"class,omitempty"`
-	Order          string `json:"order,omitempty"`
-	Family         string `json:"family,omitempty"`
-	FamilyCommon   string `json:"family_common,omitempty"`
-	WikipediaURL   string `json:"wikipedia_url,omitempty"`
-	INaturalistURL string `json:"inaturalist_url,omitempty"`
-}
+	"github.com/tphakala/openfauna/internal/dataset"
+)
 
 func main() {
 	metadataPath := "data/metadata.json"
@@ -24,7 +17,7 @@ func main() {
 		log.Fatalf("Failed to read metadata: %v", err)
 	}
 
-	var metadata map[string]Metadata
+	var metadata map[string]dataset.SpeciesRecord
 	if err := json.Unmarshal(data, &metadata); err != nil {
 		log.Fatalf("Failed to parse metadata: %v", err)
 	}
@@ -43,8 +36,7 @@ func main() {
 	csvReader.LazyQuotes = true
 
 	// Skip header
-	_, err = csvReader.Read()
-	if err != nil {
+	if _, err := csvReader.Read(); err != nil {
 		log.Fatalf("Failed to read header: %v", err)
 	}
 
@@ -62,27 +54,30 @@ func main() {
 		taxonID := row[0]
 		name := row[4]
 
-		// Check if we track this species
-		if info, exists := metadata[name]; exists {
-			if info.INaturalistURL == "" {
-				info.INaturalistURL = "https://www.inaturalist.org/taxa/" + taxonID
-				metadata[name] = info
-				count++
-			}
+		// Add the iNaturalist taxon id only for species we track that do not
+		// already carry one. Reading from a nil Links map is safe.
+		rec, exists := metadata[name]
+		if !exists {
+			continue
 		}
+		if _, has := rec.Links["inaturalist"]; has {
+			continue
+		}
+		if rec.Links == nil {
+			rec.Links = map[string]dataset.Link{}
+		}
+		rec.Links["inaturalist"] = dataset.Link{ID: taxonID}
+		metadata[name] = rec
+		count++
 	}
 
-	log.Printf("Added %d new iNaturalist URLs. Saving metadata.json...", count)
+	log.Printf("Added %d new iNaturalist ids. Saving metadata.json...", count)
 
-	outFile, err := os.Create(metadataPath)
+	buf, err := dataset.MarshalJSON(metadata)
 	if err != nil {
-		log.Fatalf("Failed to open metadata for writing: %v", err)
+		log.Fatalf("Failed to encode metadata: %v", err)
 	}
-	defer outFile.Close()
-
-	encoder := json.NewEncoder(outFile)
-	encoder.SetIndent("", "  ")
-	if err := encoder.Encode(metadata); err != nil {
+	if err := os.WriteFile(metadataPath, buf, 0o644); err != nil {
 		log.Fatalf("Failed to write metadata: %v", err)
 	}
 

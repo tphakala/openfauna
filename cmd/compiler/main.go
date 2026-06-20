@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/tphakala/openfauna/internal/dataset"
 )
 
 func main() {
@@ -102,43 +104,42 @@ func main() {
 
 	log.Printf("Successfully compiled %d total translations into %s", totalTranslations, *outputFile)
 
-	// Compile Metadata CSV if available
-	metadataFile := filepath.Join(filepath.Dir(*aliasesFile), "metadata.json")
-	if metadataData, err := os.ReadFile(metadataFile); err == nil {
-		outMetadataFile := filepath.Join(filepath.Dir(*outputFile), "metadata.csv")
-		outMeta, err := os.Create(outMetadataFile)
-		if err != nil {
-			log.Fatalf("Failed to create metadata CSV: %v", err)
-		}
-		defer outMeta.Close()
+	// Compile nested metadata, registries, and the versioned manifest.
+	buildDir := filepath.Dir(*outputFile)
+	dataDir := filepath.Dir(*aliasesFile)
 
-		metaWriter := csv.NewWriter(outMeta)
-		defer metaWriter.Flush()
-
-		if err := metaWriter.Write([]string{"scientific_name", "class", "order", "family", "family_common", "wikipedia_url", "inaturalist_url"}); err != nil {
-			log.Fatalf("Failed to write metadata header: %v", err)
-		}
-
-		var metadata map[string]struct {
-			Class          string `json:"class"`
-			Order          string `json:"order"`
-			Family         string `json:"family"`
-			FamilyCommon   string `json:"family_common"`
-			WikipediaURL   string `json:"wikipedia_url"`
-			INaturalistURL string `json:"inaturalist_url"`
-		}
-		if err := json.Unmarshal(metadataData, &metadata); err == nil {
-			var sciNames []string
-			for name := range metadata {
-				sciNames = append(sciNames, name)
-			}
-			sort.Strings(sciNames)
-
-			for _, sciName := range sciNames {
-				info := metadata[sciName]
-				metaWriter.Write([]string{sciName, info.Class, info.Order, info.Family, info.FamilyCommon, info.WikipediaURL, info.INaturalistURL})
-			}
-			log.Printf("Successfully compiled %d metadata records into %s", len(metadata), outMetadataFile)
-		}
+	recs, err := dataset.LoadMetadata(filepath.Join(dataDir, "metadata.json"))
+	if err != nil {
+		log.Fatalf("Failed to load metadata: %v", err)
 	}
+	srcs, err := dataset.LoadSources(filepath.Join(dataDir, "sources.json"))
+	if err != nil {
+		log.Fatalf("Failed to load sources: %v", err)
+	}
+	if err := dataset.ValidateSources(srcs); err != nil {
+		log.Fatalf("Invalid sources registry: %v", err)
+	}
+	mediaSrcs, err := dataset.LoadMediaSources(filepath.Join(dataDir, "media_sources.json"))
+	if err != nil {
+		log.Fatalf("Failed to load media sources: %v", err)
+	}
+	if err := dataset.ValidateMediaSources(mediaSrcs); err != nil {
+		log.Fatalf("Invalid media sources registry: %v", err)
+	}
+
+	if err := dataset.EmitJSONL(filepath.Join(buildDir, "metadata.jsonl"), recs); err != nil {
+		log.Fatalf("Failed to emit metadata.jsonl: %v", err)
+	}
+	if err := dataset.CopyFile(filepath.Join(dataDir, "sources.json"), filepath.Join(buildDir, "sources.json")); err != nil {
+		log.Fatalf("Failed to copy sources.json: %v", err)
+	}
+	if err := dataset.CopyFile(filepath.Join(dataDir, "media_sources.json"), filepath.Join(buildDir, "media_sources.json")); err != nil {
+		log.Fatalf("Failed to copy media_sources.json: %v", err)
+	}
+	// OpenFauna has no self-provenance string; the consumer's refresh-data.sh
+	// overrides the vendored manifest source with the openfauna commit SHA.
+	if err := dataset.EmitManifest(filepath.Join(buildDir, "manifest.json"), len(recs), "openfauna-build"); err != nil {
+		log.Fatalf("Failed to emit manifest: %v", err)
+	}
+	log.Printf("Compiled %d nested metadata records", len(recs))
 }

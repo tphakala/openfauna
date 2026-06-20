@@ -16,8 +16,9 @@ OpenFauna decouples the "dumb" AI models from the "smart" presentation layer:
 ### The Architecture
 - **`data/locales/`**: Discrete JSON files mapping scientific names to translated common names. Managing thousands of species across 30+ languages in a single CSV file guarantees massive merge conflicts. This repository stores translations per-language in merge-friendly, sparse JSON formats.
 - **`data/aliases.json`**: Centralized mapping of taxonomic reclassifications. When a species is renamed, you add the alias here, and it inherits all translations automatically.
-- **`data/metadata.json`**: Contains rich taxonomy (Class, Order, Family) fetched from the GBIF Backbone Taxonomy, as well as deterministic Wikipedia URLs, keyed by scientific name.
-- **`cmd/compiler/`**: A build tool that compiles all `[locale].json` and `metadata.json` files into flat, highly-optimized CSVs (`translations.csv` and `metadata.csv`) designed for fast ingestion by applications like BirdNET-Go.
+- **`data/metadata.json`**: Per-species record keyed by scientific name, holding nested `taxonomy` (Class, Order, Family from the GBIF Backbone) and `links` (external references stored as stable ids, e.g. an iNaturalist taxon id), plus an optional `media` array.
+- **`data/sources.json`** and **`data/media_sources.json`**: Registries that define each external source once (display name, ordering, icon hint, and a URL template with `{id}`/`{lang}` placeholders). Adding a new link source is a data-only change: add it here plus a `links` id per species, with no consumer code change.
+- **`cmd/compiler/`**: A build tool that compiles the locale files into `translations.csv` and the nested metadata into `metadata.jsonl` (one JSON object per line) alongside the registries and a versioned `manifest.json`, designed for fast, streaming ingestion by applications like BirdNET-Go.
 
 ## For Translators
 
@@ -49,17 +50,23 @@ go run ./cmd/auto-alias
 
 ## For Developers
 
-### Building the Compiled CSVs
+### Building the Compiled Artifacts
 
-To compile the JSON files into flat CSVs for application ingest:
+To compile the JSON sources into the artifacts applications ingest:
 
 ```bash
 go run ./cmd/compiler
 ```
 
-This will generate two artifacts:
+This will generate these artifacts:
 1. `build/translations.csv` with the schema: `scientific_name,locale,common_name`.
-2. `build/metadata.csv` with the schema detailed below.
+2. `build/metadata.jsonl` with one nested JSON object per species (schema below).
+3. `build/sources.json` and `build/media_sources.json`: copies of the source registries.
+4. `build/manifest.json` carrying the `schema_version` (currently `2.0.0`) consumers gate on.
+
+The `build/` artifacts are committed and reproducible; CI fails if they drift from the data.
+
+> Breaking change (schema 2.0.0): the old flat `build/metadata.csv` has been removed. Consumers must read `build/metadata.jsonl` and gate on `build/manifest.json` `schema_version` (major version 2). The previous flat columns now live as nested `taxonomy` and `links` per record.
 
 ### Validating the Data
 
@@ -73,33 +80,36 @@ python3 scripts/validate.py
 It checks JSON structure (sorted keys, trailing newline), alias integrity (no
 scientific name is both a full entry and an alias), scientific-name
 placeholders that would shadow a real English common name, the lowercase naming
-convention for `fi`/`sv`/`no` species names, and stray em/en dashes. It exits
+convention for `fi`/`sv`/`no` species names, stray em/en dashes, and that every
+`data/sources.json` entry has a name and a `{id}` URL template. It exits
 non-zero on any problem, and runs automatically on pull requests via
-`.github/workflows/validate.yml` (which also verifies the compiled CSVs are in
-sync). When a species genuinely has no native common name in a locale, list it
-in `data/validation/shadow_allowlist.json` so the placeholder check accepts it.
+`.github/workflows/validate.yml` (which also verifies the compiled artifacts are
+in sync). When a species genuinely has no native common name in a locale, list
+it in `data/validation/shadow_allowlist.json` so the placeholder check accepts it.
 
 ### Metadata Schema
 
-The `build/metadata.csv` artifact provides a rich taxonomic and external-link layer for every species, designed to be joined with the translation data in your application's database.
+The `build/metadata.jsonl` artifact provides a rich taxonomic and external-link layer for every species, one JSON object per line, designed for streaming ingestion and joining with the translation data. Each line carries a `scientific_name`, a nested `taxonomy` object, a `links` map, and an optional `media` array:
 
-| Column | Description | Source |
-|---|---|---|
-| `scientific_name` | The canonical scientific name of the species (Primary Key). | Target Models |
-| `class` | Taxonomic Class (e.g., *Aves*, *Amphibia*). | GBIF Backbone API |
-| `order` | Taxonomic Order (e.g., *Passeriformes*, *Anura*). | GBIF Backbone API |
-| `family` | Taxonomic Family (e.g., *Corvidae*, *Hylidae*). | GBIF Backbone API |
-| `family_common` | The English common name for the taxonomic family. | GBIF Backbone API |
-| `wikipedia_url` | A deterministic link to the species' English Wikipedia article. | Auto-generated |
-| `inaturalist_url` | The authoritative iNaturalist taxon URL. | iNaturalist Open Data S3 Dump |
+```json
+{"scientific_name":"Aquila chrysaetos","taxonomy":{"class":"Aves","order":"Accipitriformes","family":"Accipitridae","family_common":""},"links":{"inaturalist":{"id":"5074"},"wikipedia":{"id":"Aquila_chrysaetos"}}}
+```
 
-This metadata allows downstream applications to instantly group detections by taxonomic family, build migration charts, and provide users with direct, accurate links to Wikipedia and iNaturalist to learn more about the species they detect.
+`taxonomy` carries `class`/`order`/`family`/`family_common` (GBIF Backbone). `links` is keyed by source id; each entry stores a stable `id` (and an optional `url` override), which the consumer turns into a URL at render time using the matching `data/sources.json` template (so a link can resolve to the reader's language). `media` (populated separately) holds curated image references with license and attribution. Storing ids rather than baked URLs is what lets a new source be added as data only.
+
+The presentation of each source lives once in the registries:
+
+| File | Purpose |
+|---|---|
+| `build/sources.json` | Per link source: `name`, `order`, `icon`, and a `url` template with `{id}`/`{lang}`. |
+| `build/media_sources.json` | Per image source: `name`, `attribution_required`, and a `thumb` template. |
+| `build/manifest.json` | `schema_version` (SemVer), `species_count`, and `source`; consumers read it first and gate on the major version. |
 
 ### Future Metadata Expansion
 
-The OpenFauna metadata schema is designed to be extensible. We are actively planning to expand the dataset to include:
+The OpenFauna metadata schema is designed to be extensible. The `links` registry already makes a new external link source a data-only addition. Planned next:
 
-1. **Curated Thumbnails**: A community-driven, human-curated repository of species thumbnails with standardized aspect ratios and dimensions, optimized for mobile and web UI dashboards.
+1. **Curated Media**: The `media` array carries human-curated species images as stable provider ids plus license, attribution, dimensions, and aspect ratio (aligned to Audubon Core), with URLs derived at render time. Focused first on non-bird taxa.
 2. **Conservation Status**: Integrating IUCN Red List data to highlight endangered or threatened species in detection streams.
 3. **Regional Endemism**: Data mapping species to native geographic continents/regions to improve anomaly detection (e.g., detecting a European bird in North America).
 

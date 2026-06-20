@@ -1,0 +1,12 @@
+{
+  "inaturalist": {
+    "name": "iNaturalist",
+    "attribution_required": true,
+    "thumb": "https://static.inaturalist.org/photos/{id}/{size}.{ext}"
+  },
+  "wikimedia": {
+    "name": "Wikimedia Commons",
+    "attribution_required": true,
+    "thumb": "https://commons.wikimedia.org/wiki/Special:FilePath/{id}?width={w}"
+  }
+}

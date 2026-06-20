@@ -33,12 +33,12 @@ jobs:
         with:
           go-version: "1.26"
 
-      - name: Verify compiled CSVs are in sync
+      - name: Verify compiled artifacts are in sync
         run: |
           go run ./cmd/compiler
           if [ -n "$(git status --porcelain --untracked-files=all -- build/)" ]; then
-            echo "::error::build/ CSVs are stale. Run 'go run ./cmd/compiler' and commit the result."
+            echo "::error::build/ artifacts are stale. Run 'go run ./cmd/compiler' and commit the result."
             git --no-pager status --short -- build/
             exit 1
           fi
-          echo "Compiled CSVs are in sync."
+          echo "Compiled artifacts are in sync."
