@@ -146,6 +146,14 @@ func main() {
 	if err := dataset.EmitJSONL(filepath.Join(buildDir, "metadata.jsonl"), recs); err != nil {
 		log.Fatalf("Failed to emit metadata.jsonl: %v", err)
 	}
+	// Export the taxonomic alias map as a machine-readable artifact. The
+	// translation loop above only uses aliases to duplicate common names; this
+	// is the only place the scientific-to-scientific mapping itself reaches
+	// consumers (e.g. for range-filter and detection name normalization).
+	aliasCount, err := dataset.EmitAliases(filepath.Join(buildDir, "aliases.json"), aliases)
+	if err != nil {
+		log.Fatalf("Failed to emit aliases.json: %v", err)
+	}
 	if err := dataset.CopyFile(filepath.Join(dataDir, "sources.json"), filepath.Join(buildDir, "sources.json")); err != nil {
 		log.Fatalf("Failed to copy sources.json: %v", err)
 	}
@@ -154,8 +162,8 @@ func main() {
 	}
 	// OpenFauna has no self-provenance string; the consumer's refresh-data.sh
 	// overrides the vendored manifest source with the openfauna commit SHA.
-	if err := dataset.EmitManifest(filepath.Join(buildDir, "manifest.json"), len(recs), "openfauna-build"); err != nil {
+	if err := dataset.EmitManifest(filepath.Join(buildDir, "manifest.json"), len(recs), aliasCount, "openfauna-build"); err != nil {
 		log.Fatalf("Failed to emit manifest: %v", err)
 	}
-	log.Printf("Compiled %d nested metadata records", len(recs))
+	log.Printf("Compiled %d nested metadata records and %d taxonomic aliases", len(recs), aliasCount)
 }

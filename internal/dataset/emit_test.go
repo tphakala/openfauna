@@ -44,7 +44,7 @@ func TestEmitJSONLSortedWithName(t *testing.T) {
 
 func TestEmitManifest(t *testing.T) {
 	p := filepath.Join(t.TempDir(), "manifest.json")
-	if err := EmitManifest(p, 42, "openfauna@abc1234 2026-06-20"); err != nil {
+	if err := EmitManifest(p, 42, 7, "openfauna@abc1234 2026-06-20"); err != nil {
 		t.Fatal(err)
 	}
 	var m Manifest
@@ -55,8 +55,60 @@ func TestEmitManifest(t *testing.T) {
 	if err := json.Unmarshal(data, &m); err != nil {
 		t.Fatal(err)
 	}
-	if m.SchemaVersion != SchemaVersion || m.SpeciesCount != 42 || m.Source != "openfauna@abc1234 2026-06-20" {
+	if m.SchemaVersion != SchemaVersion || m.SpeciesCount != 42 || m.AliasCount != 7 || m.Source != "openfauna@abc1234 2026-06-20" {
 		t.Fatalf("manifest = %+v", m)
+	}
+}
+
+func TestFilterAliases(t *testing.T) {
+	raw := map[string]string{
+		"Streptopelia senegalensis": "Spilopelia senegalensis", // kept
+		"Accipiter gentilis":        "Astur gentilis",          // kept
+		"_comment":                  "ignored",                 // dropped: comment key
+		"Empty target":              "",                        // dropped: empty value
+		"Self alias":                "Self alias",              // dropped: no-op
+	}
+	got := FilterAliases(raw)
+	if len(got) != 2 {
+		t.Fatalf("expected 2 aliases, got %d: %v", len(got), got)
+	}
+	if got["Streptopelia senegalensis"] != "Spilopelia senegalensis" {
+		t.Errorf("senegalensis alias missing or wrong: %v", got)
+	}
+	if got["Accipiter gentilis"] != "Astur gentilis" {
+		t.Errorf("gentilis alias missing or wrong: %v", got)
+	}
+	if _, ok := got["_comment"]; ok {
+		t.Error("comment key was not dropped")
+	}
+}
+
+func TestEmitAliases(t *testing.T) {
+	raw := map[string]string{
+		"Streptopelia senegalensis": "Spilopelia senegalensis",
+		"_comment":                  "ignored",
+	}
+	p := filepath.Join(t.TempDir(), "aliases.json")
+	n, err := EmitAliases(p, raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != 1 {
+		t.Fatalf("expected 1 alias written, got %d", n)
+	}
+	data, err := os.ReadFile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var m map[string]string
+	if err := json.Unmarshal(data, &m); err != nil {
+		t.Fatalf("aliases.json not valid json: %v", err)
+	}
+	if m["Streptopelia senegalensis"] != "Spilopelia senegalensis" {
+		t.Errorf("alias mapping wrong: %v", m)
+	}
+	if _, ok := m["_comment"]; ok {
+		t.Error("comment key leaked into aliases.json")
 	}
 }
 

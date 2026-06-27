@@ -18,7 +18,7 @@ OpenFauna decouples the "dumb" AI models from the "smart" presentation layer:
 - **`data/aliases.json`**: Centralized mapping of taxonomic reclassifications. When a species is renamed, you add the alias here, and it inherits all translations automatically.
 - **`data/metadata.json`**: Per-species record keyed by scientific name, holding nested `taxonomy` (Class, Order, Family from the GBIF Backbone) and `links` (external references stored as stable ids, e.g. an iNaturalist taxon id), plus an optional `media` array.
 - **`data/sources.json`** and **`data/media_sources.json`**: Registries that define each external source once (display name, ordering, icon hint, and a URL template with `{id}`/`{lang}` placeholders). Adding a new link source is a data-only change: add it here plus a `links` id per species, with no consumer code change.
-- **`cmd/compiler/`**: A build tool that compiles the locale files into `translations.csv` and the nested metadata into `metadata.jsonl` (one JSON object per line) alongside the registries and a versioned `manifest.json`, designed for fast, streaming ingestion by applications like BirdNET-Go.
+- **`cmd/compiler/`**: A build tool that compiles the locale files into `translations.csv` and the nested metadata into `metadata.jsonl` (one JSON object per line) alongside the registries, the exported `aliases.json` map, and a versioned `manifest.json`, designed for fast, streaming ingestion by applications like BirdNET-Go.
 
 ## For Translators
 
@@ -62,7 +62,8 @@ This will generate these artifacts:
 1. `build/translations.csv` with the schema: `scientific_name,locale,common_name`.
 2. `build/metadata.jsonl` with one nested JSON object per species (schema below).
 3. `build/sources.json` and `build/media_sources.json`: copies of the source registries.
-4. `build/manifest.json` carrying the `schema_version` (currently `2.0.0`) consumers gate on.
+4. `build/aliases.json`: the taxonomic alias map (legacy scientific name -> canonical scientific name), so consumers can normalize reclassified taxa, not just inherit translations.
+5. `build/manifest.json` carrying the `schema_version` (currently `2.1.0`) consumers gate on.
 
 The `build/` artifacts are committed and reproducible; CI fails if they drift from the data.
 
@@ -104,7 +105,8 @@ The presentation of each source lives once in the registries:
 |---|---|
 | `build/sources.json` | Per link source: `name`, `order`, `icon`, and a `url` template with `{id}`/`{lang}`. |
 | `build/media_sources.json` | Per image source: `name`, `attribution_required`, and a `thumb` template. |
-| `build/manifest.json` | `schema_version` (SemVer), `species_count`, and `source`; consumers read it first and gate on the major version. |
+| `build/aliases.json` | Taxonomic alias map: legacy scientific name -> canonical scientific name. Consumers apply it to normalize reclassified taxa (range-filter matching, detection dedup). |
+| `build/manifest.json` | `schema_version` (SemVer), `species_count`, `alias_count`, and `source`; consumers read it first and gate on the major version. |
 
 ### Future Metadata Expansion
 
