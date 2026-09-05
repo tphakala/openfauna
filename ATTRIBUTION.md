@@ -46,6 +46,14 @@ The localized bird common names backfilled to close per-locale coverage gaps are
 
 *Deliberate exclusion:* OpenFauna does **not** ingest BirdNET's own non-English label files as a name source. Those localized names derive from eBird/Clements, whose terms restrict commercial redistribution and are not compatible with CC BY-SA 4.0.
 
+## 5. Aotearoa New Zealand Names (mi, en_nz)
+
+The te reo Māori (`mi`) and English (New Zealand) (`en_nz`) locales carry the official names used in Aotearoa New Zealand:
+
+- **Checklist of the Birds of New Zealand, 5th edition (2022)**, Checklist Committee, Ornithological Society of New Zealand | Te Kāhui Mātai Manu o Aotearoa (Birds New Zealand). Used as the factual reference for each species' official te reo Māori and New Zealand English common name, including macron orthography, via the society's openly published checklist database (https://www.birdsnz.org.nz/society-publications/checklist/). Individual name facts were curated per species; the society's database itself is not redistributed here.
+- Spellings were additionally verified against the checklist's companion research database of recorded Māori and Moriori bird names (Appendix 3 supplementary materials), and cross-checked against the names used in **RNZ's bird collection** (https://www.rnz.co.nz/collections/birds).
+- The `en_nz` locale follows the checklist's own dual-naming convention, Māori name first (e.g. "Pīwakawaka | New Zealand Fantail"); where the te reo name is also the accepted English name (Kea, Weka, Tūī) a single name is used.
+
 ## Summary of Your Obligations
 
 If you use OpenFauna in your application:
