@@ -4,3 +4,7 @@
 # Python bytecode from maintenance scripts
 __pycache__/
 *.pyc
+
+# Design docs, plans, specs, and research notes are kept privately and must
+# never be committed to this public repository.
+docs/
