@@ -427,6 +427,9 @@ func loadExclusions(path string) (exclusions, error) {
 	if err := loadJSONFile(path, &doc); err != nil {
 		return nil, err
 	}
+	if doc.Exclude == nil {
+		return nil, fmt.Errorf("%s: no \"exclude\" object", path)
+	}
 	return doc.Exclude, nil
 }
 
