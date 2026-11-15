@@ -141,6 +141,19 @@ class ValidateTest(unittest.TestCase):
         proc = Tree(self, files).run()
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
 
+    def test_aliases_message_names_the_fix(self):
+        locale = {"Aa bb": "alfa", "Zz yy": "alfa"}
+        cases = {
+            "normal target": ({"Zz yy": "Aa bb"}, "cmd/import-taxonomy merges it"),
+            "empty target": ({"Zz yy": ""}, "retarget the alias"),
+            "alias target": ({"Zz yy": "Zz xx", "Zz xx": "Aa bb"}, "retarget the alias"),
+            "self alias": ({"Zz yy": "Zz yy"}, "retarget the alias"),
+        }
+        for name, (aliases, needle) in cases.items():
+            with self.subTest(name):
+                proc = Tree(self, {"aliases.json": aliases, "locales/sv.json": locale}).run()
+                self.assertFails(proc, "aliases", "sv: 'Zz yy'", needle)
+
     def test_fa_zwnj_rejects_bare_token_and_stray_joiner(self):
         tokens = {"tokens": {"اب": "ا\u200cب"}}
         cases = {

@@ -175,11 +175,14 @@ def check_aliases(report: Report, en: dict) -> None:
     for path in locale_paths():
         loc = locale_name(path)
         for alias in sorted(aliases.keys() & load_json(path).keys()):
-            if not alias.startswith("_"):
-                problems.append(
-                    f"{loc}: {alias!r} is both an alias and a locale entry; its name belongs "
-                    f"under {aliases[alias]!r} (cmd/import-taxonomy merges it)"
-                )
+            if alias.startswith("_"):
+                continue
+            target = aliases[alias]
+            if target == "" or target in aliases:
+                fix = "its target is empty or itself an alias, which cmd/import-taxonomy leaves alone; retarget the alias"
+            else:
+                fix = f"its name belongs under {target!r} (cmd/import-taxonomy merges it)"
+            problems.append(f"{loc}: {alias!r} is both an alias and a locale entry; {fix}")
     for alias, canonical in aliases.items():
         if alias.startswith("_"):
             continue
