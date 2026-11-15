@@ -1,10 +1,14 @@
 {
-  "_comment": "Cells of the BirdNET+ Taxonomy that are known to be wrong and are never imported by cmd/import-taxonomy. Keyed by locale, then scientific name; value is the wrong value, reason says why. An excluded en cell becomes the scientific name. scripts/validate.py fails when a listed value is present in the data.",
+  "_comment": "Cells that are known to be wrong and must not be in the data. Keyed by locale, then scientific name; value is the wrong value, reason says why. cmd/import-taxonomy never imports a listed BirdNET+ Taxonomy cell while upstream still has that value (compared case-insensitively), and an excluded en cell becomes the scientific name. scripts/validate.py fails when a listed value is present in the data.",
   "exclude": {
     "ca": {
       "Chelonoidis niger": {
         "reason": "a scientific subspecies name, not a Catalan name",
         "value": "Chelonoidis niger niger"
+      },
+      "Dryophytes squirellus": {
+        "reason": "a scientific synonym, not a Catalan name",
+        "value": "Hyla squirella"
       },
       "Leptodactylus latrans": {
         "reason": "a scientific synonym, not a Catalan name",
@@ -179,6 +183,10 @@
       "Bufotes pseudoraddei": {
         "reason": "a scientific synonym, not a Swedish name",
         "value": "Pseudepidalea pseudoraddei"
+      },
+      "Dryophytes squirellus": {
+        "reason": "a scientific synonym, not a Swedish name",
+        "value": "Hyla squirella"
       },
       "Leptodactylus latrans": {
         "reason": "a scientific synonym, not a Swedish name",

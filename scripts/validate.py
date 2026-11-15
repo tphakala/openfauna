@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Static data-quality validator for the OpenFauna dataset.
 
-Runs a set of deterministic, network-free checks over data/locales/*.json,
-data/metadata.json and data/aliases.json, and exits non-zero if any check
-fails. Designed to run in CI on every pull request.
+Runs a set of deterministic, network-free checks over the files in data/ and
+exits non-zero if any check fails. Designed to run in CI on every pull request.
 
 Checks (each can be skipped with --skip <name>):
-  structure  JSON parses, keys sorted ascending, file ends with a newline.
+  structure  Every JSON data file (data/locales, data/validation, metadata,
+             aliases, sources, media and curated names) parses to an object, has
+             keys sorted ascending and ends with a newline.
   aliases    No scientific name is both a full locale entry and an alias key;
              every alias canonical resolves (exists in en.json or is an
              allowlisted control label).
@@ -15,16 +16,30 @@ Checks (each can be skipped with --skip <name>):
              data/validation/shadow_allowlist.json. This is the class of bug
              that hid bat common names behind their Latin names.
   casing     In lowercase-convention locales (fi, sv, no) species common names
-             start with a lowercase letter, except separate-word genitive
-             proper nouns (e.g. "Stellers sjolejon", "Thomas' galago"), which
-             those languages keep capitalized.
+             start with a lowercase letter, except what keeps_capital allows:
+             a Latin name in the key's genus, a synonym sharing the key's
+             epithet, and separate-word genitive proper nouns (e.g. "Stellers
+             sjolejon", "Thomas' galago"). It mirrors lowercaseInitial in
+             cmd/import-taxonomy.
   dashes     No common-name value contains an em dash or en dash.
-  exclusions No cell listed in data/validation/taxonomy_exclusions.json is
-             present in the locale data with its listed (wrong) value.
+  english_echo
+             No locale has more untranslated English fallbacks than its count
+             in data/validation/english_echo_baseline.json.
+  curated    Every entry of data/curated_names.json is present verbatim in its
+             locale file.
+  sources    Every link source in data/sources.json has a name and a url with
+             an {id} placeholder.
+  media_sources
+             Every media source in data/media_sources.json has a name and a
+             thumb template with an {id} placeholder.
+  media      Every item in data/media.json names a known source, has an id and
+             carries a license URI.
   labels     For each model label manifest in data/validation/labels/, the
              labels without a metadata record and the labels without a name
              equal data/validation/label_baseline.json exactly, so a change in
              label resolution is always a reviewed one.
+  exclusions No cell listed in data/validation/taxonomy_exclusions.json is
+             present in the locale data with its listed (wrong) value.
 
 Usage:
   python3 scripts/validate.py                 # run all checks
@@ -49,12 +64,13 @@ METADATA_FILE = os.path.join(ROOT, "data", "metadata.json")
 SOURCES_FILE = os.path.join(ROOT, "data", "sources.json")
 MEDIA_SOURCES_FILE = os.path.join(ROOT, "data", "media_sources.json")
 MEDIA_FILE = os.path.join(ROOT, "data", "media.json")
-SHADOW_ALLOWLIST = os.path.join(ROOT, "data", "validation", "shadow_allowlist.json")
+VALIDATION_DIR = os.path.join(ROOT, "data", "validation")
+SHADOW_ALLOWLIST = os.path.join(VALIDATION_DIR, "shadow_allowlist.json")
 CURATED_FILE = os.path.join(ROOT, "data", "curated_names.json")
-ECHO_BASELINE = os.path.join(ROOT, "data", "validation", "english_echo_baseline.json")
-EXCLUSIONS_FILE = os.path.join(ROOT, "data", "validation", "taxonomy_exclusions.json")
-LABELS_DIR = os.path.join(ROOT, "data", "validation", "labels")
-LABEL_BASELINE = os.path.join(ROOT, "data", "validation", "label_baseline.json")
+ECHO_BASELINE = os.path.join(VALIDATION_DIR, "english_echo_baseline.json")
+EXCLUSIONS_FILE = os.path.join(VALIDATION_DIR, "taxonomy_exclusions.json")
+LABELS_DIR = os.path.join(VALIDATION_DIR, "labels")
+LABEL_BASELINE = os.path.join(VALIDATION_DIR, "label_baseline.json")
 
 # Locales whose vernacular species names use a lowercase initial. Verified
 # against the national authorities (Kotus/Luomus, Spakradet/Artdatabanken,
@@ -119,7 +135,8 @@ class Report:
 def check_structure(report: Report) -> None:
     problems: list[str] = []
     files = locale_paths() + [ALIASES_FILE, METADATA_FILE, SOURCES_FILE,
-                              MEDIA_SOURCES_FILE, MEDIA_FILE, SHADOW_ALLOWLIST]
+                              MEDIA_SOURCES_FILE, MEDIA_FILE, SHADOW_ALLOWLIST, CURATED_FILE]
+    files += sorted(set(glob.glob(os.path.join(VALIDATION_DIR, "*.json"))) - set(files))
     for path in files:
         rel = os.path.relpath(path, ROOT)
         try:
@@ -207,30 +224,27 @@ def is_taxon_key(key: str, genus: set[str], en: dict, meta: dict) -> bool:
     return key in meta
 
 
-def is_eponym_first(value: str) -> bool:
-    parts = value.split(" ")
-    if len(parts) < 2:
+def keeps_capital(key: str, value: str) -> bool:
+    """Mirror of lowercaseInitial in cmd/import-taxonomy/main.go; keep the two in step."""
+    words, key_words = value.split(" "), key.split(" ")
+    if words[0] == key_words[0]:
+        return True  # Latin name in the key's genus
+    if len(words) < 2:
         return False
-    head = parts[0]
-    return head.endswith("s") or head.endswith("s’") or head.endswith("s'")
+    head = words[0]
+    # a synonym sharing the key's epithet, or a separate-word genitive eponym
+    return words[-1] == key_words[-1] or head.endswith(("s", "s’", "s'"))
 
 
 def should_be_lowercase(key: str, value: str, genus: set[str], en: dict, meta: dict) -> bool:
     """True when a fi/sv/no taxon value ought to start lowercase but does not."""
     if not is_taxon_key(key, genus, en, meta):
         return False
-    if value == key or not starts_upper(value):
+    if not starts_upper(value):
         return False
     if value == en.get(key) and " " in value:
         return False  # multi-word English-phrase fallback, separate concern
-    head = value.split(" ")[0]
-    if head in genus:
-        return False  # value is itself a scientific (Latin) name
-    if " " in value and value.split(" ")[-1] == key.split(" ")[-1]:
-        return False  # scientific synonym sharing the key's epithet
-    if is_eponym_first(value):
-        return False  # separate-word genitive proper noun keeps its capital
-    return True
+    return not keeps_capital(key, value)
 
 
 def check_casing(report: Report, en: dict, meta: dict) -> None:
@@ -254,7 +268,7 @@ def check_dashes(report: Report) -> None:
     for path in locale_paths():
         loc = locale_name(path)
         for key, value in load_json(path).items():
-            if isinstance(value, str) and ("—" in value or "–" in value):
+            if isinstance(value, str) and ("\u2014" in value or "\u2013" in value):
                 problems.append(f"{loc}: {key!r} -> {value!r} contains an em/en dash")
     if problems:
         report.fail("dashes", problems)
@@ -315,6 +329,11 @@ def check_english_echo(report: Report, en: dict) -> None:
                   f"({sum(counts.values())} total)")
 
 
+def has_name(en: dict, key) -> bool:
+    value = en.get(key)
+    return isinstance(value, str) and bool(value.strip())
+
+
 def label_gaps(en: dict, meta: dict, aliases: dict) -> dict[str, dict]:
     """Per model manifest: label names without a metadata record and label names
     without a common name (neither an en.json key nor an alias of one)."""
@@ -326,7 +345,7 @@ def label_gaps(en: dict, meta: dict, aliases: dict) -> dict[str, dict]:
             "labels": len(names),
             "no_metadata": sorted(n for n in names if n not in meta),
             "no_name": sorted(n for n in names
-                              if n not in en and aliases.get(n) not in en),
+                              if not has_name(en, n) and not has_name(en, aliases.get(n))),
         }
     return gaps
 
@@ -381,16 +400,25 @@ def check_exclusions(report: Report) -> None:
     count = 0
     for loc, cells in excluded.items():
         path = os.path.join(LOCALE_DIR, f"{loc}.json")
+        if not isinstance(cells, dict):
+            problems.append(f"{loc}: the exclusion list is not an object")
+            continue
         if not os.path.exists(path):
             problems.append(f"{loc}: no locale file for the exclusion list")
             continue
         names = load_json(path)
         for sci, cell in cells.items():
             count += 1
-            if not cell.get("reason") or not cell.get("value"):
+            value = cell.get("value") if isinstance(cell, dict) else None
+            reason = cell.get("reason") if isinstance(cell, dict) else None
+            if not (isinstance(value, str) and value.strip() and isinstance(reason, str) and reason.strip()):
                 problems.append(f"{loc}: {sci!r} needs a value and a reason")
-            elif names.get(sci) == cell["value"]:
-                problems.append(f"{loc}: {sci!r} still has the excluded value {cell['value']!r}")
+            elif value != value.strip():
+                problems.append(f"{loc}: {sci!r} has a value with leading or trailing whitespace")
+            else:
+                current = names.get(sci)
+                if isinstance(current, str) and current.casefold() == value.casefold():
+                    problems.append(f"{loc}: {sci!r} still has the excluded value {value!r}")
     if problems:
         report.fail("exclusions", problems)
     else:
@@ -568,7 +596,7 @@ def main() -> int:
             "counts": dict(sorted(counts.items())),
         }
         with open(ECHO_BASELINE, "w", encoding="utf-8") as fh:
-            fh.write(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")
+            fh.write(json.dumps(doc, indent=2, ensure_ascii=False, sort_keys=True) + "\n")
         print(f"wrote {ECHO_BASELINE} ({sum(counts.values())} echoes across {len(counts)} locales)")
         return 0
 
@@ -584,7 +612,7 @@ def main() -> int:
             "no_name": {m: g["no_name"] for m, g in sorted(gaps.items())},
         }
         with open(LABEL_BASELINE, "w", encoding="utf-8") as fh:
-            fh.write(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")
+            fh.write(json.dumps(doc, indent=2, ensure_ascii=False, sort_keys=True) + "\n")
         print(f"wrote {LABEL_BASELINE} ({len(gaps)} models)")
         return 0
 

@@ -17,9 +17,15 @@
 //     an alias of another record stays unresolved.
 //
 // Cells listed in data/validation/taxonomy_exclusions.json (locale, scientific
-// name, wrong value, reason) are never imported; an excluded English cell
-// becomes the scientific name. scripts/validate.py fails when a listed value is
-// present in the data.
+// name, wrong value, reason) are never imported while the taxonomy still has
+// the listed value (compared case-insensitively); a listed entry the taxonomy
+// no longer matches is reported on every run. scripts/validate.py fails when a
+// listed value is present in the data.
+//
+// The English name is the common_name column alone. When it is empty, contains
+// an en or em dash, or is excluded, the scientific name becomes the English
+// name and the species still gets its locale names. Regional English columns
+// (common_name_en_UK and the like) are skipped.
 //
 // Targets are the union of the scientific names in data/validation/labels/*.txt,
 // one name per line (the text before the first "_" of a model label, or the
@@ -163,8 +169,11 @@ func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir, exclusio
 	fmt.Printf("metadata records added: %d\n", rep.metaAdded)
 	fmt.Printf("English names added: %d\n", rep.namesAdded)
 	fmt.Printf("locale values added: %d\n", rep.localeValues)
-	for _, name := range rep.dashSkipped {
-		fmt.Printf("skipped, English name contains a dash: %s\n", name)
+	for _, f := range rep.sciFallback {
+		fmt.Printf("English name set to the scientific name (%s): %s\n", f.reason, f.name)
+	}
+	for _, line := range excl.mismatches(tax) {
+		fmt.Printf("exclusion does not match the taxonomy, update or remove it: %s\n", line)
 	}
 	if dryRun {
 		fmt.Println("dry run: nothing written")
@@ -266,6 +275,7 @@ func loadTaxonomy(path string) (map[string]taxon, [sha256.Size]byte, error) {
 		return nil, sum, err
 	}
 	sum = sha256.Sum256(b)
+	b = bytes.TrimPrefix(b, []byte("\xef\xbb\xbf"))
 	rows, err := csv.NewReader(bytes.NewReader(b)).ReadAll()
 	if err != nil {
 		return nil, sum, fmt.Errorf("read %s: %w", path, err)
@@ -273,26 +283,41 @@ func loadTaxonomy(path string) (map[string]taxon, [sha256.Size]byte, error) {
 	if len(rows) == 0 {
 		return nil, sum, fmt.Errorf("%s is empty", path)
 	}
+	type localeCol struct {
+		stem string
+		idx  int
+	}
 	col := map[string]int{}
+	stemHeader := map[string]string{}
+	var localeCols []localeCol
 	for i, h := range rows[0] {
+		if _, dup := col[h]; dup {
+			return nil, sum, fmt.Errorf("%s: duplicate column %q", path, h)
+		}
 		col[h] = i
+		suffix, ok := strings.CutPrefix(h, "common_name_")
+		if !ok || suffix == "alt" || suffix == "aliases" {
+			continue
+		}
+		stem := localeStem(suffix)
+		// The English name comes from the common_name column alone, the only
+		// English cell the exclusion list, the dash rule and the scientific-name
+		// fallback apply to. OpenFauna's regional English files (en_uk, en_us,
+		// en_nz) are small curated override sets, and a regional column would
+		// otherwise be imported into them as an ordinary locale.
+		if stem == enLocale || strings.HasPrefix(stem, enLocale+"_") {
+			continue
+		}
+		if first, dup := stemHeader[stem]; dup {
+			return nil, sum, fmt.Errorf("%s: columns %q and %q both map to locale %q", path, first, h, stem)
+		}
+		stemHeader[stem] = h
+		localeCols = append(localeCols, localeCol{stem, i})
 	}
 	for _, name := range requiredColumns {
 		if _, ok := col[name]; !ok {
 			return nil, sum, fmt.Errorf("%s has no %q column", path, name)
 		}
-	}
-	type localeCol struct {
-		stem string
-		idx  int
-	}
-	var localeCols []localeCol
-	for h, i := range col {
-		suffix, ok := strings.CutPrefix(h, "common_name_")
-		if !ok || suffix == "en" || suffix == "alt" || suffix == "aliases" {
-			continue
-		}
-		localeCols = append(localeCols, localeCol{localeStem(suffix), i})
 	}
 	tax := make(map[string]taxon, len(rows))
 	for _, r := range rows[1:] {
@@ -395,29 +420,60 @@ type exclusion struct {
 	Reason string `json:"reason"`
 }
 
-// exclusions maps locale stem, then scientific name, to a cell that is never
-// imported. An excluded English cell is replaced by the scientific name.
+// exclusions maps locale stem, then scientific name, to a cell that is not
+// imported while the taxonomy still has that value. An excluded English cell is
+// replaced by the scientific name.
 type exclusions map[string]map[string]exclusion
 
 // validate rejects an entry for a locale without a data file, so a typo in the
-// list cannot silently stop excluding, and an entry without a reason.
+// list cannot silently stop excluding, and an entry without a reason or a value.
+// Taxonomy cells are trimmed, so a padded value could never match.
 func (e exclusions) validate(locales map[string]map[string]string) error {
 	for loc, cells := range e {
 		if _, ok := locales[loc]; !ok {
 			return fmt.Errorf("exclusions: locale %q has no data file", loc)
 		}
 		for sci, x := range cells {
-			if x.Value == "" || x.Reason == "" {
+			if strings.TrimSpace(x.Value) == "" || strings.TrimSpace(x.Reason) == "" {
 				return fmt.Errorf("exclusions: %s %q needs a value and a reason", loc, sci)
+			}
+			if x.Value != strings.TrimSpace(x.Value) {
+				return fmt.Errorf("exclusions: %s %q has a value with leading or trailing whitespace", loc, sci)
 			}
 		}
 	}
 	return nil
 }
 
-func (e exclusions) has(loc, sci string) bool {
-	_, ok := e[loc][sci]
-	return ok
+// matches reports whether the cell value is the listed one. Values compare
+// case-insensitively because a listed value may be the form lowercaseInitial
+// produced, and an entry stops applying once upstream changes the cell.
+func (e exclusions) matches(loc, sci, value string) bool {
+	x, ok := e[loc][sci]
+	return ok && strings.EqualFold(x.Value, value)
+}
+
+// mismatches lists the entries whose taxonomy cell is non-empty and differs from
+// the listed value. A missing row or an empty cell is not a mismatch: such an
+// entry only serves the validate.py check.
+func (e exclusions) mismatches(tax map[string]taxon) []string {
+	var out []string
+	for _, loc := range sortedKeys(e) {
+		for _, sci := range sortedKeys(e[loc]) {
+			t, ok := tax[sci]
+			if !ok {
+				continue
+			}
+			up := t.names[loc]
+			if loc == enLocale {
+				up = t.common
+			}
+			if listed := e[loc][sci].Value; up != "" && !strings.EqualFold(up, listed) {
+				out = append(out, fmt.Sprintf("%s %q: listed %q, taxonomy has %q", loc, sci, listed, up))
+			}
+		}
+	}
+	return out
 }
 
 func loadExclusions(path string) (exclusions, error) {
@@ -435,8 +491,12 @@ func loadExclusions(path string) (exclusions, error) {
 
 type importReport struct {
 	metaAdded, namesAdded, localeValues int
-	dashSkipped                         []string
+	sciFallback                         []fallback
 }
+
+// fallback is a species whose English name became its scientific name for the
+// given reason.
+type fallback struct{ name, reason string }
 
 type rank struct{ class, order, family string }
 
@@ -465,8 +525,9 @@ func genusRanks(meta map[string]dataset.SpeciesRecord) map[string]rank {
 // importSpecies adds, for each target (sorted and unique) that has a species row, a metadata
 // record when none exists and, when the label is neither an alias key nor
 // already named in en.json, its English name and the locale names that
-// existing locale files lack, except the cells listed in excl. Nothing existing
-// is changed.
+// existing locale files lack, except the cells listed in excl. An English name
+// that is empty, dashed or excluded becomes the scientific name (reported in
+// sciFallback, except when excluded). Nothing existing is changed.
 func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclusions) importReport {
 	var rep importReport
 	ranks := genusRanks(s.meta)
@@ -482,15 +543,19 @@ func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclus
 			rep.metaAdded++
 		}
 		_, isAlias := s.aliases[target]
-		if _, named := en[target]; named || isAlias || t.common == "" {
+		if _, named := en[target]; named || isAlias {
 			continue
 		}
 		english := t.common
-		if excl.has(enLocale, target) {
+		switch {
+		case t.common == "":
 			english = target
-		} else if hasDash(t.common) {
-			rep.dashSkipped = append(rep.dashSkipped, target)
-			continue
+			rep.sciFallback = append(rep.sciFallback, fallback{target, "no English name"})
+		case excl.matches(enLocale, target, t.common):
+			english = target
+		case hasDash(t.common):
+			english = target
+			rep.sciFallback = append(rep.sciFallback, fallback{target, "English name contains a dash"})
 		}
 		en[target] = english
 		rep.namesAdded++
@@ -499,10 +564,10 @@ func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclus
 			if loc == enLocale || !ok {
 				continue
 			}
-			if _, exists := s.locales[loc][target]; exists || excl.has(loc, target) {
+			if _, exists := s.locales[loc][target]; exists || excl.matches(loc, target, v) {
 				continue
 			}
-			if v == target || strings.EqualFold(v, t.common) || hasDash(v) {
+			if strings.EqualFold(v, target) || strings.EqualFold(v, t.common) || hasDash(v) {
 				continue
 			}
 			if lowercaseLocales[loc] {
@@ -538,7 +603,8 @@ func newRecord(sci string, t taxon, ranks map[string]rank) dataset.SpeciesRecord
 // (same first word as the key, or sharing its last word) and a separate-word
 // genitive eponym ("Stellers sjolejon"). It reads only the key and the value.
 // The casing check in scripts/validate.py (should_be_lowercase) is the gate on
-// its output.
+// its output and applies the same rule (keeps_capital); both are tested against
+// testdata/lowercase_initial.json.
 func lowercaseInitial(key, value string) string {
 	idx := strings.IndexFunc(value, unicode.IsLetter)
 	if idx < 0 {

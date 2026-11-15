@@ -306,20 +306,22 @@ func seedMedia(c *fetch.Client, meta map[string]dataset.SpeciesRecord, work []st
 	return added, skipped
 }
 
-// report tallies the QID cross-check outcome for the maintainer to review.
+// report tallies the QID cross-check outcome for the maintainer to review. The
+// field order of report and conflict is the sorted key order that
+// scripts/validate.py (check_structure) requires of the written file.
 type report struct {
 	Agree        int        `json:"agree"`
+	Disagree     []conflict `json:"disagree"`
 	MediaAdded   int        `json:"media_added"`
 	MediaSkipped int        `json:"media_skipped"`
-	Disagree     []conflict `json:"disagree"`
 	Unresolved   []conflict `json:"unresolved"`
 }
 
 type conflict struct {
 	Name     string `json:"name"`
-	Title    string `json:"title"`
-	QIDTitle string `json:"qid_title,omitempty"`
 	QIDName  string `json:"qid_name,omitempty"`
+	QIDTitle string `json:"qid_title,omitempty"`
+	Title    string `json:"title"`
 }
 
 func newReport() *report {
@@ -331,9 +333,9 @@ func (r *report) record(status, name, title, qidTitle, qidName string) {
 	case dataset.QIDAgree:
 		r.Agree++
 	case dataset.QIDDisagree:
-		r.Disagree = append(r.Disagree, conflict{name, title, qidTitle, qidName})
+		r.Disagree = append(r.Disagree, conflict{Name: name, Title: title, QIDTitle: qidTitle, QIDName: qidName})
 	case dataset.QIDUnresolved:
-		r.Unresolved = append(r.Unresolved, conflict{name, title, qidTitle, qidName})
+		r.Unresolved = append(r.Unresolved, conflict{Name: name, Title: title, QIDTitle: qidTitle, QIDName: qidName})
 	}
 }
 

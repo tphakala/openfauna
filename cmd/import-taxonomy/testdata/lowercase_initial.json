@@ -1,0 +1,9 @@
+[
+  {"name": "plain capitalized name is lowered", "key": "Pica pica", "value": "Harmaa lintu", "want": "harmaa lintu"},
+  {"name": "eponym keeps its capital", "key": "Pica pica", "value": "Stellers sjolejon", "want": "Stellers sjolejon"},
+  {"name": "synonym sharing the key's epithet", "key": "Pica pica", "value": "Garrulus pica", "want": "Garrulus pica"},
+  {"name": "value in the key's genus", "key": "Osteopilus ocellatus", "value": "Osteopilus brunneus", "want": "Osteopilus brunneus"},
+  {"name": "first letter follows a non-letter", "key": "Pica pica", "value": "“Harmaa” lintu", "want": "“harmaa” lintu"},
+  {"name": "already lowercase", "key": "Pica pica", "value": "harmaa lintu", "want": "harmaa lintu"},
+  {"name": "synonym in another genus is lowered", "key": "Dryophytes squirellus", "value": "Hyla squirella", "want": "hyla squirella"}
+]
