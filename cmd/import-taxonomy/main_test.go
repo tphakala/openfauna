@@ -114,6 +114,8 @@ func mergeFixture() *state {
 			"h":   {"Poo hyp": "Real H", "Poo hypo": "Real H"},         // equal
 			"f":   {"Poo hyp": "Real F", "Poo hypo": "Warbling-Finch"}, // alias echoes, canonical real: canonical kept
 			"k":   {"Two a1": "First", "Two a2": "Second"},             // two aliases, no canonical: sorted first wins
+			"p":   {"Poo hypo": "Warbling Finch"},                      // only the alias, echoing its own English name: dropped
+			"q":   {"Poo hypo": "Poo hypo"},                            // only the alias, echoing its own key: dropped
 			"fa":  {"Poo hypo": bareBrown},                             // moved in its joined form
 			"u":   {"_comment": "kept", "Chain z": "Z", "Self s": "S", "Empty e": "E"},
 		})
@@ -133,6 +135,8 @@ func TestMergeAliasCells(t *testing.T) {
 		"d":   {"Poo hyp": "Real D"},
 		"x":   {},
 		"y":   {},
+		"p":   {},
+		"q":   {},
 		"g":   {"Poo hyp": "Real G"},
 		"h":   {"Poo hyp": "Real H"},
 		"f":   {"Poo hyp": "Real F"},
@@ -143,7 +147,7 @@ func TestMergeAliasCells(t *testing.T) {
 	if !reflect.DeepEqual(s.locales, want) {
 		t.Errorf("locales = %v\nwant %v", s.locales, want)
 	}
-	wantRep := mergeReport{equal: 1, caseOnly: 1, moved: 3, echoReplaced: 2, echoDropped: 2, conflicts: []string{
+	wantRep := mergeReport{equal: 1, caseOnly: 1, moved: 3, echoReplaced: 2, echoDropped: 4, conflicts: []string{
 		`b: "Poo hypo" "Real B2" dropped, "Poo hyp" keeps "Real B1"`,
 		`f: "Poo hypo" "Warbling-Finch" dropped, "Poo hyp" keeps "Real F"`,
 		`k: "Two a2" "Second" dropped, "Two can" keeps "First"`,
@@ -151,8 +155,8 @@ func TestMergeAliasCells(t *testing.T) {
 	if !reflect.DeepEqual(rep, wantRep) {
 		t.Errorf("report = %+v\nwant %+v", rep, wantRep)
 	}
-	if rep.total() != 12 {
-		t.Errorf("total = %d, want 12", rep.total())
+	if rep.total() != 14 {
+		t.Errorf("total = %d, want 14", rep.total())
 	}
 
 	// A second pass finds nothing.
