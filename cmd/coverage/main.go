@@ -95,40 +95,30 @@ func main() {
 	if len(manifests) == 0 {
 		log.Fatalf("no label manifests in %s", labelsDir)
 	}
-	byStem := make(map[string]string, len(manifests))
+	display := map[string]string{}
+	order := map[string]int{}
+	for i, mo := range modelOrder {
+		display[mo.stem] = mo.display
+		order[mo.stem] = i
+	}
+	stemOf := func(path string) string { return strings.TrimSuffix(filepath.Base(path), ".txt") }
+	rank := func(path string) int {
+		if i, ok := order[stemOf(path)]; ok {
+			return i
+		}
+		return len(modelOrder)
+	}
+	sort.SliceStable(manifests, func(i, j int) bool { return rank(manifests[i]) < rank(manifests[j]) })
 	for _, m := range manifests {
-		byStem[strings.TrimSuffix(filepath.Base(m), ".txt")] = m
-	}
-	var stems []string
-	for _, mo := range modelOrder {
-		if _, ok := byStem[mo.stem]; ok {
-			stems = append(stems, mo.stem)
-		}
-	}
-	listed := make(map[string]bool, len(modelOrder))
-	for _, mo := range modelOrder {
-		listed[mo.stem] = true
-	}
-	var extra []string
-	for stem := range byStem {
-		if !listed[stem] {
-			extra = append(extra, stem)
-		}
-	}
-	sort.Strings(extra)
-	stems = append(stems, extra...)
-	for _, stem := range stems {
-		names, err := readLines(byStem[stem])
+		names, err := readLines(m)
 		if err != nil {
-			log.Fatalf("read %s: %v", byStem[stem], err)
+			log.Fatalf("read %s: %v", m, err)
 		}
-		display := stem
-		for _, mo := range modelOrder {
-			if mo.stem == stem {
-				display = mo.display
-			}
+		name := display[stemOf(m)]
+		if name == "" {
+			name = stemOf(m)
 		}
-		calcCoverage(display, names)
+		calcCoverage(name, names)
 	}
 
 	// 6. Output Table

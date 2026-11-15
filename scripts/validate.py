@@ -333,7 +333,7 @@ def check_labels(report: Report, en: dict, meta: dict) -> None:
     one means the baseline is stale. Refresh it after a reviewed data change with
     python3 scripts/validate.py --write-label-baseline."""
     hint = "refresh with: python3 scripts/validate.py --write-label-baseline"
-    if not os.path.isdir(LABELS_DIR) or not glob.glob(os.path.join(LABELS_DIR, "*.txt")):
+    if not glob.glob(os.path.join(LABELS_DIR, "*.txt")):
         report.fail("labels", [f"{os.path.relpath(LABELS_DIR, ROOT)} has no label manifests"])
         return
     if not os.path.exists(LABEL_BASELINE):

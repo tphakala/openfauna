@@ -27,6 +27,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/csv"
 	"encoding/json"
@@ -119,7 +120,7 @@ func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir string, d
 	if err != nil {
 		return err
 	}
-	orig := s.clone()
+	aliasesBefore := len(s.aliases)
 
 	targets, err := loadTargets(labelsDir)
 	if err != nil {
@@ -145,7 +146,7 @@ func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir string, d
 
 	fmt.Printf("taxonomy sha256 %x (%d rows)\n", sum, len(tax))
 	fmt.Printf("targets: %d\n", len(targets))
-	fmt.Printf("aliases: %d -> %d\n", len(orig.aliases), len(s.aliases))
+	fmt.Printf("aliases: %d -> %d\n", aliasesBefore, len(s.aliases))
 	fmt.Printf("metadata records added: %d\n", rep.metaAdded)
 	fmt.Printf("English names added: %d\n", rep.namesAdded)
 	fmt.Printf("locale values added: %d\n", rep.localeValues)
@@ -252,7 +253,7 @@ func loadTaxonomy(path string) (map[string]taxon, [sha256.Size]byte, error) {
 		return nil, sum, err
 	}
 	sum = sha256.Sum256(b)
-	rows, err := csv.NewReader(strings.NewReader(string(b))).ReadAll()
+	rows, err := csv.NewReader(bytes.NewReader(b)).ReadAll()
 	if err != nil {
 		return nil, sum, fmt.Errorf("read %s: %w", path, err)
 	}
@@ -404,7 +405,7 @@ func genusRanks(meta map[string]dataset.SpeciesRecord) map[string]rank {
 	return ranks
 }
 
-// importSpecies adds, for each target that has a species row, a metadata
+// importSpecies adds, for each target (sorted and unique) that has a species row, a metadata
 // record when none exists and, when the label is neither an alias key nor
 // already named in en.json, its English name and the locale names that
 // existing locale files lack. Nothing existing is changed.
@@ -413,7 +414,7 @@ func importSpecies(s *state, tax map[string]taxon, targets []string) importRepor
 	ranks := genusRanks(s.meta)
 	en := s.locales[enLocale]
 	locs := sortedKeys(s.locales)
-	for _, target := range sortedUnique(targets) {
+	for _, target := range targets {
 		t, ok := tax[target]
 		if !ok || t.recType != speciesRecordType {
 			continue
@@ -475,6 +476,8 @@ func newRecord(sci string, t taxon, ranks map[string]rank) dataset.SpeciesRecord
 // except for names the casing convention keeps capitalized: a Latin synonym
 // (same first word as the key, or sharing its last word) and a separate-word
 // genitive eponym ("Stellers sjolejon"). It reads only the key and the value.
+// The casing check in scripts/validate.py (should_be_lowercase) is the gate on
+// its output.
 func lowercaseInitial(key, value string) string {
 	idx := strings.IndexFunc(value, unicode.IsLetter)
 	if idx < 0 {
@@ -507,14 +510,6 @@ func sortedKeys[V any](m map[string]V) []string {
 	return keys
 }
 
-func sortedUnique(in []string) []string {
-	set := make(map[string]bool, len(in))
-	for _, v := range in {
-		set[v] = true
-	}
-	return sortedKeys(set)
-}
-
 // writeState writes every changed file. Locale files other than en.json go
 // first, then metadata.json, en.json and aliases.json last, so an interrupted
 // run is completed by rerunning it.
@@ -545,7 +540,7 @@ func writeIfChanged(path string, v any) error {
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
-	if string(old) == string(out) {
+	if bytes.Equal(old, out) {
 		return nil
 	}
 	tmp := path + ".tmp"
