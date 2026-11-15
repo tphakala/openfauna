@@ -87,6 +87,10 @@
       "Vitreorana eurygnatha": {
         "reason": "truncated Portuguese name in the Spanish locale",
         "value": "ra-de-vidro"
+      },
+      "Vitreorana parvula": {
+        "reason": "truncated Portuguese name in the Spanish locale",
+        "value": "r'-de-vidro"
       }
     },
     "et": {
