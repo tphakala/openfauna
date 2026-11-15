@@ -68,4 +68,3 @@ If you use OpenFauna in your application:
 2. You **must** provide attribution to the IOC World Bird List (Gill, Donsker & Rasmussen, Eds) for the multilingual common names.
 3. You **must** provide attribution to the BirdNET+ Taxonomy in the form given in section 6.
 4. You **must** share any modified translation files under the same CC BY-SA 4.0 license.
-5. You **must not** use the data for prohibited uses outlined in the BirdNET V3.0 terms (e.g., military use, poaching, wildlife exploitation).
