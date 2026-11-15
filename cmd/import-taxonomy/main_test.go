@@ -403,6 +403,9 @@ func TestExclusions_Validate(t *testing.T) {
 	if err := (exclusions{"fa_IR": {"A b": {Value: "x", Reason: "r"}}}).validate(locales); err == nil {
 		t.Errorf("unknown locale accepted")
 	}
+	if err := (exclusions{"de": nil}).validate(locales); err == nil {
+		t.Errorf("null locale list accepted")
+	}
 	if err := (exclusions{"de": {"A b": {Value: "x"}}}).validate(locales); err == nil {
 		t.Errorf("entry without a reason accepted")
 	}

@@ -426,12 +426,16 @@ type exclusion struct {
 type exclusions map[string]map[string]exclusion
 
 // validate rejects an entry for a locale without a data file, so a typo in the
-// list cannot silently stop excluding, and an entry without a reason or a value.
+// list cannot silently stop excluding, a locale whose list is null, and an
+// entry without a reason or a value.
 // Taxonomy cells are trimmed, so a padded value could never match.
 func (e exclusions) validate(locales map[string]map[string]string) error {
 	for loc, cells := range e {
 		if _, ok := locales[loc]; !ok {
 			return fmt.Errorf("exclusions: locale %q has no data file", loc)
+		}
+		if cells == nil {
+			return fmt.Errorf("exclusions: locale %q is not an object", loc)
 		}
 		for sci, x := range cells {
 			if strings.TrimSpace(x.Value) == "" || strings.TrimSpace(x.Reason) == "" {

@@ -84,6 +84,7 @@ class ValidateTest(unittest.TestCase):
     def test_structure_covers_validation_files_and_curated_names(self):
         cases = {
             "validation/extra.json": '{"b": 1, "a": 2}\n',
+            "validation/sub/nested.json": '{"b": 1, "a": 2}\n',
             "curated_names.json": '{"names": {}}',
         }
         for rel, text in cases.items():

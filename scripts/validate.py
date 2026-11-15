@@ -136,7 +136,7 @@ def check_structure(report: Report) -> None:
     problems: list[str] = []
     files = locale_paths() + [ALIASES_FILE, METADATA_FILE, SOURCES_FILE,
                               MEDIA_SOURCES_FILE, MEDIA_FILE, SHADOW_ALLOWLIST, CURATED_FILE]
-    files += sorted(set(glob.glob(os.path.join(VALIDATION_DIR, "*.json"))) - set(files))
+    files += sorted(set(glob.glob(os.path.join(VALIDATION_DIR, "**", "*.json"), recursive=True)) - set(files))
     for path in files:
         rel = os.path.relpath(path, ROOT)
         try:

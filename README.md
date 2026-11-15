@@ -134,7 +134,7 @@ Currently, OpenFauna provides translation support across the major bioacoustics 
 These CSVs can be natively embedded in your application for rapid database seeding during startup.
 
 ### Importing from the BirdNET+ Taxonomy
-To add the species, English names and locale names of a BirdNET+ Taxonomy CSV for every label in `data/validation/labels/`, and to record reviewed rename pairs as aliases (add-only and idempotent). Cells listed in `data/validation/taxonomy_exclusions.json` are skipped:
+To add the species, English names and locale names of a BirdNET+ Taxonomy CSV for every label in `data/validation/labels/`, and to record reviewed rename pairs as aliases (add-only and idempotent). A cell listed in `data/validation/taxonomy_exclusions.json` is skipped while its upstream value still matches the listed one; once upstream changes the value, the cell is imported and every run reports the stale entry until it is updated or removed:
 ```bash
 go run ./cmd/import-taxonomy -taxonomy=/path/to/BirdNET_Taxonomy.csv -renames=/path/to/renames.tsv
 ```
