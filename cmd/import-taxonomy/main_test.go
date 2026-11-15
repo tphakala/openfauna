@@ -341,15 +341,17 @@ func TestImportSpecies_ExcludedCells(t *testing.T) {
 		"Genus1 stale":      {sci: "Genus1 stale", common: "Fixed Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Neu"}},
 	}
 	excl := exclusions{
-		"de": {"Genus1 badlocale": {Value: "Falsch", Reason: "names another species"}},
+		"de": {
+			"Genus1 badlocale": {Value: "Falsch", Reason: "names another species"},
+			"Genus1 casevar":   {Value: "falsch", Reason: "names another species"},
+			"Genus1 stale":     {Value: "Alt", Reason: "names another species"},
+		},
 		"en": {
 			"Genus1 badenglish": {Value: "Wrong Bird", Reason: "names another animal"},
 			"Genus1 dashed":     {Value: "Wrong\u2013Bird", Reason: "names another animal"},
 			"Genus1 stale":      {Value: "Broken Bird", Reason: "names another animal"},
 		},
 	}
-	excl["de"]["Genus1 casevar"] = exclusion{Value: "falsch", Reason: "names another species"}
-	excl["de"]["Genus1 stale"] = exclusion{Value: "Alt", Reason: "names another species"}
 	importSpecies(s, tax, []string{"Genus1 badlocale", "Genus1 badenglish", "Genus1 dashed", "Genus1 casevar", "Genus1 stale"}, excl)
 
 	if _, ok := s.locales["de"]["Genus1 casevar"]; ok {
@@ -599,7 +601,8 @@ func readTree(t *testing.T, root string) map[string]string {
 			return err
 		}
 		b, err := os.ReadFile(p)
-		tree[p] = string(b)
+		rel, _ := filepath.Rel(root, p)
+		tree[rel] = string(b)
 		return err
 	})
 	if err != nil {
@@ -658,17 +661,8 @@ func TestRun_InterruptedWriteIsCompletedByRerun(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := readTree(t, ref.data)
-	rel := func(f runFixture, tree map[string]string) map[string]string {
-		out := map[string]string{}
-		for p, v := range tree {
-			r, _ := filepath.Rel(f.data, p)
-			out[r] = v
-		}
-		return out
-	}
-
 	f := newRunFixture(t)
-	before := rel(f, readTree(t, f.data))
+	before := readTree(t, f.data)
 	obstacle := filepath.Join(f.data, "metadata.json.tmp")
 	if err := os.Mkdir(obstacle, 0o755); err != nil {
 		t.Fatal(err)
@@ -676,7 +670,7 @@ func TestRun_InterruptedWriteIsCompletedByRerun(t *testing.T) {
 	if err := f.run(false); err == nil {
 		t.Fatal("run succeeded despite the obstacle")
 	}
-	mid := rel(f, readTree(t, f.data))
+	mid := readTree(t, f.data)
 	if mid["locales/de.json"] == before["locales/de.json"] {
 		t.Errorf("de.json was not written before the failure")
 	}
@@ -691,7 +685,7 @@ func TestRun_InterruptedWriteIsCompletedByRerun(t *testing.T) {
 	if err := f.run(false); err != nil {
 		t.Fatal(err)
 	}
-	if got := rel(f, readTree(t, f.data)); !reflect.DeepEqual(got, rel(ref, want)) {
+	if got := readTree(t, f.data); !reflect.DeepEqual(got, want) {
 		t.Errorf("rerun after an interrupted run differs from an uninterrupted run")
 	}
 }

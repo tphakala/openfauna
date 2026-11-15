@@ -307,8 +307,9 @@ func seedMedia(c *fetch.Client, meta map[string]dataset.SpeciesRecord, work []st
 }
 
 // report tallies the QID cross-check outcome for the maintainer to review. The
-// field order of report and conflict is the sorted key order that
-// scripts/validate.py (check_structure) requires of the written file.
+// field order of report is the sorted key order that scripts/validate.py
+// (check_structure) requires of the written file's top level; conflict keeps
+// the same order.
 type report struct {
 	Agree        int        `json:"agree"`
 	Disagree     []conflict `json:"disagree"`

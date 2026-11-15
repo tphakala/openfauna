@@ -329,8 +329,8 @@ def check_english_echo(report: Report, en: dict) -> None:
                   f"({sum(counts.values())} total)")
 
 
-def has_name(en: dict, key) -> bool:
-    value = en.get(key)
+def is_text(value) -> bool:
+    """A string with something other than whitespace in it."""
     return isinstance(value, str) and bool(value.strip())
 
 
@@ -345,7 +345,7 @@ def label_gaps(en: dict, meta: dict, aliases: dict) -> dict[str, dict]:
             "labels": len(names),
             "no_metadata": sorted(n for n in names if n not in meta),
             "no_name": sorted(n for n in names
-                              if not has_name(en, n) and not has_name(en, aliases.get(n))),
+                              if not is_text(en.get(n)) and not is_text(en.get(aliases.get(n)))),
         }
     return gaps
 
@@ -409,9 +409,9 @@ def check_exclusions(report: Report) -> None:
         names = load_json(path)
         for sci, cell in cells.items():
             count += 1
-            value = cell.get("value") if isinstance(cell, dict) else None
-            reason = cell.get("reason") if isinstance(cell, dict) else None
-            if not (isinstance(value, str) and value.strip() and isinstance(reason, str) and reason.strip()):
+            cell = cell if isinstance(cell, dict) else {}
+            value, reason = cell.get("value"), cell.get("reason")
+            if not (is_text(value) and is_text(reason)):
                 problems.append(f"{loc}: {sci!r} needs a value and a reason")
             elif value != value.strip():
                 problems.append(f"{loc}: {sci!r} has a value with leading or trailing whitespace")
