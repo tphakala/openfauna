@@ -4,10 +4,24 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
+
+const labelsDir = "data/validation/labels"
+
+// modelOrder fixes the row order and display names of the README coverage table.
+var modelOrder = []struct{ stem, display string }{
+	{"birdnet-v2.4", "BirdNET V2.4"},
+	{"birdnet-v3.0-preview3.1", "BirdNET V3.0 preview3.1"},
+	{"birdnet-v3.0-preview4", "BirdNET V3.0 preview4"},
+	{"birdnet-plus-v3.0", "BirdNET+ V3.0"},
+	{"perch-v2", "Perch V2"},
+	{"battybirdnet", "BattyBirdNET"},
+}
 
 func main() {
 	// 1. Load OpenFauna Species
@@ -73,57 +87,49 @@ func main() {
 		}{name, total, covered, pct})
 	}
 
-	// 2. BirdNET 2.4
-	bn24, _ := readLines("/home/thakala/src/birdnet-go/internal/classifier/data/labels/V2.4/BirdNET_GLOBAL_6K_V2.4_Labels_en_us.txt")
-	var s24 []string
-	for _, l := range bn24 {
-		p := strings.Split(l, "_")
-		s24 = append(s24, strings.TrimSpace(p[0]))
+	// 2. Model label manifests, in README order; unlisted manifests follow by stem.
+	manifests, err := filepath.Glob(filepath.Join(labelsDir, "*.txt"))
+	if err != nil {
+		log.Fatalf("list manifests: %v", err)
 	}
-	calcCoverage("BirdNET V2.4", s24)
-
-	// 3. BirdNET 3.0
-	bn30, _ := readLines("/home/thakala/src/birdnet-v3.0/acoustic/BirdNET+_V3.0-preview3_Global_11K_Labels.csv")
-	var s30 []string
-	for i, l := range bn30 {
-		if i == 0 {
-			continue
-		} // skip header
-		p := strings.Split(l, ";")
-		if len(p) > 2 {
-			s30 = append(s30, strings.TrimSpace(p[2]))
+	if len(manifests) == 0 {
+		log.Fatalf("no label manifests in %s", labelsDir)
+	}
+	byStem := make(map[string]string, len(manifests))
+	for _, m := range manifests {
+		byStem[strings.TrimSuffix(filepath.Base(m), ".txt")] = m
+	}
+	var stems []string
+	for _, mo := range modelOrder {
+		if _, ok := byStem[mo.stem]; ok {
+			stems = append(stems, mo.stem)
 		}
 	}
-	calcCoverage("BirdNET V3.0", s30)
-
-	// 4. Perch V2
-	perch, _ := readLines("/home/thakala/src/Perch-v2/labels.txt")
-	calcCoverage("Perch V2", perch)
-
-	// 5. BattyBirdNET
-	var batSpecies []string
-	batFiles, _ := os.ReadDir("/home/thakala/bats/hf-upload/labels")
-	for _, f := range batFiles {
-		if strings.HasSuffix(f.Name(), "_Labels.txt") {
-			lines, _ := readLines(filepath.Join("/home/thakala/bats/hf-upload/labels", f.Name()))
-			for _, l := range lines {
-				p := strings.Split(l, "_")
-				if len(p) > 0 {
-					batSpecies = append(batSpecies, strings.TrimSpace(p[0]))
-				}
+	listed := make(map[string]bool, len(modelOrder))
+	for _, mo := range modelOrder {
+		listed[mo.stem] = true
+	}
+	var extra []string
+	for stem := range byStem {
+		if !listed[stem] {
+			extra = append(extra, stem)
+		}
+	}
+	sort.Strings(extra)
+	stems = append(stems, extra...)
+	for _, stem := range stems {
+		names, err := readLines(byStem[stem])
+		if err != nil {
+			log.Fatalf("read %s: %v", byStem[stem], err)
+		}
+		display := stem
+		for _, mo := range modelOrder {
+			if mo.stem == stem {
+				display = mo.display
 			}
 		}
+		calcCoverage(display, names)
 	}
-	// unique bats
-	uniqBats := make(map[string]bool)
-	var finalBats []string
-	for _, b := range batSpecies {
-		if !uniqBats[b] {
-			uniqBats[b] = true
-			finalBats = append(finalBats, b)
-		}
-	}
-	calcCoverage("BattyBirdNET", finalBats)
 
 	// 6. Output Table
 	fmt.Println("## Model Coverage")
