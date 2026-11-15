@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -352,7 +353,11 @@ func TestImportSpecies_ExcludedCells(t *testing.T) {
 			"Genus1 stale":      {Value: "Broken Bird", Reason: "names another animal"},
 		},
 	}
-	importSpecies(s, tax, []string{"Genus1 badlocale", "Genus1 badenglish", "Genus1 dashed", "Genus1 casevar", "Genus1 stale"}, excl)
+	report := importSpecies(s, tax, []string{"Genus1 badlocale", "Genus1 badenglish", "Genus1 dashed", "Genus1 casevar", "Genus1 stale"}, excl)
+
+	if len(report.sciFallback) != 0 {
+		t.Errorf("an excluded English cell was reported as a fallback: %v", report.sciFallback)
+	}
 
 	if _, ok := s.locales["de"]["Genus1 casevar"]; ok {
 		t.Errorf("a cell that differs from the listed value only by case was imported")
@@ -578,8 +583,9 @@ func newRunFixture(t *testing.T) runFixture {
 	}
 	writeFile(t, f.taxonomy, "scientific_name,common_name,taxon_group,record_type,inat_id,wikidata_qid,common_name_de\n"+
 		"Genus1 new,New Bird,Aves,species,1,Q1,Neuer Vogel\n"+
-		"Genus1 old,Old Bird,Aves,species,2,Q2,Alter Vogel\n")
-	writeFile(t, filepath.Join(f.labels, "m.txt"), "Genus1 new\n")
+		"Genus1 old,Old Bird,Aves,species,2,Q2,Alter Vogel\n"+
+		"Genus1 blank,,Aves,species,3,Q3,Leerer Vogel\n")
+	writeFile(t, filepath.Join(f.labels, "m.txt"), "Genus1 new\nGenus1 blank\n")
 	writeFile(t, f.renames[0], "Genus1 old\tGenus1 oldish\n")
 	writeFile(t, f.exclusions, `{"exclude": {"de": {"Genus1 old": {"value": "x", "reason": "r"}}}}`)
 	writeFile(t, filepath.Join(f.data, "metadata.json"), "{}\n")
@@ -611,11 +617,41 @@ func readTree(t *testing.T, root string) map[string]string {
 	return tree
 }
 
+// captureStdout returns what fn prints to os.Stdout.
+func captureStdout(t *testing.T, fn func()) string {
+	t.Helper()
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	old := os.Stdout
+	os.Stdout = w
+	done := make(chan string)
+	go func() {
+		b, _ := io.ReadAll(r)
+		done <- string(b)
+	}()
+	fn()
+	os.Stdout = old
+	w.Close()
+	return <-done
+}
+
 func TestRun_DryRunThenWriteThenRerun(t *testing.T) {
 	f := newRunFixture(t)
 	before := readTree(t, f.data)
-	if err := f.run(true); err != nil {
-		t.Fatal(err)
+	var runErr error
+	out := captureStdout(t, func() { runErr = f.run(true) })
+	if runErr != nil {
+		t.Fatal(runErr)
+	}
+	for _, want := range []string{
+		"English name set to the scientific name (no English name): Genus1 blank",
+		"exclusion does not match the taxonomy, update or remove it: de \"Genus1 old\"",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("output lacks %q:\n%s", want, out)
+		}
 	}
 	if !reflect.DeepEqual(readTree(t, f.data), before) {
 		t.Fatalf("dry run changed the data directory")
