@@ -116,8 +116,6 @@ The OpenFauna metadata schema is designed to be extensible. The `links` registry
 2. **Conservation Status**: Integrating IUCN Red List data to highlight endangered or threatened species in detection streams.
 3. **Regional Endemism**: Data mapping species to native geographic continents/regions to improve anomaly detection (e.g., detecting a European bird in North America).
 
-*Note: To keep OpenFauna strictly open-source (CC BY-SA 4.0), we source taxonomy from CC0 providers (GBIF, iNaturalist Open Data) and multilingual common names from the IOC World Bird List (CC BY 3.0), GBIF and Wikidata. We do not ingest proprietary eBird or Clements taxonomy, nor BirdNET's eBird-derived localized label files, due to their non-commercial licensing restrictions.*
-
 ## Model Coverage
 
 Currently, OpenFauna provides translation support across the major bioacoustics models:
@@ -161,7 +159,7 @@ It updates `data/metadata.json` and `data/media.json` in place and writes a cros
 
 ### Backfilling Localized Common Names (IOC & GBIF)
 
-Per-locale common names are populated from open, license-compatible sources, never from a model's own (often eBird-derived) label files. `scripts/backfill_v24_open.py` fills the names a model needs but OpenFauna is missing, using the IOC World Bird List Multilingual file (CC BY 3.0) as the primary source and GBIF Backbone vernacular names (CC0) as a supplement. It is additive only and never overwrites a curated entry.
+Per-locale common names are populated from open, license-compatible sources. `scripts/backfill_v24_open.py` fills the names a model needs but OpenFauna is missing, using the IOC World Bird List Multilingual file (CC BY 3.0) as the primary source and GBIF Backbone vernacular names (CC0) as a supplement. It is additive only and never overwrites a curated entry.
 
 ```bash
 # Requires: pip install openpyxl, plus the IOC Multilingual .xlsx (CC BY 3.0):
@@ -176,6 +174,6 @@ Without `--apply` it runs a dry run and prints a per-locale fill report. Quality
 
 ## License and Attribution
 
-OpenFauna is licensed under the **Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)** license, matching the upstream BirdNET project.
+OpenFauna is licensed under the **Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)** license.
 
 Please see [ATTRIBUTION.md](ATTRIBUTION.md) for required credits to the original BirdNET authors (Cornell Lab of Ornithology and Chemnitz University of Technology) who provided the baseline translation data.
