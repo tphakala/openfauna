@@ -308,7 +308,7 @@ func loadTaxonomy(path string) (map[string]taxon, [sha256.Size]byte, error) {
 	return tax, sum, nil
 }
 
-func hasDash(s string) bool { return strings.ContainsAny(s, "–—") }
+func hasDash(s string) bool { return strings.ContainsAny(s, "\u2013\u2014") }
 
 // applyRenames records each pair as the alias model -> geomodel. Pairs are
 // checked in order against the alias map as already extended by earlier pairs,
