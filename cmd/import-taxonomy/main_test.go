@@ -156,7 +156,7 @@ func seqFixture() (*state, map[string]taxon, []string, []string) {
 func TestImportSpecies_Sequences(t *testing.T) {
 	full := func() *state {
 		s, tax, a, b := seqFixture()
-		importSpecies(s, tax, append(append([]string{}, a...), b...))
+		importSpecies(s, tax, append(append([]string{}, a...), b...), nil)
 		return s
 	}()
 	initial, tax, a, b := seqFixture()
@@ -228,7 +228,7 @@ func TestImportSpecies_Sequences(t *testing.T) {
 
 	// A second run changes nothing.
 	again := full.clone()
-	importSpecies(again, tax, append(append([]string{}, a...), b...))
+	importSpecies(again, tax, append(append([]string{}, a...), b...), nil)
 	if !reflect.DeepEqual(again, full) {
 		t.Errorf("second run changed the state")
 	}
@@ -236,8 +236,8 @@ func TestImportSpecies_Sequences(t *testing.T) {
 	// import(A u B) equals import(A) then import(B), in both orders.
 	for _, order := range [][2][]string{{a, b}, {b, a}} {
 		s, tax, _, _ := seqFixture()
-		importSpecies(s, tax, order[0])
-		importSpecies(s, tax, order[1])
+		importSpecies(s, tax, order[0], nil)
+		importSpecies(s, tax, order[1], nil)
 		if !reflect.DeepEqual(s, full) {
 			t.Errorf("sequenced run %v then %v differs from the union run", order[0], order[1])
 		}
@@ -250,7 +250,7 @@ func TestImportSpecies_Sequences(t *testing.T) {
 			s.locales[loc] = copyMap(m)
 		}
 	}
-	importSpecies(s, tax, append(append([]string{}, a...), b...))
+	importSpecies(s, tax, append(append([]string{}, a...), b...), nil)
 	if !reflect.DeepEqual(s, full) {
 		t.Errorf("resumed run differs from the uninterrupted run")
 	}

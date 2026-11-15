@@ -16,6 +16,11 @@
 //   - Exact scientific-name matches only. A label known to the taxonomy only as
 //     an alias of another record stays unresolved.
 //
+// Cells listed in data/validation/taxonomy_exclusions.json (locale, scientific
+// name, wrong value, reason) are never imported; an excluded English cell
+// becomes the scientific name. scripts/validate.py fails when a listed value is
+// present in the data.
+//
 // Targets are the union of the scientific names in data/validation/labels/*.txt,
 // one name per line (the text before the first "_" of a model label, or the
 // whole line for class labels). Regenerate a manifest from a model label file
@@ -104,24 +109,32 @@ func main() {
 	flag.Var(&renames, "renames", "Rename TSV, geomodel name then model label (repeatable)")
 	dataDir := flag.String("data", "data", "OpenFauna data directory")
 	labelsDir := flag.String("labels", "data/validation/labels", "Directory of label manifests (*.txt)")
+	exclusionsPath := flag.String("exclusions", "data/validation/taxonomy_exclusions.json", "JSON list of known-wrong taxonomy cells that are never imported")
 	dryRun := flag.Bool("dry-run", false, "Report what would change without writing")
 	flag.Parse()
 
 	if *taxonomyPath == "" {
 		log.Fatal("-taxonomy is required")
 	}
-	if err := run(*taxonomyPath, renames, *dataDir, *labelsDir, *dryRun); err != nil {
+	if err := run(*taxonomyPath, renames, *dataDir, *labelsDir, *exclusionsPath, *dryRun); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir string, dryRun bool) error {
+func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir, exclusionsPath string, dryRun bool) error {
 	s, err := loadState(dataDir)
 	if err != nil {
 		return err
 	}
 	aliasesBefore := len(s.aliases)
 
+	excl, err := loadExclusions(exclusionsPath)
+	if err != nil {
+		return err
+	}
+	if err := excl.validate(s.locales); err != nil {
+		return err
+	}
 	targets, err := loadTargets(labelsDir)
 	if err != nil {
 		return err
@@ -142,7 +155,7 @@ func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir string, d
 	if err := applyRenames(s, pairs); err != nil {
 		return err
 	}
-	rep := importSpecies(s, tax, targets)
+	rep := importSpecies(s, tax, targets, excl)
 
 	fmt.Printf("taxonomy sha256 %x (%d rows)\n", sum, len(tax))
 	fmt.Printf("targets: %d\n", len(targets))
@@ -376,6 +389,32 @@ func mergeEntry(s *state, g, m string) {
 	}
 }
 
+// exclusion records a taxonomy cell known to be wrong, with the wrong value and why.
+type exclusion struct {
+	Value  string `json:"value"`
+	Reason string `json:"reason"`
+}
+
+// exclusions maps locale stem, then scientific name, to a cell that is never
+// imported. An excluded English cell is replaced by the scientific name.
+type exclusions map[string]map[string]exclusion
+
+// validate rejects an entry for a locale without a data file, so a typo in the
+// list cannot silently stop excluding, and an entry without a reason.
+func (e exclusions) validate(locales map[string]map[string]string) error { return nil }
+
+func (e exclusions) has(loc, sci string) bool { return false }
+
+func loadExclusions(path string) (exclusions, error) {
+	var doc struct {
+		Exclude exclusions `json:"exclude"`
+	}
+	if err := loadJSONFile(path, &doc); err != nil {
+		return nil, err
+	}
+	return doc.Exclude, nil
+}
+
 type importReport struct {
 	metaAdded, namesAdded, localeValues int
 	dashSkipped                         []string
@@ -408,8 +447,9 @@ func genusRanks(meta map[string]dataset.SpeciesRecord) map[string]rank {
 // importSpecies adds, for each target (sorted and unique) that has a species row, a metadata
 // record when none exists and, when the label is neither an alias key nor
 // already named in en.json, its English name and the locale names that
-// existing locale files lack. Nothing existing is changed.
-func importSpecies(s *state, tax map[string]taxon, targets []string) importReport {
+// existing locale files lack, except the cells listed in excl. Nothing existing
+// is changed.
+func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclusions) importReport {
 	var rep importReport
 	ranks := genusRanks(s.meta)
 	en := s.locales[enLocale]
@@ -431,14 +471,18 @@ func importSpecies(s *state, tax map[string]taxon, targets []string) importRepor
 			rep.dashSkipped = append(rep.dashSkipped, target)
 			continue
 		}
-		en[target] = t.common
+		english := t.common
+		if excl.has(enLocale, target) {
+			english = target
+		}
+		en[target] = english
 		rep.namesAdded++
 		for _, loc := range locs {
 			v, ok := t.names[loc]
 			if loc == enLocale || !ok {
 				continue
 			}
-			if _, exists := s.locales[loc][target]; exists {
+			if _, exists := s.locales[loc][target]; exists || excl.has(loc, target) {
 				continue
 			}
 			if v == target || strings.EqualFold(v, t.common) || hasDash(v) {
