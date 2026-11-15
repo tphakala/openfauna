@@ -1,10 +1,48 @@
 {
   "_comment": "Cells of the BirdNET+ Taxonomy that are known to be wrong and are never imported by cmd/import-taxonomy. Keyed by locale, then scientific name; value is the wrong value, reason says why. An excluded en cell becomes the scientific name. scripts/validate.py fails when a listed value is present in the data.",
   "exclude": {
+    "ca": {
+      "Chelonoidis niger": {
+        "reason": "a scientific subspecies name, not a Catalan name",
+        "value": "Chelonoidis niger niger"
+      },
+      "Leptodactylus latrans": {
+        "reason": "a scientific synonym, not a Catalan name",
+        "value": "Leptodactylus ocellatus"
+      },
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species, by its scientific name",
+        "value": "Osteopilus brunneus"
+      },
+      "Rana macrocnemis": {
+        "reason": "a scientific synonym, not a Catalan name",
+        "value": "Rana camerani"
+      },
+      "Rhacophorus rhodopus": {
+        "reason": "scientific name of a different species",
+        "value": "Rhacophorus namdaphaensis"
+      }
+    },
     "cs": {
       "Lemmus lemmus": {
         "reason": "names the Amur lemming (Lemmus amurensis), a different species",
         "value": "lumík amurský"
+      },
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species",
+        "value": "rosnička západoindická"
+      }
+    },
+    "da": {
+      "Trachypithecus phayrei": {
+        "reason": "names Popa langur (Trachypithecus popa), a different species",
+        "value": "Popalangur"
+      }
+    },
+    "de": {
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species, by its scientific name",
+        "value": "Osteopilus brunneus"
       }
     },
     "en": {
@@ -14,6 +52,10 @@
       }
     },
     "es": {
+      "Chelonoidis niger": {
+        "reason": "names only the Floreana subspecies",
+        "value": "Tortuga gigante de Floreana"
+      },
       "Gopherus agassizii": {
         "reason": "names the Sonoran desert tortoise, a different species (Gopherus morafkai)",
         "value": "Tortuga patona del desierto de Sonora"
@@ -21,6 +63,10 @@
       "Lilioceris merdigera": {
         "reason": "Dutch name in the Spanish locale",
         "value": "Bruinrood leliehaantje"
+      },
+      "Rana macrocnemis": {
+        "reason": "a scientific synonym, not a Spanish name",
+        "value": "Rana camerani"
       },
       "Saimiri ustus": {
         "reason": "Portuguese name in the Spanish locale",
@@ -30,9 +76,19 @@
         "reason": "truncated name",
         "value": "Bufeo Asi"
       },
+      "Tetraopes tetrophthalmus": {
+        "reason": "a misspelled scientific name, not a Spanish name",
+        "value": "Tetraopes tetraophtalmus"
+      },
       "Vitreorana eurygnatha": {
         "reason": "truncated Portuguese name in the Spanish locale",
         "value": "ra-de-vidro"
+      }
+    },
+    "et": {
+      "Gorilla beringei": {
+        "reason": "names only the mountain gorilla subspecies",
+        "value": "Mägigorilla"
       }
     },
     "fa": {
@@ -49,10 +105,114 @@
         "value": "نهنگ پوزهبطری شمالی"
       }
     },
+    "fi": {
+      "Chelonoidis niger": {
+        "reason": "a scientific subspecies name, not a Finnish name",
+        "value": "Chelonoidis niger niger"
+      },
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species, by its scientific name",
+        "value": "Osteopilus brunneus"
+      }
+    },
+    "fr": {
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species, by its scientific name",
+        "value": "Osteopilus brunneus"
+      }
+    },
+    "it": {
+      "Osmia bicornis": {
+        "reason": "a scientific synonym, not an Italian name",
+        "value": "Osmia rufa"
+      },
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species, by its scientific name",
+        "value": "Osteopilus brunneus"
+      }
+    },
+    "nl": {
+      "Lampropeltis holbrooki": {
+        "reason": "a scientific subspecies name, not a Dutch name",
+        "value": "Lampropeltis getula holbrooki"
+      },
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species, by its scientific name",
+        "value": "Osteopilus brunneus"
+      }
+    },
     "pl": {
       "Anguilla rostrata": {
         "reason": "names a moray, not the American eel",
         "value": "Moringa cetkowana"
+      },
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species, by its scientific name",
+        "value": "Osteopilus brunneus"
+      }
+    },
+    "pt": {
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species, by its scientific name",
+        "value": "Osteopilus brunneus"
+      }
+    },
+    "ru": {
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species",
+        "value": "Вест-индская квакша"
+      }
+    },
+    "sv": {
+      "Anolis sagrei": {
+        "reason": "a scientific synonym, not a Swedish name",
+        "value": "Norops sagrei"
+      },
+      "Bufotes luristanicus": {
+        "reason": "a scientific synonym, not a Swedish name",
+        "value": "pseudepidalea luristanica"
+      },
+      "Bufotes oblongus": {
+        "reason": "a scientific synonym, not a Swedish name",
+        "value": "pseudepidalea oblonga"
+      },
+      "Bufotes pseudoraddei": {
+        "reason": "a scientific synonym, not a Swedish name",
+        "value": "Pseudepidalea pseudoraddei"
+      },
+      "Leptodactylus latrans": {
+        "reason": "a scientific synonym, not a Swedish name",
+        "value": "Leptodactylus ocellatus"
+      },
+      "Megapomponia imperatoria": {
+        "reason": "a misspelled scientific name, not a Swedish name",
+        "value": "Megapomponia impteratoria"
+      },
+      "Metacarcinus magister": {
+        "reason": "a scientific synonym, not a Swedish name",
+        "value": "Cancer magister"
+      },
+      "Osteopilus ocellatus": {
+        "reason": "names Osteopilus brunneus, a different species, by its scientific name",
+        "value": "Osteopilus brunneus"
+      },
+      "Pachylia ficus": {
+        "reason": "scientific name of a different taxon",
+        "value": "Pachylia undatifascia"
+      },
+      "Trachycephalus typhonius": {
+        "reason": "a scientific synonym, not a Swedish name",
+        "value": "Trachycephalus venulosus"
+      },
+      "Trimeresurus stejnegeri": {
+        "reason": "a scientific synonym, not a Swedish name",
+        "value": "Viridovipera stejnegeri"
+      }
+    },
+    "tr": {
+      "Thamnophis sirtalis": {
+        "reason": "a scientific subspecies name, not a Turkish name",
+        "value": "Thamnophis sirtalis sirtalis"
       }
     }
   }
