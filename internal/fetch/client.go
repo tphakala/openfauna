@@ -13,7 +13,8 @@ import (
 
 // Client wraps an HTTP client with a descriptive User-Agent and a politeness
 // throttle. Public APIs require the User-Agent and rate-limit aggressive
-// clients. A Client is for sequential use: it is not safe for concurrent calls.
+// clients. HTTP, UserAgent and Ctx must be set. A Client is for sequential use:
+// it is not safe for concurrent calls.
 type Client struct {
 	HTTP      *http.Client
 	UserAgent string
