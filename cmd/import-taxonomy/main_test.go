@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -347,5 +349,30 @@ func TestExclusions_Validate(t *testing.T) {
 	}
 	if err := (exclusions{"de": {"A b": {Value: "x"}}}).validate(locales); err == nil {
 		t.Errorf("entry without a reason accepted")
+	}
+}
+
+func TestLoadExclusions(t *testing.T) {
+	excl, err := loadExclusions("../../data/validation/taxonomy_exclusions.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(excl) == 0 {
+		t.Fatal("committed exclusion list is empty")
+	}
+	st, err := loadState("../../data")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := excl.validate(st.locales); err != nil {
+		t.Errorf("committed exclusion list: %v", err)
+	}
+
+	bad := filepath.Join(t.TempDir(), "x.json")
+	if err := os.WriteFile(bad, []byte(`{"excludes": {}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := loadExclusions(bad); err == nil {
+		t.Errorf("a file without an exclude object was accepted")
 	}
 }
