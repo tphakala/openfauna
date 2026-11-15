@@ -1,0 +1,59 @@
+{
+  "_comment": "Cells of the BirdNET+ Taxonomy that are known to be wrong and are never imported by cmd/import-taxonomy. Keyed by locale, then scientific name; value is the wrong value, reason says why. An excluded en cell becomes the scientific name. scripts/validate.py fails when a listed value is present in the data.",
+  "exclude": {
+    "cs": {
+      "Lemmus lemmus": {
+        "reason": "names the Amur lemming (Lemmus amurensis), a different species",
+        "value": "lumík amurský"
+      }
+    },
+    "en": {
+      "Carineta cearana": {
+        "reason": "names a frog; the species is a cicada",
+        "value": "Maned Froglet"
+      }
+    },
+    "es": {
+      "Gopherus agassizii": {
+        "reason": "names the Sonoran desert tortoise, a different species (Gopherus morafkai)",
+        "value": "Tortuga patona del desierto de Sonora"
+      },
+      "Lilioceris merdigera": {
+        "reason": "Dutch name in the Spanish locale",
+        "value": "Bruinrood leliehaantje"
+      },
+      "Saimiri ustus": {
+        "reason": "Portuguese name in the Spanish locale",
+        "value": "Macaco-de-cheiro"
+      },
+      "Sousa chinensis": {
+        "reason": "truncated name",
+        "value": "Bufeo Asi"
+      },
+      "Vitreorana eurygnatha": {
+        "reason": "truncated Portuguese name in the Spanish locale",
+        "value": "ra-de-vidro"
+      }
+    },
+    "fa": {
+      "Anolis sagrei": {
+        "reason": "missing half-space",
+        "value": "آنول قهوهای"
+      },
+      "Caiman latirostris": {
+        "reason": "missing half-space",
+        "value": "کیمن پوزهپهن"
+      },
+      "Hyperoodon ampullatus": {
+        "reason": "missing half-space",
+        "value": "نهنگ پوزهبطری شمالی"
+      }
+    },
+    "pl": {
+      "Anguilla rostrata": {
+        "reason": "names a moray, not the American eel",
+        "value": "Moringa cetkowana"
+      }
+    }
+  }
+}

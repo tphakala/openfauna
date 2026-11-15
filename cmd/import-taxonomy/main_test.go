@@ -307,3 +307,45 @@ func TestLocaleStem(t *testing.T) {
 		}
 	}
 }
+
+func TestImportSpecies_ExcludedCells(t *testing.T) {
+	s := newState(nil, map[string]map[string]string{"en": {}, "de": {}, "fr": {}})
+	tax := map[string]taxon{
+		"Genus1 badlocale":  {sci: "Genus1 badlocale", common: "Locale Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Falsch", "fr": "Oiseau"}},
+		"Genus1 badenglish": {sci: "Genus1 badenglish", common: "Wrong Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Vogel"}},
+	}
+	excl := exclusions{
+		"de": {"Genus1 badlocale": {Value: "Falsch", Reason: "names another species"}},
+		"en": {"Genus1 badenglish": {Value: "Wrong Bird", Reason: "names another animal"}},
+	}
+	importSpecies(s, tax, []string{"Genus1 badlocale", "Genus1 badenglish"}, excl)
+
+	if _, ok := s.locales["de"]["Genus1 badlocale"]; ok {
+		t.Errorf("excluded de cell was imported: %q", s.locales["de"]["Genus1 badlocale"])
+	}
+	if got := s.locales["fr"]["Genus1 badlocale"]; got != "Oiseau" {
+		t.Errorf("other locale of the same species = %q, want it imported", got)
+	}
+	if got := s.locales["en"]["Genus1 badlocale"]; got != "Locale Bird" {
+		t.Errorf("English name = %q", got)
+	}
+	if got := s.locales["en"]["Genus1 badenglish"]; got != "Genus1 badenglish" {
+		t.Errorf("excluded English cell = %q, want the scientific name", got)
+	}
+	if got := s.locales["de"]["Genus1 badenglish"]; got != "Vogel" {
+		t.Errorf("locale value of a species with an excluded English cell = %q", got)
+	}
+}
+
+func TestExclusions_Validate(t *testing.T) {
+	locales := map[string]map[string]string{"en": {}, "de": {}}
+	if err := (exclusions{"de": {"A b": {Value: "x", Reason: "r"}}}).validate(locales); err != nil {
+		t.Errorf("known locale: %v", err)
+	}
+	if err := (exclusions{"fa_IR": {"A b": {Value: "x", Reason: "r"}}}).validate(locales); err == nil {
+		t.Errorf("unknown locale accepted")
+	}
+	if err := (exclusions{"de": {"A b": {Value: "x"}}}).validate(locales); err == nil {
+		t.Errorf("entry without a reason accepted")
+	}
+}

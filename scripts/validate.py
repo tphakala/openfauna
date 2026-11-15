@@ -19,6 +19,8 @@ Checks (each can be skipped with --skip <name>):
              proper nouns (e.g. "Stellers sjolejon", "Thomas' galago"), which
              those languages keep capitalized.
   dashes     No common-name value contains an em dash or en dash.
+  exclusions No cell listed in data/validation/taxonomy_exclusions.json is
+             present in the locale data with its listed (wrong) value.
   labels     For each model label manifest in data/validation/labels/, the
              labels without a metadata record and the labels without a name
              equal data/validation/label_baseline.json exactly, so a change in
@@ -50,6 +52,7 @@ MEDIA_FILE = os.path.join(ROOT, "data", "media.json")
 SHADOW_ALLOWLIST = os.path.join(ROOT, "data", "validation", "shadow_allowlist.json")
 CURATED_FILE = os.path.join(ROOT, "data", "curated_names.json")
 ECHO_BASELINE = os.path.join(ROOT, "data", "validation", "english_echo_baseline.json")
+EXCLUSIONS_FILE = os.path.join(ROOT, "data", "validation", "taxonomy_exclusions.json")
 LABELS_DIR = os.path.join(ROOT, "data", "validation", "labels")
 LABEL_BASELINE = os.path.join(ROOT, "data", "validation", "label_baseline.json")
 
@@ -362,6 +365,34 @@ def check_labels(report: Report, en: dict, meta: dict) -> None:
                   f"{len(gap['no_metadata'])} without metadata, {len(gap['no_name'])} without a name")
 
 
+def check_exclusions(report: Report) -> None:
+    """Cells listed in taxonomy_exclusions.json are known-wrong imported values. The
+    importer never writes them, and a backfill or hand edit must not put one back."""
+    if not os.path.exists(EXCLUSIONS_FILE):
+        report.fail("exclusions", [f"{os.path.relpath(EXCLUSIONS_FILE, ROOT)} is missing; "
+                                   "it is a required, version-controlled data file."])
+        return
+    excluded = load_json(EXCLUSIONS_FILE).get("exclude", {})
+    problems: list[str] = []
+    count = 0
+    for loc, cells in excluded.items():
+        path = os.path.join(LOCALE_DIR, f"{loc}.json")
+        if not os.path.exists(path):
+            problems.append(f"{loc}: no locale file for the exclusion list")
+            continue
+        names = load_json(path)
+        for sci, cell in cells.items():
+            count += 1
+            if not cell.get("reason") or not cell.get("value"):
+                problems.append(f"{loc}: {sci!r} needs a value and a reason")
+            elif names.get(sci) == cell["value"]:
+                problems.append(f"{loc}: {sci!r} still has the excluded value {cell['value']!r}")
+    if problems:
+        report.fail("exclusions", problems)
+    else:
+        report.ok("exclusions", f"{count} excluded cells absent from the data")
+
+
 def check_curated(report: Report, en: dict) -> None:
     """Every data/curated_names.json entry must appear verbatim in its locale file.
     The file holds hand-verified, reviewer-checked names (e.g. the issue #11 bat
@@ -505,7 +536,7 @@ def check_media(report: Report) -> None:
         report.ok("media", f"{count} media item(s) valid")
 
 
-CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated", "sources", "media_sources", "media", "labels")
+CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated", "sources", "media_sources", "media", "labels", "exclusions")
 
 
 def main() -> int:
@@ -589,6 +620,8 @@ def main() -> int:
         check_media(report)
     if "labels" not in args.skip:
         check_labels(report, en, meta)
+    if "exclusions" not in args.skip:
+        check_exclusions(report)
 
     if report.failures:
         print(f"\nFAILED: {report.failures} problem(s) found.")

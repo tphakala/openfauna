@@ -401,9 +401,24 @@ type exclusions map[string]map[string]exclusion
 
 // validate rejects an entry for a locale without a data file, so a typo in the
 // list cannot silently stop excluding, and an entry without a reason.
-func (e exclusions) validate(locales map[string]map[string]string) error { return nil }
+func (e exclusions) validate(locales map[string]map[string]string) error {
+	for loc, cells := range e {
+		if _, ok := locales[loc]; !ok {
+			return fmt.Errorf("exclusions: locale %q has no data file", loc)
+		}
+		for sci, x := range cells {
+			if x.Value == "" || x.Reason == "" {
+				return fmt.Errorf("exclusions: %s %q needs a value and a reason", loc, sci)
+			}
+		}
+	}
+	return nil
+}
 
-func (e exclusions) has(loc, sci string) bool { return false }
+func (e exclusions) has(loc, sci string) bool {
+	_, ok := e[loc][sci]
+	return ok
+}
 
 func loadExclusions(path string) (exclusions, error) {
 	var doc struct {
