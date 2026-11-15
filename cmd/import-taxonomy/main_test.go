@@ -379,3 +379,20 @@ func TestLoadExclusions(t *testing.T) {
 		t.Errorf("a file without an exclude object was accepted")
 	}
 }
+
+func TestLoadTaxonomy_LocaleColumns(t *testing.T) {
+	csv := "scientific_name,common_name,taxon_group,record_type,inat_id,wikidata_qid,common_name_alt,common_name_en,common_name_es_EC,common_name_zh-CN,common_name_de\n" +
+		"Genus1 a,Bird,Aves,species,1,Q1,Alt,En,Pajaro,Niao,Vogel\n"
+	path := filepath.Join(t.TempDir(), "tax.csv")
+	if err := os.WriteFile(path, []byte(csv), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	tax, _, err := loadTaxonomy(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := map[string]string{"es_ec": "Pajaro", "zh_cn": "Niao", "de": "Vogel"}
+	if got := tax["Genus1 a"].names; !reflect.DeepEqual(got, want) {
+		t.Errorf("names = %v, want %v", got, want)
+	}
+}
