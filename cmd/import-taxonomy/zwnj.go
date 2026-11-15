@@ -30,7 +30,7 @@ func loadZWNJTokens(path string) (zwnjTokens, error) {
 		return nil, fmt.Errorf("%s: no \"tokens\" object", path)
 	}
 	for k, v := range doc.Tokens {
-		if k == v || strings.ContainsFunc(k, func(r rune) bool { return !isLetterOrMark(r) }) ||
+		if !strings.ContainsRune(v, zwnj) || strings.ContainsFunc(k, func(r rune) bool { return !isLetterOrMark(r) }) ||
 			strings.ReplaceAll(v, string(zwnj), "") != k || stripStrayZWNJ(v) != v {
 			return nil, fmt.Errorf("%s: %q: the key must be one word of letters and the value the same word with U+200C inserted between letters", path, k)
 		}
