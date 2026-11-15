@@ -64,24 +64,20 @@ func (c *Client) Get(rawURL string) ([]byte, error) {
 		}
 		body, readErr := io.ReadAll(resp.Body)
 		_ = resp.Body.Close()
-		if readErr != nil {
-			lastErr = readErr
-			if serr := c.sleep(c.backoff(attempt)); serr != nil {
-				return nil, serr
-			}
-			continue
-		}
-		if resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500 {
+		switch {
+		case resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500:
 			lastErr = fmt.Errorf("status %d", resp.StatusCode)
-			if serr := c.sleep(c.backoff(attempt)); serr != nil {
-				return nil, serr
-			}
-			continue
-		}
-		if resp.StatusCode != http.StatusOK {
+		case resp.StatusCode != http.StatusOK:
+			// A terminal status is final even when its body was cut short.
 			return nil, fmt.Errorf("status %d", resp.StatusCode)
+		case readErr != nil:
+			lastErr = readErr
+		default:
+			return body, nil
 		}
-		return body, nil
+		if serr := c.sleep(c.backoff(attempt)); serr != nil {
+			return nil, serr
+		}
 	}
 	return nil, fmt.Errorf("giving up after %d attempts: %w", maxAttempts, lastErr)
 }

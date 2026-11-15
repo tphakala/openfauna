@@ -130,3 +130,23 @@ func TestClientGetCancelEndsBackoff(t *testing.T) {
 		t.Fatalf("err = %v, want context.Canceled", err)
 	}
 }
+
+func TestClientGetTruncatedTerminalStatusIsFinal(t *testing.T) {
+	var n atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		n.Add(1)
+		w.Header().Set("Content-Length", "10")
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte("short"))
+	}))
+	defer srv.Close()
+	c := &Client{HTTP: srv.Client(), UserAgent: "test-agent/1", Ctx: context.Background(),
+		Backoff: func(int) time.Duration { return 0 }}
+	_, err := c.Get(srv.URL)
+	if err == nil || err.Error() != "status 404" {
+		t.Fatalf("Get error = %v, want status 404", err)
+	}
+	if got := n.Load(); got != 1 {
+		t.Errorf("requests = %d, want 1", got)
+	}
+}
