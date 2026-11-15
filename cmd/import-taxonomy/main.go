@@ -485,13 +485,12 @@ func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclus
 		if _, named := en[target]; named || isAlias || t.common == "" {
 			continue
 		}
-		if hasDash(t.common) {
-			rep.dashSkipped = append(rep.dashSkipped, target)
-			continue
-		}
 		english := t.common
 		if excl.has(enLocale, target) {
 			english = target
+		} else if hasDash(t.common) {
+			rep.dashSkipped = append(rep.dashSkipped, target)
+			continue
 		}
 		en[target] = english
 		rep.namesAdded++

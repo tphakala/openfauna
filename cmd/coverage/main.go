@@ -65,7 +65,7 @@ func main() {
 		covered := 0
 		for _, s := range species {
 			// Skip noise/unknown classes
-			if strings.HasPrefix(s, "Noise") || s == "Unknown" || s == "inat2024_fsd50k" {
+			if strings.HasPrefix(strings.ToLower(s), "noise") || s == "Unknown" || s == "inat2024_fsd50k" {
 				continue
 			}
 			total++

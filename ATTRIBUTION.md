@@ -53,7 +53,7 @@ The te reo Māori (`mi`) and English (New Zealand) (`en_nz`) locales carry the o
 
 ## 6. BirdNET+ Taxonomy
 
-The English and localized common names, class, iNaturalist ids and Wikidata QIDs of the species added in v1.2.0 come from:
+The English and localized common names, class, iNaturalist ids and Wikidata QIDs of the species and names added in v1.2.0 come from:
 
 - *BirdNET+ Taxonomy v0.5-Nov2026, https://birdnet.cornell.edu/taxonomy, CC BY-SA 4.0.*
 

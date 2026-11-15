@@ -315,12 +315,16 @@ func TestImportSpecies_ExcludedCells(t *testing.T) {
 	tax := map[string]taxon{
 		"Genus1 badlocale":  {sci: "Genus1 badlocale", common: "Locale Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Falsch", "fr": "Oiseau"}},
 		"Genus1 badenglish": {sci: "Genus1 badenglish", common: "Wrong Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Vogel"}},
+		"Genus1 dashed":     {sci: "Genus1 dashed", common: "Wrong\u2013Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Gestrichelt"}},
 	}
 	excl := exclusions{
 		"de": {"Genus1 badlocale": {Value: "Falsch", Reason: "names another species"}},
-		"en": {"Genus1 badenglish": {Value: "Wrong Bird", Reason: "names another animal"}},
+		"en": {
+			"Genus1 badenglish": {Value: "Wrong Bird", Reason: "names another animal"},
+			"Genus1 dashed":     {Value: "Wrong\u2013Bird", Reason: "names another animal"},
+		},
 	}
-	importSpecies(s, tax, []string{"Genus1 badlocale", "Genus1 badenglish"}, excl)
+	importSpecies(s, tax, []string{"Genus1 badlocale", "Genus1 badenglish", "Genus1 dashed"}, excl)
 
 	if _, ok := s.locales["de"]["Genus1 badlocale"]; ok {
 		t.Errorf("excluded de cell was imported: %q", s.locales["de"]["Genus1 badlocale"])
@@ -336,6 +340,12 @@ func TestImportSpecies_ExcludedCells(t *testing.T) {
 	}
 	if got := s.locales["de"]["Genus1 badenglish"]; got != "Vogel" {
 		t.Errorf("locale value of a species with an excluded English cell = %q", got)
+	}
+	if got := s.locales["en"]["Genus1 dashed"]; got != "Genus1 dashed" {
+		t.Errorf("excluded English cell with a dash = %q, want the scientific name", got)
+	}
+	if got := s.locales["de"]["Genus1 dashed"]; got != "Gestrichelt" {
+		t.Errorf("locale value of a species whose excluded English cell has a dash = %q", got)
 	}
 }
 

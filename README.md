@@ -127,7 +127,7 @@ Currently, OpenFauna provides translation support across the major bioacoustics 
 | BirdNET V3.0 preview4 | 12295 | 12036 | 97.9% |
 | BirdNET+ V3.0 | 11725 | 11725 | 100.0% |
 | Perch V2 | 14795 | 14259 | 96.4% |
-| BattyBirdNET | 88 | 87 | 98.9% |
+| BattyBirdNET | 85 | 85 | 100.0% |
 
 These CSVs can be natively embedded in your application for rapid database seeding during startup.
 
