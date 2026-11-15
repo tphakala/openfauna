@@ -140,16 +140,17 @@ func seqFixture() (*state, map[string]taxon, []string, []string) {
 		"Genus1 newmeta": {sci: "Genus1 newmeta", common: "New Meta Bird", group: "Aves", recType: "species", inat: "1", qid: "Q1"},
 		"Genus1 nameonly": {sci: "Genus1 nameonly", common: "Name Only Bird", group: "Aves", recType: "species", inat: "2",
 			names: map[string]string{"de": "Nur Name", "fr": "Oiseau", "fi": "Harmaa lintu", "it": "Uccello"}},
-		"Genus2 alias":  {sci: "Genus2 alias", common: "Alias Bird", group: "Aves", recType: "species", inat: "3", names: map[string]string{"de": "Alias"}},
-		"Soundy":        {sci: "Soundy", common: "Soundy", group: "Sound", recType: "sound_class"},
-		"Genus1 mammal": {sci: "Genus1 mammal", common: "Mammal Name", group: "Mammalia", recType: "species", qid: "Q6"},
-		"Genus3 a":      {sci: "Genus3 a", common: "Three A", group: "Aves", recType: "species", inat: "8"},
-		"Genus3 b":      {sci: "Genus3 b", common: "Three B", group: "Aves", recType: "species", inat: "9"},
+		"Genus2 alias":    {sci: "Genus2 alias", common: "Alias Bird", group: "Aves", recType: "species", inat: "3", names: map[string]string{"de": "Alias"}},
+		"Soundy":          {sci: "Soundy", common: "Soundy", group: "Sound", recType: "sound_class"},
+		"Genus1 mammal":   {sci: "Genus1 mammal", common: "Mammal Name", group: "Mammalia", recType: "species", qid: "Q6"},
+		"Genus3 a":        {sci: "Genus3 a", common: "Three A", group: "Aves", recType: "species", inat: "8"},
+		"Genus3 b":        {sci: "Genus3 b", common: "Three B", group: "Aves", recType: "species", inat: "9"},
+		"Genus5 nocommon": {sci: "Genus5 nocommon", common: "", group: "Aves", recType: "species", names: map[string]string{"de": "Ohne"}},
 		"Genus4 echo": {sci: "Genus4 echo", common: "Echo Bird", group: "Aves", recType: "species",
 			names: map[string]string{"de": "Genus4 echo", "fr": "echo bird", "fi": "Toinen lintu"}},
 	}
 	a := []string{"Genus1 newmeta", "Genus1 nameonly", "Genus4 echo"}
-	b := []string{"Genus2 alias", "Genus1 mammal", "Genus3 a", "Genus3 b", "Soundy", "No row"}
+	b := []string{"Genus2 alias", "Genus1 mammal", "Genus3 a", "Genus3 b", "Genus5 nocommon", "Soundy", "No row"}
 	return s, tax, a, b
 }
 
@@ -174,6 +175,12 @@ func TestImportSpecies_Sequences(t *testing.T) {
 	}
 	if _, ok := full.meta["Genus2 alias"]; !ok {
 		t.Errorf("alias-key target got no metadata record")
+	}
+	if _, ok := full.locales["en"]["Genus5 nocommon"]; ok {
+		t.Errorf("an empty English name was written")
+	}
+	if _, ok := full.meta["Genus5 nocommon"]; !ok {
+		t.Errorf("species with an empty common name got no metadata record")
 	}
 	if _, ok := full.meta["Soundy"]; ok {
 		t.Errorf("sound_class row produced a metadata record")
@@ -280,4 +287,23 @@ func copyMap(m map[string]string) map[string]string {
 		out[k] = v
 	}
 	return out
+}
+
+func TestApplyRenames_ErrorAfterMergeRestoresLocales(t *testing.T) {
+	s := mergeFixture()
+	err := applyRenames(s, []renamePair{{"Poo hyp", "Poo hypo"}, {"Nowhere", "Mod"}})
+	if err == nil {
+		t.Fatal("want an error from the second row")
+	}
+	if want := mergeFixture(); !reflect.DeepEqual(s, want) {
+		t.Errorf("locales changed by a run that failed after a merge: %v", s.locales)
+	}
+}
+
+func TestLocaleStem(t *testing.T) {
+	for in, want := range map[string]string{"es_EC": "es_ec", "pt_PT": "pt_pt", "zh-CN": "zh_cn", "de": "de"} {
+		if got := localeStem(in); got != want {
+			t.Errorf("localeStem(%q) = %q, want %q", in, got, want)
+		}
+	}
 }
