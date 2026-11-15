@@ -255,13 +255,26 @@ func execute(cfg config, c *fetch.Client) error {
 		return ok
 	}
 
-	inScopeNames := pending(meta)
-	var work []string
-	for _, name := range inScopeNames {
-		if !fromAlias(name) {
-			work = append(work, name)
+	// fromPartners fills what it can from alias partners and returns the rest.
+	// It repeats until a pass fills nothing, so a record whose partner is
+	// filled later in the same pass is still reached.
+	fromPartners := func(names []string) []string {
+		for {
+			var left []string
+			for _, name := range names {
+				if !fromAlias(name) {
+					left = append(left, name)
+				}
+			}
+			if len(left) == len(names) {
+				return left
+			}
+			names = left
 		}
 	}
+
+	inScopeNames := pending(meta)
+	work := fromPartners(inScopeNames)
 	if cfg.limit > 0 && cfg.limit < len(work) {
 		work = work[:cfg.limit]
 	}
@@ -292,8 +305,9 @@ func execute(cfg config, c *fetch.Client) error {
 	}
 
 	// A rejected record may now have a partner that GBIF filled in this run.
-	for _, name := range slices.Sorted(maps.Keys(rejects)) {
-		if fromAlias(name) {
+	left := fromPartners(slices.Sorted(maps.Keys(rejects)))
+	for name := range rejects {
+		if !slices.Contains(left, name) {
 			delete(rejects, name)
 		}
 	}

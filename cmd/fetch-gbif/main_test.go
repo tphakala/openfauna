@@ -498,3 +498,41 @@ func TestExecute_RejectReportCarriesGBIFMatch(t *testing.T) {
 		t.Errorf("rejected records changed: %+v", got)
 	}
 }
+
+// Two aliases share a canonical name. Only one alias is found in GBIF, so the
+// canonical record and then the other alias can only be filled from partners
+// that change later in the same run; one run must reach the fixed point.
+func TestExecute_AliasChainReachesFixedPoint(t *testing.T) {
+	cls := dataset.Taxonomy{Class: "Aves"}
+	meta := map[string]dataset.SpeciesRecord{"A sp": {Taxonomy: cls}, "B sp": {Taxonomy: cls}, "C sp": {Taxonomy: cls}}
+	e := newEnv(t, meta, map[string]string{"A sp": "C sp", "B sp": "C sp"},
+		map[string]match{"B sp": exact("Aves", "Passeriformes", "Corvidae")})
+	e.run(t)
+	want := dataset.Taxonomy{Class: "Aves", Order: "Passeriformes", Family: "Corvidae"}
+	for name, rec := range e.meta(t) {
+		if rec.Taxonomy != want {
+			t.Errorf("%s = %+v", name, rec.Taxonomy)
+		}
+	}
+	if !strings.Contains(string(e.bytes(t, e.cfg.reportPath)), `"rejects": []`) {
+		t.Errorf("report should be empty: %s", e.bytes(t, e.cfg.reportPath))
+	}
+}
+
+// The same chain resolved before any request: B is already complete, so C and
+// then A fill from partners and GBIF is never asked.
+func TestExecute_AliasChainNeedsNoRequest(t *testing.T) {
+	cls := dataset.Taxonomy{Class: "Aves"}
+	full := dataset.Taxonomy{Class: "Aves", Order: "Passeriformes", Family: "Corvidae"}
+	meta := map[string]dataset.SpeciesRecord{"A sp": {Taxonomy: cls}, "B sp": {Taxonomy: full}, "C sp": {Taxonomy: cls}}
+	e := newEnv(t, meta, map[string]string{"A sp": "C sp", "B sp": "C sp"}, nil)
+	e.run(t)
+	if n := e.srv.take(); len(n) != 0 {
+		t.Errorf("requested %v", n)
+	}
+	for name, rec := range e.meta(t) {
+		if rec.Taxonomy != full {
+			t.Errorf("%s = %+v", name, rec.Taxonomy)
+		}
+	}
+}
