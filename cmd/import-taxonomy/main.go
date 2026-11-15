@@ -167,14 +167,14 @@ func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir, exclusio
 	if err := applyRenames(s, pairs); err != nil {
 		return err
 	}
-	merged := mergeAliasCells(s, fa)
+	merged := mergeAliasCells(s, fa, excl)
 	rep := importSpecies(s, tax, targets, excl, fa)
 
 	fmt.Printf("taxonomy sha256 %x (%d rows)\n", sum, len(tax))
 	fmt.Printf("targets: %d\n", len(targets))
 	fmt.Printf("aliases: %d -> %d\n", aliasesBefore, len(s.aliases))
-	fmt.Printf("alias cells merged: %d (%d equal, %d case only, %d moved, %d replaced an echo, %d echo dropped, %d conflicts)\n",
-		merged.total(), merged.equal, merged.caseOnly, merged.moved, merged.echoReplaced, merged.echoDropped, len(merged.conflicts))
+	fmt.Printf("alias cells merged: %d (%d equal, %d case only, %d moved, %d replaced an echo, %d echo dropped, %d excluded, %d conflicts)\n",
+		merged.total(), merged.equal, merged.caseOnly, merged.moved, merged.echoReplaced, merged.echoDropped, merged.excluded, len(merged.conflicts))
 	for _, line := range merged.conflicts {
 		fmt.Printf("alias cell dropped, canonical kept: %s\n", line)
 	}
@@ -404,12 +404,12 @@ func applyRenames(s *state, pairs []renamePair) error {
 // by outcome. conflicts lists each dropped cell whose name differs from the
 // canonical one by more than letter case.
 type mergeReport struct {
-	equal, caseOnly, moved, echoReplaced, echoDropped int
-	conflicts                                         []string
+	equal, caseOnly, moved, echoReplaced, echoDropped, excluded int
+	conflicts                                                   []string
 }
 
 func (r mergeReport) total() int {
-	return r.equal + r.caseOnly + r.moved + r.echoReplaced + r.echoDropped + len(r.conflicts)
+	return r.equal + r.caseOnly + r.moved + r.echoReplaced + r.echoDropped + r.excluded + len(r.conflicts)
 }
 
 // mergeAliasCells folds every locale cell stored under an alias key into the
@@ -418,15 +418,16 @@ func (r mergeReport) total() int {
 // of one canonical name both have a cell and the canonical has none. An alias
 // whose target is empty or itself an alias key (a chain or a self alias) is
 // left alone; scripts/validate.py reports its cells. A moved or replacing fa
-// value is normalized with fa first.
-func mergeAliasCells(s *state, fa zwnjTokens) mergeReport {
+// value is normalized with fa first, and a value excl lists for the canonical
+// name is dropped.
+func mergeAliasCells(s *state, fa zwnjTokens, excl exclusions) mergeReport {
 	var rep mergeReport
 	for _, alias := range sortedKeys(s.aliases) {
 		canonical := s.aliases[alias]
 		if _, chained := s.aliases[canonical]; chained || canonical == "" || strings.HasPrefix(alias, "_") {
 			continue
 		}
-		mergeEntry(s, canonical, alias, fa, &rep)
+		mergeEntry(s, canonical, alias, fa, excl, &rep)
 	}
 	return rep
 }
@@ -435,7 +436,8 @@ func mergeAliasCells(s *state, fa zwnjTokens) mergeReport {
 // value of g stays. In every other locale a value only m has is moved over,
 // unless it is empty or merely echoes a scientific or English name of the pair; when both
 // have a value, m's replaces g's only if g's is such an echo and m's is not.
-func mergeEntry(s *state, g, m string, fa zwnjTokens, rep *mergeReport) {
+// A value of m that excl lists for g is dropped.
+func mergeEntry(s *state, g, m string, fa zwnjTokens, excl exclusions, rep *mergeReport) {
 	echoes := []string{g, m}
 	for _, k := range []string{g, m} {
 		if v, ok := s.locales[enLocale][k]; ok {
@@ -463,11 +465,14 @@ func mergeEntry(s *state, g, m string, fa zwnjTokens, rep *mergeReport) {
 		if loc == enLocale {
 			continue
 		}
+		raw := mv
 		if loc == faLocale {
 			mv = fa.normalize(mv)
 		}
 		gv, has := entries[g]
 		switch {
+		case excl.matches(loc, g, raw) || excl.matches(loc, g, mv):
+			rep.excluded++
 		case !has && isEcho(mv):
 			rep.echoDropped++
 		case !has:
@@ -647,7 +652,7 @@ func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclus
 			}
 			// Normalize before the echo checks so a stray joiner cannot hide an echo.
 			if loc == faLocale {
-				if v = fa.normalize(v); v == "" {
+				if v = fa.normalize(v); v == "" || excl.matches(loc, target, v) {
 					continue
 				}
 			}

@@ -124,7 +124,7 @@ func mergeFixture() *state {
 func TestMergeAliasCells(t *testing.T) {
 	fa := zwnjTokens{bareBrown: joinedBrown}
 	s := mergeFixture()
-	rep := mergeAliasCells(s, fa)
+	rep := mergeAliasCells(s, fa, nil)
 
 	want := map[string]map[string]string{
 		"en":  {"Poo hyp": "Warbling-Finch", "Self s": "Self", "Chain c": "C"},
@@ -161,7 +161,7 @@ func TestMergeAliasCells(t *testing.T) {
 
 	// A second pass finds nothing.
 	before := s.clone()
-	if again := mergeAliasCells(s, fa); again.total() != 0 || !reflect.DeepEqual(s, before) {
+	if again := mergeAliasCells(s, fa, nil); again.total() != 0 || !reflect.DeepEqual(s, before) {
 		t.Errorf("second pass changed state or reported %+v", again)
 	}
 }
@@ -180,7 +180,7 @@ func TestMergeAliasCells_AfterRename(t *testing.T) {
 	if got := s.locales["de"]; !reflect.DeepEqual(got, map[string]string{"Mod one": "Eins"}) {
 		t.Fatalf("applyRenames changed locale cells: %v", got)
 	}
-	rep := mergeAliasCells(s, nil)
+	rep := mergeAliasCells(s, nil, nil)
 	want := map[string]map[string]string{
 		"en": {"Geo one": "One"},
 		"de": {"Geo one": "Eins"},
@@ -188,6 +188,46 @@ func TestMergeAliasCells_AfterRename(t *testing.T) {
 	}
 	if !reflect.DeepEqual(s.locales, want) || rep.moved != 1 || len(rep.conflicts) != 1 {
 		t.Errorf("locales = %v, report = %+v", s.locales, rep)
+	}
+}
+
+// An alias value that is excluded for the canonical name is dropped, never
+// moved or used to replace an echo.
+func TestMergeAliasCells_SkipsExcludedValues(t *testing.T) {
+	s := newState(map[string]string{"Mod one": "Geo one", "Mod two": "Geo two"},
+		map[string]map[string]string{
+			"en": {"Geo one": "One", "Geo two": "Two"},
+			"de": {"Mod one": "Falsch", "Mod two": "Auch falsch", "Geo two": "Two"},
+		})
+	excl := exclusions{"de": {
+		"Geo one": {Value: "falsch", Reason: "r"},
+		"Geo two": {Value: "Auch falsch", Reason: "r"},
+	}}
+	rep := mergeAliasCells(s, nil, excl)
+	want := map[string]string{"Geo two": "Two"}
+	if got := s.locales["de"]; !reflect.DeepEqual(got, want) || rep.excluded != 2 {
+		t.Errorf("de = %v, report = %+v", got, rep)
+	}
+}
+
+// A Persian exclusion lists the raw upstream form, which the merge and the
+// import must still recognize after adding joiners, and the joined form too.
+func TestExclusions_PersianRawAndJoinedForms(t *testing.T) {
+	fa := zwnjTokens{bareBrown: joinedBrown}
+	s := newState(map[string]string{"Mod one": "Geo one"},
+		map[string]map[string]string{"en": {"Geo one": "One"}, "fa": {"Mod one": bareBrown}})
+	excl := exclusions{"fa": {
+		"Geo one":    {Value: bareBrown, Reason: "r"},
+		"Genus1 two": {Value: joinedBrown, Reason: "r"},
+	}}
+	if rep := mergeAliasCells(s, fa, excl); rep.excluded != 1 || len(s.locales["fa"]) != 0 {
+		t.Errorf("merge: fa = %v, report = %+v", s.locales["fa"], rep)
+	}
+	tax := map[string]taxon{"Genus1 two": {sci: "Genus1 two", common: "Two", group: "Aves", recType: "species",
+		names: map[string]string{"fa": bareBrown}}}
+	importSpecies(s, tax, []string{"Genus1 two"}, excl, fa)
+	if v, ok := s.locales["fa"]["Genus1 two"]; ok {
+		t.Errorf("import: fa cell written for an excluded joined form: %q", v)
 	}
 }
 
