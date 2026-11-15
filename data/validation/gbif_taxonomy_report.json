@@ -1,0 +1,485 @@
+{
+  "_comment": "Records with a class that fetch-gbif could not give an order and family: GBIF has no exact species match, or the match failed a safety check. Rewritten only by a full run (no -limit, no -dry-run). Rerunning with unchanged data leaves this file as it is.",
+  "rejects": [
+    {
+      "class": "Aves",
+      "name": "Aerospiza castanilius",
+      "reason": "no_match"
+    },
+    {
+      "class": "Mammalia",
+      "name": "Aethalodelphis obliquidens",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Amirafra angolensis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Amirafra collaris",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Angusta fangtingyui",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Anstisia alba",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Anstisia lutea",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Anstisia rosea",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Anstisia vitellina",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Artomyias fuliginosa",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Artomyias ussheri",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Asianopleura hilpa",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Brachycephalus rotenbergae",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Camponotus confusus",
+      "reason": "no_match"
+    },
+    {
+      "class": "Mammalia",
+      "name": "Cephalophorus harveyi",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Chinavia pensylvanica",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Chlorocanta viridis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Chlorohyla chloris",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Clemacantha goliath",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Colleeneremia pyrina",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Duellmanohyla legleri",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Duellmanohyla salvadorensis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Emblema modestum",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Euspinolia militaris",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Firouzophrynus stomaticus",
+      "reason": "no_match"
+    },
+    {
+      "class": "Mammalia",
+      "gbif": {
+        "canonical_name": "Gardnerycteris crenulatum",
+        "class": "Mammalia",
+        "family": "Phyllostomidae",
+        "kingdom": "Animalia",
+        "match_type": "FUZZY",
+        "order": "Chiroptera",
+        "phylum": "Chordata",
+        "rank": "SPECIES",
+        "status": "ACCEPTED",
+        "usage_key": 8962358
+      },
+      "name": "Gardnerycteris crenulata",
+      "reason": "not_exact"
+    },
+    {
+      "class": "Insecta",
+      "name": "Hewlettia nigriviridis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Imatismus villosus",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Indopurana cheeveeda",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "gbif": {
+        "canonical_name": "Lagopus scoticus",
+        "class": "Aves",
+        "family": "Phasianidae",
+        "kingdom": "Animalia",
+        "match_type": "FUZZY",
+        "order": "Galliformes",
+        "phylum": "Chordata",
+        "rank": "SPECIES",
+        "status": "SYNONYM",
+        "usage_key": 8189518
+      },
+      "name": "Lagopus scotica",
+      "reason": "not_exact"
+    },
+    {
+      "class": "Aves",
+      "name": "Leucophantes brachyurus",
+      "reason": "no_match"
+    },
+    {
+      "class": "Mammalia",
+      "name": "Lupulella adusta",
+      "reason": "no_match"
+    },
+    {
+      "class": "Mammalia",
+      "name": "Lupulella mesomelas",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Mariazofia gibba",
+      "reason": "no_match"
+    },
+    {
+      "class": "Mammalia",
+      "name": "Melogale subaurantiaca",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Mertensophryne lughensis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Metapurana nebulilinea",
+      "reason": "no_match"
+    },
+    {
+      "class": "Actinopterygii",
+      "name": "Micropterus nigricans",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Myopornis boehmi",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Nannopsittacus gulielmitertii",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Nannopsittacus melanogenia",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Nannopsittacus nigrifrons",
+      "reason": "no_match"
+    },
+    {
+      "class": "Mammalia",
+      "name": "Neoeptesicus furinalis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Mammalia",
+      "name": "Neogale vison",
+      "reason": "no_match"
+    },
+    {
+      "class": "Actinopterygii",
+      "gbif": {
+        "canonical_name": "Neoniphon coruscum",
+        "class": "",
+        "family": "Holocentridae",
+        "kingdom": "Animalia",
+        "match_type": "FUZZY",
+        "order": "Beryciformes",
+        "phylum": "Chordata",
+        "rank": "SPECIES",
+        "status": "SYNONYM",
+        "usage_key": 10929509
+      },
+      "name": "Neoniphon coruscus",
+      "reason": "not_exact"
+    },
+    {
+      "class": "Actinopterygii",
+      "gbif": {
+        "canonical_name": "Neoniphon vexillarium",
+        "class": "",
+        "family": "Holocentridae",
+        "kingdom": "Animalia",
+        "match_type": "FUZZY",
+        "order": "Beryciformes",
+        "phylum": "Chordata",
+        "rank": "SPECIES",
+        "status": "ACCEPTED",
+        "usage_key": 11092132
+      },
+      "name": "Neoniphon vexillarius",
+      "reason": "not_exact"
+    },
+    {
+      "class": "Insecta",
+      "name": "Opodiphthera eucalypti",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Paropsis atomaria",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Pengilleyia ridibunda",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Pericallea ewartioides",
+      "reason": "no_match"
+    },
+    {
+      "class": "Mammalia",
+      "name": "Petaurista grandis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "gbif": {
+        "canonical_name": "Pica nuttalli",
+        "class": "Aves",
+        "family": "Corvidae",
+        "kingdom": "Animalia",
+        "match_type": "FUZZY",
+        "order": "Passeriformes",
+        "phylum": "Chordata",
+        "rank": "SPECIES",
+        "status": "ACCEPTED",
+        "usage_key": 5229489
+      },
+      "name": "Pica nuttallii",
+      "reason": "not_exact"
+    },
+    {
+      "class": "Insecta",
+      "name": "Planopleura kaempferi",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Planopleura takasagona",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Plocealauda microptera",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Protrellius helverseni",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Purapurana carmente",
+      "reason": "no_match"
+    },
+    {
+      "class": "Mammalia",
+      "name": "Sciurus brasiliensis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Serranobatrachus sanctaemartae",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Spicicalyx myola",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Stephoblemmus blennus",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Streeyola oshimensis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Streeyola silhetana",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Tachiramantis cuentasi",
+      "reason": "no_match"
+    },
+    {
+      "class": "Amphibia",
+      "name": "Tachiramantis tayrona",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza albogularis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza brachyura",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza brevipes",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza butleri",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza erythrauchen",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza erythropus",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza francesiae",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza haplochroa",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza henicogramma",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza imitator",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza luteoschistacea",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza melanochlamys",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza nanus",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza poliocephala",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza princeps",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza rhodogaster",
+      "reason": "no_match"
+    },
+    {
+      "class": "Aves",
+      "name": "Tachyspiza rufitorques",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Vietanna orientalis",
+      "reason": "no_match"
+    },
+    {
+      "class": "Insecta",
+      "name": "Zoraena maculata",
+      "reason": "no_match"
+    }
+  ]
+}

@@ -143,10 +143,11 @@ go run ./cmd/import-bats
 ```
 
 ### Fetching Taxonomy Metadata (GBIF & iNaturalist)
-To fetch taxonomy from the GBIF Backbone API:
+To fill the missing `order` and `family` of records that have a `class`, from an alias partner in `data/aliases.json` or an exact species match in the GBIF Backbone API:
 ```bash
 go run ./cmd/fetch-gbif
 ```
+It never changes an existing value and lists the records it could not fill in `data/validation/gbif_taxonomy_report.json`. Use `-dry-run` to write nothing. `-limit N` caps the GBIF queries (alias fills still apply) and writes `data/metadata.json` but not the report, so only a full run updates the report.
 
 To extract authoritative iNaturalist taxonomy URLs without querying their rate-limited API (streams directly from AWS Open Data):
 ```bash

@@ -14,8 +14,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
-	"io"
 	"log"
 	"maps"
 	"net/http"
@@ -27,6 +25,7 @@ import (
 	"time"
 
 	"github.com/tphakala/openfauna/internal/dataset"
+	"github.com/tphakala/openfauna/internal/fetch"
 )
 
 const (
@@ -74,10 +73,10 @@ func main() {
 	// requests instead of hanging on a slow endpoint.
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
-	c := &client{http: &http.Client{Timeout: 60 * time.Second}, ua: *userAgent, interval: rateInterval(*qps), ctx: ctx}
+	c := &fetch.Client{HTTP: &http.Client{Timeout: 60 * time.Second}, UserAgent: *userAgent, Interval: fetch.RateInterval(*qps), Ctx: ctx}
 
-	titleQID := c.resolveTitles(meta, work)
-	nameQID := c.resolveNames(work)
+	titleQID := resolveTitles(c, meta, work)
+	nameQID := resolveNames(c, work)
 
 	rep := newReport()
 	for _, name := range work {
@@ -99,7 +98,7 @@ func main() {
 		media = map[string][]dataset.MediaItem{}
 	}
 	if !*skipMedia {
-		added, skipped := c.seedMedia(meta, work, *limit, media)
+		added, skipped := seedMedia(c, meta, work, *limit, media)
 		rep.MediaAdded = added
 		rep.MediaSkipped = skipped
 		log.Printf("media: %d added, %d skipped for an unclean license", added, skipped)
@@ -120,7 +119,7 @@ func main() {
 // resolveTitles maps each work species' stored enwiki title to a QID via the
 // MediaWiki pageprops API, batched and resolved per batch (normalization and
 // redirect maps are batch-local).
-func (c *client) resolveTitles(meta map[string]dataset.SpeciesRecord, work []string) map[string]string {
+func resolveTitles(c *fetch.Client, meta map[string]dataset.SpeciesRecord, work []string) map[string]string {
 	out := make(map[string]string, len(work))
 	for _, batch := range chunk(work, apiBatch) {
 		titles := make([]string, len(batch))
@@ -134,7 +133,7 @@ func (c *client) resolveTitles(meta map[string]dataset.SpeciesRecord, work []str
 		q.Set("ppprop", "wikibase_item")
 		q.Set("redirects", "1")
 		q.Set("titles", strings.Join(titles, "|"))
-		body, err := c.get(enwikiAPI + "?" + q.Encode())
+		body, err := c.Get(enwikiAPI + "?" + q.Encode())
 		if err != nil {
 			log.Printf("pageprops batch failed (%d titles): %v", len(titles), err)
 			continue
@@ -155,7 +154,7 @@ func (c *client) resolveTitles(meta map[string]dataset.SpeciesRecord, work []str
 
 // resolveNames cross-checks each work species' scientific name against the P225
 // (taxon name) SPARQL lookup. An ambiguous name (homonym) yields no entry.
-func (c *client) resolveNames(work []string) map[string]string {
+func resolveNames(c *fetch.Client, work []string) map[string]string {
 	out := make(map[string]string, len(work))
 	for _, batch := range chunk(work, sparqlBatch) {
 		var b strings.Builder
@@ -169,7 +168,7 @@ func (c *client) resolveNames(work []string) map[string]string {
 		q := url.Values{}
 		q.Set("format", "json")
 		q.Set("query", b.String())
-		body, err := c.get(sparqlAPI + "?" + q.Encode())
+		body, err := c.Get(sparqlAPI + "?" + q.Encode())
 		if err != nil {
 			log.Printf("sparql batch failed (%d names): %v", len(batch), err)
 			continue
@@ -188,7 +187,7 @@ func (c *client) resolveNames(work []string) map[string]string {
 // builds a CC-clean MediaItem from the Commons imageinfo for each. With limit>0
 // only the bounded work set is considered; with limit==0 all non-bird QID species
 // are. It returns the count added and the count skipped for license reasons.
-func (c *client) seedMedia(meta map[string]dataset.SpeciesRecord, work []string, limit int, media map[string][]dataset.MediaItem) (added, skipped int) {
+func seedMedia(c *fetch.Client, meta map[string]dataset.SpeciesRecord, work []string, limit int, media map[string][]dataset.MediaItem) (added, skipped int) {
 	// Candidate names: non-bird species with a QID wikipedia link.
 	var names []string
 	if limit > 0 {
@@ -226,7 +225,7 @@ func (c *client) seedMedia(meta map[string]dataset.SpeciesRecord, work []string,
 		q.Set("format", "json")
 		q.Set("props", "claims")
 		q.Set("ids", strings.Join(batch, "|"))
-		body, err := c.get(wikidataAPI + "?" + q.Encode())
+		body, err := c.Get(wikidataAPI + "?" + q.Encode())
 		if err != nil {
 			log.Printf("wbgetentities batch failed: %v", err)
 			continue
@@ -259,7 +258,7 @@ func (c *client) seedMedia(meta map[string]dataset.SpeciesRecord, work []string,
 		q.Set("iiprop", "size|mime|extmetadata")
 		q.Set("redirects", "1") // a P18 value can name a since-renamed Commons file
 		q.Set("titles", strings.Join(batch, "|"))
-		body, err := c.get(commonsAPI + "?" + q.Encode())
+		body, err := c.Get(commonsAPI + "?" + q.Encode())
 		if err != nil {
 			log.Printf("imageinfo batch failed: %v", err)
 			continue
@@ -305,96 +304,6 @@ func (c *client) seedMedia(meta map[string]dataset.SpeciesRecord, work []string,
 		added++
 	}
 	return added, skipped
-}
-
-// client wraps an HTTP client with a descriptive User-Agent and a politeness
-// throttle. Wikimedia requires the User-Agent and rate-limits aggressive clients.
-type client struct {
-	http     *http.Client
-	ua       string
-	interval time.Duration
-	last     time.Time
-	ctx      context.Context
-}
-
-func rateInterval(qps float64) time.Duration {
-	if qps <= 0 {
-		return 0
-	}
-	return time.Duration(float64(time.Second) / qps)
-}
-
-// get fetches a URL, throttling to the configured rate and retrying transient
-// failures (a connection error, a body-read error on an otherwise-200 response,
-// or a 429/5xx status) with a short backoff. A GET is idempotent, so a read
-// error is safe to retry.
-func (c *client) get(rawURL string) ([]byte, error) {
-	const maxAttempts = 4
-	var lastErr error
-	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		if c.interval > 0 {
-			if wait := c.interval - time.Since(c.last); wait > 0 {
-				if err := c.sleep(wait); err != nil {
-					return nil, err
-				}
-			}
-		}
-		c.last = time.Now()
-
-		req, err := http.NewRequestWithContext(c.ctx, http.MethodGet, rawURL, nil)
-		if err != nil {
-			return nil, err
-		}
-		req.Header.Set("User-Agent", c.ua)
-		req.Header.Set("Accept", "application/json")
-		resp, err := c.http.Do(req)
-		if err != nil {
-			lastErr = err
-			if serr := c.sleep(backoff(attempt)); serr != nil {
-				return nil, serr
-			}
-			continue
-		}
-		body, readErr := io.ReadAll(resp.Body)
-		resp.Body.Close()
-		if readErr != nil {
-			lastErr = readErr
-			if serr := c.sleep(backoff(attempt)); serr != nil {
-				return nil, serr
-			}
-			continue
-		}
-		if resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500 {
-			lastErr = fmt.Errorf("status %d", resp.StatusCode)
-			if serr := c.sleep(backoff(attempt)); serr != nil {
-				return nil, serr
-			}
-			continue
-		}
-		if resp.StatusCode != http.StatusOK {
-			return nil, fmt.Errorf("status %d", resp.StatusCode)
-		}
-		return body, nil
-	}
-	return nil, fmt.Errorf("giving up after %d attempts: %w", maxAttempts, lastErr)
-}
-
-// sleep waits for d or until the context is cancelled, so an interrupt (Ctrl+C)
-// returns promptly instead of blocking for the full throttle or backoff delay.
-func (c *client) sleep(d time.Duration) error {
-	if d <= 0 {
-		return nil
-	}
-	select {
-	case <-c.ctx.Done():
-		return c.ctx.Err()
-	case <-time.After(d):
-		return nil
-	}
-}
-
-func backoff(attempt int) time.Duration {
-	return time.Duration(attempt) * time.Second
 }
 
 // report tallies the QID cross-check outcome for the maintainer to review.
