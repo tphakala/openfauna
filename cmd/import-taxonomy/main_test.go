@@ -350,6 +350,9 @@ func TestExclusions_Validate(t *testing.T) {
 	if err := (exclusions{"de": {"A b": {Value: "x"}}}).validate(locales); err == nil {
 		t.Errorf("entry without a reason accepted")
 	}
+	if err := (exclusions{"de": {"A b": {Reason: "r"}}}).validate(locales); err == nil {
+		t.Errorf("entry without a value accepted")
+	}
 }
 
 func TestLoadExclusions(t *testing.T) {
