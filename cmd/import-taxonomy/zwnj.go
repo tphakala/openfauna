@@ -8,7 +8,7 @@ import (
 
 const (
 	faLocale = "fa"
-	zwnj     = '‌'
+	zwnj     = '\u200c'
 )
 
 // zwnjTokens maps a Persian token written without a zero-width non-joiner

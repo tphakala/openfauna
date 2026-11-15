@@ -17,13 +17,13 @@ func TestZWNJTokens_Normalize(t *testing.T) {
 		{"next to a hyphen", "x-" + bareBrown, "x-" + joinedBrown, m},
 		{"next to a digit", bareBrown + "2", joinedBrown + "2", m},
 		{"longer token left alone", bareBrown + "ها", bareBrown + "ها", m},
-		{"doubled collapsed", "ا‌‌ب", "ا‌ب", m},
-		{"leading removed", "‌اب", "اب", m},
-		{"trailing removed", "اب‌", "اب", m},
-		{"next to a space removed", "اب ‌اب", "اب اب", m},
-		{"well-formed kept", "ا‌ب", "ا‌ب", m},
+		{"doubled collapsed", "ا\u200c\u200cب", "ا\u200cب", m},
+		{"leading removed", "\u200cاب", "اب", m},
+		{"trailing removed", "اب\u200c", "اب", m},
+		{"next to a space removed", "اب \u200cاب", "اب اب", m},
+		{"well-formed kept", "ا\u200cب", "ا\u200cب", m},
 		{"latin untouched", "Common Name", "Common Name", m},
-		{"nil map strips only", "‌" + bareBrown, bareBrown, nil},
+		{"nil map strips only", "\u200c" + bareBrown, bareBrown, nil},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -49,11 +49,11 @@ func TestLoadZWNJTokens(t *testing.T) {
 
 	bad := map[string]string{
 		"no tokens object":         `{"_comment": "x"}`,
-		"value changes a letter":   `{"tokens": {"اب": "ا‌ج"}}`,
+		"value changes a letter":   `{"tokens": {"اب": "ا\u200cج"}}`,
 		"value equals key":         `{"tokens": {"اب": "اب"}}`,
-		"key holds U+200C":         `{"tokens": {"ا‌ب": "ا‌ب‌ج"}}`,
-		"key holds a space":        `{"tokens": {"ا ب": "ا‌ ب"}}`,
-		"value has a stray U+200C": `{"tokens": {"اب": "اب‌"}}`,
+		"key holds U+200C":         `{"tokens": {"ا\u200cب": "ا\u200cب\u200cج"}}`,
+		"key holds a space":        `{"tokens": {"ا ب": "ا\u200c ب"}}`,
+		"value has a stray U+200C": `{"tokens": {"اب": "اب\u200c"}}`,
 	}
 	for name, content := range bad {
 		t.Run(name, func(t *testing.T) {
