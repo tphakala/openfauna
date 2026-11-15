@@ -19,6 +19,12 @@ Checks (each can be skipped with --skip <name>):
              proper nouns (e.g. "Stellers sjolejon", "Thomas' galago"), which
              those languages keep capitalized.
   dashes     No common-name value contains an em dash or en dash.
+  exclusions No cell listed in data/validation/taxonomy_exclusions.json is
+             present in the locale data with its listed (wrong) value.
+  labels     For each model label manifest in data/validation/labels/, the
+             labels without a metadata record and the labels without a name
+             equal data/validation/label_baseline.json exactly, so a change in
+             label resolution is always a reviewed one.
 
 Usage:
   python3 scripts/validate.py                 # run all checks
@@ -46,6 +52,9 @@ MEDIA_FILE = os.path.join(ROOT, "data", "media.json")
 SHADOW_ALLOWLIST = os.path.join(ROOT, "data", "validation", "shadow_allowlist.json")
 CURATED_FILE = os.path.join(ROOT, "data", "curated_names.json")
 ECHO_BASELINE = os.path.join(ROOT, "data", "validation", "english_echo_baseline.json")
+EXCLUSIONS_FILE = os.path.join(ROOT, "data", "validation", "taxonomy_exclusions.json")
+LABELS_DIR = os.path.join(ROOT, "data", "validation", "labels")
+LABEL_BASELINE = os.path.join(ROOT, "data", "validation", "label_baseline.json")
 
 # Locales whose vernacular species names use a lowercase initial. Verified
 # against the national authorities (Kotus/Luomus, Spakradet/Artdatabanken,
@@ -56,7 +65,7 @@ LOWERCASE_LOCALES = ("fi", "sv", "no")
 # English sound-event labels whose keys are binomial-shaped and would otherwise
 # pollute the genus set (e.g. "Human vocal", "Power tools"). These are not
 # species; their first token is not a real genus.
-PSEUDO_GENERA = {"Human", "Power"}
+PSEUDO_GENERA = {"Human", "Power", "Motor", "Vehicle"}
 
 # Alias canonicals that legitimately do not exist as a translated species
 # (control-label aliases). The compiler treats them as no-ops.
@@ -153,7 +162,8 @@ def check_aliases(report: Report, en: dict) -> None:
     if problems:
         report.fail("aliases", problems)
     else:
-        report.ok("aliases", f"{len(aliases)} aliases consistent, no duplicates")
+        count = sum(1 for alias in aliases if not alias.startswith("_"))
+        report.ok("aliases", f"{count} aliases consistent, no duplicates")
 
 
 def check_shadowing(report: Report, en: dict) -> None:
@@ -305,6 +315,88 @@ def check_english_echo(report: Report, en: dict) -> None:
                   f"({sum(counts.values())} total)")
 
 
+def label_gaps(en: dict, meta: dict, aliases: dict) -> dict[str, dict]:
+    """Per model manifest: label names without a metadata record and label names
+    without a common name (neither an en.json key nor an alias of one)."""
+    gaps: dict[str, dict] = {}
+    for path in sorted(glob.glob(os.path.join(LABELS_DIR, "*.txt"))):
+        model = os.path.basename(path)[:-4]
+        names = [line.strip() for line in read_text(path).splitlines() if line.strip()]
+        gaps[model] = {
+            "labels": len(names),
+            "no_metadata": sorted(n for n in names if n not in meta),
+            "no_name": sorted(n for n in names
+                              if n not in en and aliases.get(n) not in en),
+        }
+    return gaps
+
+
+def check_labels(report: Report, en: dict, meta: dict) -> None:
+    """Pin label resolution. The unresolved labels of every model manifest must equal
+    the committed baseline: a newly unresolved label is a regression, a newly resolved
+    one means the baseline is stale. Refresh it after a reviewed data change with
+    python3 scripts/validate.py --write-label-baseline."""
+    hint = "refresh with: python3 scripts/validate.py --write-label-baseline"
+    if not glob.glob(os.path.join(LABELS_DIR, "*.txt")):
+        report.fail("labels", [f"{os.path.relpath(LABELS_DIR, ROOT)} has no label manifests"])
+        return
+    if not os.path.exists(LABEL_BASELINE):
+        report.fail("labels", [f"baseline {os.path.relpath(LABEL_BASELINE, ROOT)} is missing; {hint}"])
+        return
+    base = load_json(LABEL_BASELINE)
+    gaps = label_gaps(en, meta, load_json(ALIASES_FILE))
+    problems: list[str] = []
+    for kind in ("no_metadata", "no_name"):
+        base_kind = base.get(kind, {})
+        for model in sorted(set(gaps) | set(base_kind)):
+            if model not in gaps or model not in base_kind:
+                where = "baseline" if model not in base_kind else "manifests"
+                problems.append(f"{model}: {kind} is missing from the {where}; {hint}")
+                continue
+            now, then = set(gaps[model][kind]), set(base_kind[model])
+            for name in sorted(now - then):
+                problems.append(f"{model}: {name!r} is newly unresolved ({kind})")
+            for name in sorted(then - now):
+                problems.append(f"{model}: {name!r} is now resolved ({kind}) but still in the baseline; {hint}")
+    if problems:
+        report.fail("labels", problems)
+        return
+    for model, gap in gaps.items():
+        report.ok("labels", f"{model}: {gap['labels']} labels, "
+                  f"{len(gap['no_metadata'])} without metadata, {len(gap['no_name'])} without a name")
+
+
+def check_exclusions(report: Report) -> None:
+    """Cells listed in taxonomy_exclusions.json are known-wrong imported values. The
+    importer never writes them, and a backfill or hand edit must not put one back."""
+    if not os.path.exists(EXCLUSIONS_FILE):
+        report.fail("exclusions", [f"{os.path.relpath(EXCLUSIONS_FILE, ROOT)} is missing; "
+                                   "it is a required, version-controlled data file."])
+        return
+    excluded = load_json(EXCLUSIONS_FILE).get("exclude")
+    if not isinstance(excluded, dict):
+        report.fail("exclusions", [f"{os.path.relpath(EXCLUSIONS_FILE, ROOT)} has no \"exclude\" object"])
+        return
+    problems: list[str] = []
+    count = 0
+    for loc, cells in excluded.items():
+        path = os.path.join(LOCALE_DIR, f"{loc}.json")
+        if not os.path.exists(path):
+            problems.append(f"{loc}: no locale file for the exclusion list")
+            continue
+        names = load_json(path)
+        for sci, cell in cells.items():
+            count += 1
+            if not cell.get("reason") or not cell.get("value"):
+                problems.append(f"{loc}: {sci!r} needs a value and a reason")
+            elif names.get(sci) == cell["value"]:
+                problems.append(f"{loc}: {sci!r} still has the excluded value {cell['value']!r}")
+    if problems:
+        report.fail("exclusions", problems)
+    else:
+        report.ok("exclusions", f"{count} excluded cells absent from the data")
+
+
 def check_curated(report: Report, en: dict) -> None:
     """Every data/curated_names.json entry must appear verbatim in its locale file.
     The file holds hand-verified, reviewer-checked names (e.g. the issue #11 bat
@@ -448,7 +540,7 @@ def check_media(report: Report) -> None:
         report.ok("media", f"{count} media item(s) valid")
 
 
-CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated", "sources", "media_sources", "media")
+CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated", "sources", "media_sources", "media", "labels", "exclusions")
 
 
 def main() -> int:
@@ -459,6 +551,10 @@ def main() -> int:
     parser.add_argument("--write-echo-baseline", action="store_true",
                         help="record current per-locale English-fallback counts as the "
                              "baseline and exit (run after a legitimate backfill)")
+    parser.add_argument("--write-label-baseline", action="store_true",
+                        help="record the labels of every model manifest that lack metadata "
+                             "or a name as the baseline and exit (run after a reviewed "
+                             "data or manifest change)")
     args = parser.parse_args()
 
     if args.write_echo_baseline:
@@ -474,6 +570,22 @@ def main() -> int:
         with open(ECHO_BASELINE, "w", encoding="utf-8") as fh:
             fh.write(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")
         print(f"wrote {ECHO_BASELINE} ({sum(counts.values())} echoes across {len(counts)} locales)")
+        return 0
+
+    if args.write_label_baseline:
+        gaps = label_gaps(load_json(os.path.join(LOCALE_DIR, "en.json")),
+                          load_json(METADATA_FILE), load_json(ALIASES_FILE))
+        doc = {
+            "_comment": "Labels of each model manifest in data/validation/labels/ that have no "
+                        "metadata record (no_metadata) or no common name (no_name). check_labels "
+                        "fails CI if the current sets differ. Refresh after a reviewed change "
+                        "with: python3 scripts/validate.py --write-label-baseline",
+            "no_metadata": {m: g["no_metadata"] for m, g in sorted(gaps.items())},
+            "no_name": {m: g["no_name"] for m, g in sorted(gaps.items())},
+        }
+        with open(LABEL_BASELINE, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps(doc, indent=2, ensure_ascii=False) + "\n")
+        print(f"wrote {LABEL_BASELINE} ({len(gaps)} models)")
         return 0
 
     report = Report(args.quiet)
@@ -510,6 +622,10 @@ def main() -> int:
         check_media_sources(report)
     if "media" not in args.skip:
         check_media(report)
+    if "labels" not in args.skip:
+        check_labels(report, en, meta)
+    if "exclusions" not in args.skip:
+        check_exclusions(report)
 
     if report.failures:
         print(f"\nFAILED: {report.failures} problem(s) found.")

@@ -2,7 +2,7 @@
 
 OpenFauna is an open-source biological metadata and translation dictionary built for the global bioacoustics and environmental monitoring community. 
 
-This project aggregates data from several incredible scientific institutions and open-source projects. We deeply respect their terms of use and require all users of OpenFauna to provide similar attribution in their derived works.
+This project aggregates data from several scientific institutions and open-source projects. Users of OpenFauna must provide the same attribution in derived works.
 
 ## 1. Baseline Translations (BirdNET & BattyBirdNET)
 
@@ -23,10 +23,9 @@ These translations are released under the **Creative Commons Attribution-ShareAl
 
 ## 2. Taxonomy Classification Metadata (Class, Order, Family)
 
-The taxonomic metadata containing Class, Order, and Family tree information is derived entirely from the **GBIF Backbone Taxonomy**.
+The taxonomic metadata containing Class, Order, and Family tree information is derived from the **GBIF Backbone Taxonomy**. For species imported from the BirdNET+ Taxonomy (section 6) the class comes from that dataset.
 
 *License Note:* The GBIF Backbone Taxonomy is released into the public domain under **CC0 1.0**. (https://doi.org/10.15468/39omei)
-This means the taxonomic tree data (Class, Order, Family) inside OpenFauna has absolutely no commercial restrictions.
 
 ## 3. External Links & Enrichment
 
@@ -44,8 +43,6 @@ The localized bird common names backfilled to close per-locale coverage gaps are
 - **IOC World Bird List, Multilingual Version (v15.2)**: the primary source of curated multilingual bird common names, covering 41 languages. Edited by Frank Gill, David Donsker and Pamela Rasmussen (Eds). Released under the **Creative Commons Attribution 3.0 license (CC BY 3.0)**, which is forward-compatible with CC BY-SA 4.0. (https://www.worldbirdnames.org/)
 - **GBIF Backbone vernacular names** (CC0 1.0) and **Wikidata** (CC0 1.0): used to supplement locales and non-avian taxa that IOC does not cover.
 
-*Deliberate exclusion:* OpenFauna does **not** ingest BirdNET's own non-English label files as a name source. Those localized names derive from eBird/Clements, whose terms restrict commercial redistribution and are not compatible with CC BY-SA 4.0.
-
 ## 5. Aotearoa New Zealand Names (mi, en_nz)
 
 The te reo Māori (`mi`) and English (New Zealand) (`en_nz`) locales carry the official names used in Aotearoa New Zealand:
@@ -54,10 +51,21 @@ The te reo Māori (`mi`) and English (New Zealand) (`en_nz`) locales carry the o
 - Spellings were additionally verified against the checklist's companion research database of recorded Māori and Moriori bird names (Appendix 3 supplementary materials), and cross-checked against the names used in **RNZ's bird collection** (https://www.rnz.co.nz/collections/birds).
 - The `en_nz` locale follows the checklist's own dual-naming convention, Māori name first (e.g. "Pīwakawaka | New Zealand Fantail"); where the te reo name is also the accepted English name (e.g. Kea, Weka) a single name is used.
 
+## 6. BirdNET+ Taxonomy
+
+The English and localized common names, class, iNaturalist ids and Wikidata QIDs of the species and names added in v1.2.0 come from:
+
+- *BirdNET+ Taxonomy v0.5-Nov2026, https://birdnet.cornell.edu/taxonomy, CC BY-SA 4.0.*
+
+The BirdNET+ Taxonomy lists these sources for the parts used here: bird taxonomy from the AviList Core Team (2026), *AviList: The Global Avian Checklist, v2026*, doi:10.2173/avilist.v2026 (CC BY 4.0); names and identifiers from eBird and the eBird/Clements Checklist, iNaturalist, Wikidata (CC0), GBIF, Catalogue of Life, Macaulay Library, Xeno-Canto and observation.org.
+
+OpenFauna uses a subset of the records and normalizes the initial letter case of Finnish, Swedish and Norwegian names.
+
 ## Summary of Your Obligations
 
 If you use OpenFauna in your application:
 1. You **must** provide attribution to the BirdNET project and the Cornell Lab of Ornithology.
 2. You **must** provide attribution to the IOC World Bird List (Gill, Donsker & Rasmussen, Eds) for the multilingual common names.
-3. You **must** share any modified translation files under the same CC BY-SA 4.0 license.
-4. You **must not** use the data for prohibited uses outlined in the BirdNET V3.0 terms (e.g., military use, poaching, wildlife exploitation).
+3. You **must** provide attribution to the BirdNET+ Taxonomy in the form given in section 6.
+4. You **must** share any modified translation files under the same CC BY-SA 4.0 license.
+5. You **must not** use the data for prohibited uses outlined in the BirdNET V3.0 terms (e.g., military use, poaching, wildlife exploitation).

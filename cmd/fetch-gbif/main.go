@@ -91,7 +91,7 @@ func main() {
 
 	// 3. Update metadata taxonomy
 	for species, rec := range metadata {
-		rec.Taxonomy.FamilyCommon = "" // Always clear proprietary eBird family-common names
+		rec.Taxonomy.FamilyCommon = "" // Always clear family-common names
 		parts := strings.Split(species, " ")
 		if len(parts) > 0 {
 			genus := parts[0]

@@ -16,7 +16,7 @@ OpenFauna decouples the "dumb" AI models from the "smart" presentation layer:
 ### The Architecture
 - **`data/locales/`**: Discrete JSON files mapping scientific names to translated common names. Managing thousands of species across 30+ languages in a single CSV file guarantees massive merge conflicts. This repository stores translations per-language in merge-friendly, sparse JSON formats.
 - **`data/aliases.json`**: Centralized mapping of taxonomic reclassifications. When a species is renamed, you add the alias here, and it inherits all translations automatically.
-- **`data/metadata.json`**: Per-species record keyed by scientific name, holding nested `taxonomy` (Class, Order, Family from the GBIF Backbone) and `links` (external references stored as stable ids, e.g. an iNaturalist taxon id), plus an optional `media` array.
+- **`data/metadata.json`**: Per-species record keyed by scientific name, holding nested `taxonomy` (Class, Order, Family) and `links` (external references stored as stable ids, e.g. an iNaturalist taxon id), plus an optional `media` array.
 - **`data/sources.json`** and **`data/media_sources.json`**: Registries that define each external source once (display name, ordering, icon hint, and a URL template with `{id}`/`{lang}` placeholders). Adding a new link source is a data-only change: add it here plus a `links` id per species, with no consumer code change.
 - **`cmd/compiler/`**: A build tool that compiles the locale files into `translations.csv` and the nested metadata into `metadata.jsonl` (one JSON object per line) alongside the registries, the exported `aliases.json` map, and a versioned `manifest.json`, designed for fast, streaming ingestion by applications like BirdNET-Go.
 
@@ -82,7 +82,7 @@ It checks JSON structure (sorted keys, trailing newline), alias integrity (no
 scientific name is both a full entry and an alias), scientific-name
 placeholders that would shadow a real English common name, the lowercase naming
 convention for `fi`/`sv`/`no` species names, stray em/en dashes, and that every
-`data/sources.json` entry has a name and a `{id}` URL template. It exits
+`data/sources.json` entry has a name and a `{id}` URL template, and that the labels of each model in `data/validation/labels/` without a metadata record or a name match a committed baseline. It exits
 non-zero on any problem, and runs automatically on pull requests via
 `.github/workflows/validate.yml` (which also verifies the compiled artifacts are
 in sync). When a species genuinely has no native common name in a locale, list
@@ -97,7 +97,7 @@ The `build/metadata.jsonl` artifact provides a rich taxonomic and external-link 
 {"scientific_name":"Vulpes vulpes","taxonomy":{"class":"Mammalia","order":"Carnivora","family":"Canidae","family_common":""},"links":{"inaturalist":{"id":"42069"},"wikipedia":{"id":"Q8332"}},"media":[{"source":"wikimedia","id":"Fox at the British Wildlife Centre, Newchapel, Surrey - geograph.org.uk - 2221750.jpg","format":"image/jpeg","width":1865,"height":2802,"aspect_ratio":0.67,"orientation":"portrait","license":"https://creativecommons.org/licenses/by-sa/2.0","creator":"Peter Trimming","rightsHolder":"Peter Trimming"}]}
 ```
 
-`taxonomy` carries `class`/`order`/`family`/`family_common` (GBIF Backbone). `links` is keyed by source id; each entry stores a stable `id` (and an optional `url` override), which the consumer turns into a URL at render time using the matching `data/sources.json` template (so a link can resolve to the reader's language). The Wikipedia `id` is a language-agnostic Wikidata QID that the registry template resolves to the reader's language via `Special:GoToLinkedPage`; the roughly 13% of species that have no confident QID keep a `url` override pointing at the English article, so Wikipedia coverage stays complete. `media` holds curated, CC-clean image references (license, attribution, dimensions, aspect ratio) for non-bird taxa, by Commons filename, with the thumbnail URL derived at render time. Storing ids rather than baked URLs is what lets a new source be added as data only.
+`taxonomy` carries `class`/`order`/`family`/`family_common`. `links` is keyed by source id; each entry stores a stable `id` (and an optional `url` override), which the consumer turns into a URL at render time using the matching `data/sources.json` template (so a link can resolve to the reader's language). The Wikipedia `id` is a language-agnostic Wikidata QID that the registry template resolves to the reader's language via `Special:GoToLinkedPage`; the roughly 13% of species that have no confident QID keep a `url` override pointing at the English article, so Wikipedia coverage stays complete. `media` holds curated, CC-clean image references (license, attribution, dimensions, aspect ratio) for non-bird taxa, by Commons filename, with the thumbnail URL derived at render time. Storing ids rather than baked URLs is what lets a new source be added as data only.
 
 The presentation of each source lives once in the registries:
 
@@ -122,17 +122,19 @@ Currently, OpenFauna provides translation support across the major bioacoustics 
 
 | Model | Target Species | Supported by OpenFauna | Coverage |
 |---|---|---|---|
-| BirdNET V2.4 | 6,521 | 6,521 | 100.0% |
-| BirdNET V3.0 | 11,560 | 10,932 | 94.6% |
-| Perch V2 | 14,795 | 12,580 | 85.0% |
-| BattyBirdNET | 88 | 87 | 98.9% |
+| BirdNET V2.4 | 6521 | 6521 | 100.0% |
+| BirdNET V3.0 preview3.1 | 11560 | 11255 | 97.4% |
+| BirdNET V3.0 preview4 | 12295 | 12036 | 97.9% |
+| BirdNET+ V3.0 | 11725 | 11725 | 100.0% |
+| Perch V2 | 14795 | 14259 | 96.4% |
+| BattyBirdNET | 85 | 85 | 100.0% |
 
 These CSVs can be natively embedded in your application for rapid database seeding during startup.
 
-### Bootstrapping from Upstream Models
-The initial baseline of OpenFauna was bootstrapped from the amazing BirdNET+ V3.0 taxonomy. If you ever need to re-import upstream BirdNET translations:
+### Importing from the BirdNET+ Taxonomy
+To add the species, English names and locale names of a BirdNET+ Taxonomy CSV for every label in `data/validation/labels/`, and to record reviewed rename pairs as aliases (add-only and idempotent):
 ```bash
-go run ./cmd/bootstrap -taxonomy=/path/to/taxonomy.csv -out=data/locales
+go run ./cmd/import-taxonomy -taxonomy=/path/to/BirdNET_Taxonomy.csv -renames=/path/to/renames.tsv
 ```
 
 To import regional BattyBirdNET translations (from huggingface labels):
@@ -141,7 +143,7 @@ go run ./cmd/import-bats
 ```
 
 ### Fetching Taxonomy Metadata (GBIF & iNaturalist)
-The taxonomy tree (Class, Order, Family) is CC0 Public Domain. To fetch taxonomy from the GBIF Backbone API:
+To fetch taxonomy from the GBIF Backbone API:
 ```bash
 go run ./cmd/fetch-gbif
 ```
