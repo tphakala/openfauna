@@ -372,7 +372,10 @@ def check_exclusions(report: Report) -> None:
         report.fail("exclusions", [f"{os.path.relpath(EXCLUSIONS_FILE, ROOT)} is missing; "
                                    "it is a required, version-controlled data file."])
         return
-    excluded = load_json(EXCLUSIONS_FILE).get("exclude", {})
+    excluded = load_json(EXCLUSIONS_FILE).get("exclude")
+    if not isinstance(excluded, dict):
+        report.fail("exclusions", [f"{os.path.relpath(EXCLUSIONS_FILE, ROOT)} has no \"exclude\" object"])
+        return
     problems: list[str] = []
     count = 0
     for loc, cells in excluded.items():
