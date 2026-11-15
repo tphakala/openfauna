@@ -603,7 +603,9 @@ func genusRanks(meta map[string]dataset.SpeciesRecord) map[string]rank {
 // already named in en.json, its English name and the locale names that
 // existing locale files lack, except the cells listed in excl. An English name
 // that is empty, dashed or excluded becomes the scientific name (reported in
-// sciFallback, except when excluded). Nothing existing is changed.
+// sciFallback, except when excluded). Persian values are normalized with fa
+// before the echo checks, and one that normalizes to nothing is skipped.
+// Nothing existing is changed.
 func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclusions, fa zwnjTokens) importReport {
 	var rep importReport
 	ranks := genusRanks(s.meta)
@@ -643,16 +645,17 @@ func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclus
 			if _, exists := s.locales[loc][target]; exists || excl.matches(loc, target, v) {
 				continue
 			}
+			// Normalize before the echo checks so a stray joiner cannot hide an echo.
+			if loc == faLocale {
+				if v = fa.normalize(v); v == "" {
+					continue
+				}
+			}
 			if strings.EqualFold(v, target) || strings.EqualFold(v, t.common) || hasDash(v) {
 				continue
 			}
 			if lowercaseLocales[loc] {
 				v = lowercaseInitial(target, v)
-			}
-			if loc == faLocale {
-				if v = fa.normalize(v); v == "" {
-					continue
-				}
 			}
 			s.locales[loc][target] = v
 			rep.localeValues++

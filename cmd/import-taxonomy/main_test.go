@@ -797,8 +797,10 @@ func TestImportSpecies_NormalizesPersian(t *testing.T) {
 			names: map[string]string{"fa": bareBrown, "de": bareBrown}},
 		"Genus1 two": {sci: "Genus1 two", common: "Two", group: "Aves", recType: "species",
 			names: map[string]string{"fa": "\u200c"}},
+		"Genus1 three": {sci: "Genus1 three", common: "Three", group: "Aves", recType: "species",
+			names: map[string]string{"fa": "Three\u200c"}},
 	}
-	rep := importSpecies(s, tax, []string{"Genus1 one", "Genus1 two"}, nil, zwnjTokens{bareBrown: joinedBrown})
+	rep := importSpecies(s, tax, []string{"Genus1 one", "Genus1 two", "Genus1 three"}, nil, zwnjTokens{bareBrown: joinedBrown})
 	if got := s.locales["fa"]["Genus1 one"]; got != joinedBrown {
 		t.Errorf("fa = %q, want %q", got, joinedBrown)
 	}
@@ -807,6 +809,9 @@ func TestImportSpecies_NormalizesPersian(t *testing.T) {
 	}
 	if v, ok := s.locales["fa"]["Genus1 two"]; ok {
 		t.Errorf("fa cell written for a name that is only U+200C: %q", v)
+	}
+	if v, ok := s.locales["fa"]["Genus1 three"]; ok {
+		t.Errorf("fa cell written for an English echo with a stray joiner: %q", v)
 	}
 	if rep.localeValues != 2 {
 		t.Errorf("localeValues = %d, want 2", rep.localeValues)
