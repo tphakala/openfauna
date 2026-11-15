@@ -143,7 +143,7 @@ func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir string, d
 	}
 	rep := importSpecies(s, tax, targets)
 
-	fmt.Printf("taxonomy sha256 %x (%d species rows)\n", sum, len(tax))
+	fmt.Printf("taxonomy sha256 %x (%d rows)\n", sum, len(tax))
 	fmt.Printf("targets: %d\n", len(targets))
 	fmt.Printf("aliases: %d -> %d\n", len(orig.aliases), len(s.aliases))
 	fmt.Printf("metadata records added: %d\n", rep.metaAdded)
