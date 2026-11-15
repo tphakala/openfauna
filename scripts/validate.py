@@ -162,7 +162,8 @@ def check_aliases(report: Report, en: dict) -> None:
     if problems:
         report.fail("aliases", problems)
     else:
-        report.ok("aliases", f"{len(aliases)} aliases consistent, no duplicates")
+        count = sum(1 for alias in aliases if not alias.startswith("_"))
+        report.ok("aliases", f"{count} aliases consistent, no duplicates")
 
 
 def check_shadowing(report: Report, en: dict) -> None:

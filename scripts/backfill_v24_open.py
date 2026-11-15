@@ -1,17 +1,12 @@
 """Backfill BirdNET V2.4 localized common names from OPEN, license-clean sources.
 
-OpenFauna is CC BY-SA 4.0 and sources only from compatible providers. This script
-closes per-locale coverage gaps for the BirdNET GLOBAL 6K V2.4 label set using:
+This script closes per-locale coverage gaps for the BirdNET GLOBAL 6K V2.4 label set using:
 
   1. IOC World Bird List, Multilingual Version (birds; CC BY 3.0, attribution
      required). Primary source: one curated common name per language for every
      bird species. Covers 41 languages.
   2. GBIF Backbone vernacular names API (CC0 / open). Supplement for species or
      locales IOC does not cover (e.g. Vietnamese, Hindi) and for non-bird taxa.
-
-It deliberately does NOT read BirdNET's own per-locale label files: those names are
-pulled from eBird/Clements (Cornell, proprietary, non-commercial) and are not
-license-compatible with CC BY-SA 4.0.
 
 The script is ADDITIVE ONLY: it never overwrites an existing curated entry, it only
 fills species currently missing from a locale file. Names equal to the scientific
