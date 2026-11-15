@@ -35119,23 +35119,6 @@
       }
     }
   },
-  "Camera": {
-    "taxonomy": {
-      "class": "Insecta",
-      "order": "Hymenoptera",
-      "family": "Ichneumonidae",
-      "family_common": ""
-    },
-    "links": {
-      "inaturalist": {
-        "id": "250605"
-      },
-      "wikipedia": {
-        "id": "Camera",
-        "url": "https://en.wikipedia.org/wiki/Camera"
-      }
-    }
-  },
   "Campephaga flava": {
     "taxonomy": {
       "class": "Aves",
@@ -37608,23 +37591,6 @@
       },
       "wikipedia": {
         "id": "Q858281"
-      }
-    }
-  },
-  "Car": {
-    "taxonomy": {
-      "class": "Insecta",
-      "order": "Coleoptera",
-      "family": "Caridae",
-      "family_common": ""
-    },
-    "links": {
-      "inaturalist": {
-        "id": "1262766"
-      },
-      "wikipedia": {
-        "id": "Car",
-        "url": "https://en.wikipedia.org/wiki/Car"
       }
     }
   },
@@ -72956,19 +72922,6 @@
       },
       "wikipedia": {
         "id": "Q2226263"
-      }
-    }
-  },
-  "Drill": {
-    "taxonomy": {
-      "class": "Mammalia",
-      "order": "Primates",
-      "family": "Cercopithecidae",
-      "family_common": ""
-    },
-    "links": {
-      "wikipedia": {
-        "id": "Q58964"
       }
     }
   },
@@ -213619,23 +213572,6 @@
       },
       "wikipedia": {
         "id": "Q945015"
-      }
-    }
-  },
-  "Siren": {
-    "taxonomy": {
-      "class": "Amphibia",
-      "order": "Caudata",
-      "family": "Sirenidae",
-      "family_common": ""
-    },
-    "links": {
-      "inaturalist": {
-        "id": "27857"
-      },
-      "wikipedia": {
-        "id": "Siren",
-        "url": "https://en.wikipedia.org/wiki/Siren"
       }
     }
   },
