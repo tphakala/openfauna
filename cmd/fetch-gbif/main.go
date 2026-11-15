@@ -1,117 +1,320 @@
+// Command fetch-gbif fills the missing order and family of species records that
+// already have a class, using the GBIF Backbone Taxonomy (CC0).
+//
+// It is a manual maintenance tool, run like cmd/fetch-wikidata; its output
+// (data/metadata.json and the report) is committed, and the build stays
+// network-free. It never overwrites: a non-empty class, order or family is left
+// as it is, class is never written, and family_common, links and media are not
+// touched. Re-running is safe: a record that is complete is not queried again.
+//
+// A record is first completed from its taxonomic alias partner (data/aliases.json)
+// when the partner has an order and family and the same class, which needs no
+// request. The remaining records are looked up by species name with a strict
+// GBIF match, and only an exact species-level match in kingdom Animalia whose
+// class agrees with the record is used. Records that could not be filled are
+// listed in the report, which only a full run (no -limit, no -dry-run) rewrites.
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
-	"sync"
+	"os/signal"
+	"slices"
+	"sort"
 	"time"
 
 	"github.com/tphakala/openfauna/internal/dataset"
+	"github.com/tphakala/openfauna/internal/fetch"
 )
 
-type GBIFResponse struct {
-	Class  string `json:"class"`
-	Order  string `json:"order"`
-	Family string `json:"family"`
+const gbifMatchAPI = "https://api.gbif.org/v1/species/match"
+
+// match is the part of a GBIF species/match response the tool reads.
+type match struct {
+	UsageKey      int    `json:"usageKey"`
+	CanonicalName string `json:"canonicalName"`
+	Rank          string `json:"rank"`
+	Status        string `json:"status"`
+	MatchType     string `json:"matchType"`
+	Kingdom       string `json:"kingdom"`
+	Phylum        string `json:"phylum"`
+	Class         string `json:"class"`
+	Order         string `json:"order"`
+	Family        string `json:"family"`
+}
+
+// report lists what is still missing after a full pass. Fields are declared in
+// the alphabetical order of their JSON keys so dataset.MarshalJSON emits the
+// repo's canonical sorted form.
+type report struct {
+	Comment string   `json:"_comment"`
+	Rejects []reject `json:"rejects"`
+}
+
+type reject struct {
+	Class  string     `json:"class"`
+	GBIF   *gbifMatch `json:"gbif,omitempty"`
+	Name   string     `json:"name"`
+	Reason string     `json:"reason"`
+}
+
+type gbifMatch struct {
+	CanonicalName string `json:"canonical_name"`
+	Class         string `json:"class"`
+	Family        string `json:"family"`
+	Kingdom       string `json:"kingdom"`
+	MatchType     string `json:"match_type"`
+	Order         string `json:"order"`
+	Phylum        string `json:"phylum"`
+	Rank          string `json:"rank"`
+	Status        string `json:"status"`
+	UsageKey      int    `json:"usage_key"`
+}
+
+const reportComment = "Records with a class that fetch-gbif could not give an order and family: GBIF has no exact species match, or the match failed a safety check. Rewritten only by a full run (no -limit, no -dry-run). Rerunning with unchanged data leaves this file as it is."
+
+type config struct {
+	metadataPath, aliasesPath, reportPath, api string
+	limit                                      int
+	dryRun                                     bool
 }
 
 func main() {
-	metadataPath := "data/metadata.json"
+	var cfg config
+	flag.StringVar(&cfg.metadataPath, "metadata", "data/metadata.json", "nested metadata file to update in place")
+	flag.StringVar(&cfg.aliasesPath, "aliases", "data/aliases.json", "alias map used to copy order and family from an alias partner")
+	flag.StringVar(&cfg.reportPath, "report", "data/validation/gbif_taxonomy_report.json", "report of records that could not be filled")
+	flag.IntVar(&cfg.limit, "limit", 0, "query at most this many species (0 = all, first N by name); a limited run does not rewrite the report")
+	flag.BoolVar(&cfg.dryRun, "dry-run", false, "query and log, write nothing")
+	qps := flag.Float64("qps", 4, "max GBIF requests per second (politeness throttle)")
+	userAgent := flag.String("user-agent", "fetch-gbif/1.0 (species taxonomy maintenance tool)", "HTTP User-Agent")
+	flag.Parse()
+	cfg.api = gbifMatchAPI
 
-	data, err := os.ReadFile(metadataPath)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+	c := &fetch.Client{HTTP: &http.Client{Timeout: 30 * time.Second}, UserAgent: *userAgent,
+		Interval: fetch.RateInterval(*qps), Ctx: ctx}
+	if err := execute(cfg, c); err != nil {
+		log.Fatal(err)
+	}
+}
+
+// inScope reports whether a record has a class but lacks an order or family.
+func inScope(t dataset.Taxonomy) bool {
+	return t.Class != "" && (t.Order == "" || t.Family == "")
+}
+
+// decide applies a GBIF match to a record's taxonomy. It returns the taxonomy to
+// store, with only an empty order or family set, and a reason; the reason is empty
+// when the record is now complete.
+func decide(t dataset.Taxonomy, m match) (dataset.Taxonomy, string) {
+	switch {
+	case m.MatchType == "NONE":
+		return t, "no_match"
+	case m.MatchType != "EXACT":
+		return t, "not_exact"
+	case m.Rank != "SPECIES":
+		return t, "not_species"
+	case m.Kingdom != "Animalia":
+		return t, "not_animalia"
+	case m.Status != "ACCEPTED" && m.Status != "SYNONYM":
+		return t, "status"
+	}
+	order := m.Order
+	switch {
+	case m.Class == t.Class:
+	case t.Class == "Reptilia" && m.Order == "" && slices.Contains([]string{"Squamata", "Testudines", "Crocodylia"}, m.Class):
+		// GBIF ranks these reptile orders as classes.
+		order = m.Class
+	case t.Class == "Actinopterygii" && m.Class == "" && m.Phylum == "Chordata":
+	default:
+		return t, "class_mismatch"
+	}
+	if t.Order != "" && order != "" && t.Order != order {
+		return t, "order_conflict"
+	}
+	if t.Family != "" && m.Family != "" && t.Family != m.Family {
+		return t, "family_conflict"
+	}
+	if t.Order == "" {
+		t.Order = order
+	}
+	if t.Family == "" {
+		t.Family = m.Family
+	}
+	if t.Order == "" || t.Family == "" {
+		return t, "incomplete"
+	}
+	return t, ""
+}
+
+// buildPartners maps each name in the alias map to the names on the other side
+// of its alias entries, sorted.
+func buildPartners(aliases map[string]string) map[string][]string {
+	p := map[string][]string{}
+	for from, to := range dataset.FilterAliases(aliases) {
+		p[from] = append(p[from], to)
+		p[to] = append(p[to], from)
+	}
+	for _, v := range p {
+		sort.Strings(v)
+	}
+	return p
+}
+
+// aliasFill completes name's empty order and family from its alias partners.
+// A partner counts when it has a record with the same class and both an order
+// and a family. It declines when the partners disagree, or when one disagrees
+// with a value the record already has.
+func aliasFill(meta map[string]dataset.SpeciesRecord, partners map[string][]string, name string) (dataset.Taxonomy, bool) {
+	t := meta[name].Taxonomy
+	var order, family string
+	for _, pn := range partners[name] {
+		pt := meta[pn].Taxonomy // zero value, so skipped, when pn has no record
+		if pt.Class != t.Class || pt.Order == "" || pt.Family == "" {
+			continue
+		}
+		if (t.Order != "" && t.Order != pt.Order) || (t.Family != "" && t.Family != pt.Family) {
+			return t, false
+		}
+		if order != "" && (order != pt.Order || family != pt.Family) {
+			return t, false
+		}
+		order, family = pt.Order, pt.Family
+	}
+	if order == "" {
+		return t, false
+	}
+	t.Order, t.Family = order, family
+	return t, true
+}
+
+func toGBIFMatch(m match) *gbifMatch {
+	return &gbifMatch{CanonicalName: m.CanonicalName, Class: m.Class, Family: m.Family, Kingdom: m.Kingdom,
+		MatchType: m.MatchType, Order: m.Order, Phylum: m.Phylum, Rank: m.Rank, Status: m.Status, UsageKey: m.UsageKey}
+}
+
+// pending returns the in-scope record names, sorted.
+func pending(meta map[string]dataset.SpeciesRecord) []string {
+	var names []string
+	for name, rec := range meta {
+		if inScope(rec.Taxonomy) {
+			names = append(names, name)
+		}
+	}
+	sort.Strings(names)
+	return names
+}
+
+func execute(cfg config, c *fetch.Client) error {
+	meta, err := dataset.LoadMetadata(cfg.metadataPath)
 	if err != nil {
-		log.Fatalf("Failed to read %s: %v", metadataPath, err)
+		return fmt.Errorf("load metadata: %w", err)
 	}
-
-	var metadata map[string]dataset.SpeciesRecord
-	if err := json.Unmarshal(data, &metadata); err != nil {
-		log.Fatalf("Failed to parse metadata: %v", err)
+	var rawAliases map[string]string
+	if data, err := os.ReadFile(cfg.aliasesPath); err != nil {
+		return fmt.Errorf("load aliases: %w", err)
+	} else if err := json.Unmarshal(data, &rawAliases); err != nil {
+		return fmt.Errorf("parse aliases: %w", err)
 	}
+	partners := buildPartners(rawAliases)
 
-	// 1. Extract unique genera
-	genera := make(map[string]bool)
-	for species := range metadata {
-		parts := strings.Split(species, " ")
-		if len(parts) > 0 {
-			genera[parts[0]] = true
+	// Fills are applied to meta in memory and written only after the last
+	// request succeeds, so a failed run leaves the files as they were.
+	total := len(pending(meta))
+	aliasFilled, gbifFilled := 0, 0
+	for _, name := range pending(meta) {
+		if t, ok := aliasFill(meta, partners, name); ok {
+			rec := meta[name]
+			rec.Taxonomy = t
+			meta[name] = rec
+			aliasFilled++
+			log.Printf("alias %s: order=%s family=%s", name, t.Order, t.Family)
 		}
 	}
 
-	var generaList []string
-	for g := range genera {
-		generaList = append(generaList, g)
+	work := pending(meta)
+	if cfg.limit > 0 && cfg.limit < len(work) {
+		work = work[:cfg.limit]
 	}
-	log.Printf("Found %d unique genera to fetch from GBIF", len(generaList))
-
-	// 2. Fetch GBIF taxonomy for each genus concurrently
-	genusData := make(map[string]GBIFResponse)
-	var mu sync.Mutex
-	var wg sync.WaitGroup
-
-	sem := make(chan struct{}, 10) // 10 concurrent requests
-	client := &http.Client{Timeout: 10 * time.Second}
-
-	for i, g := range generaList {
-		wg.Add(1)
-		sem <- struct{}{}
-		go func(idx int, genus string) {
-			defer wg.Done()
-			defer func() { <-sem }()
-
-			apiURL := fmt.Sprintf("https://api.gbif.org/v1/species/match?name=%s", url.QueryEscape(genus))
-			resp, err := client.Get(apiURL)
-			if err != nil {
-				log.Printf("Failed to fetch %s: %v", genus, err)
-				return
-			}
-			defer resp.Body.Close()
-
-			body, _ := io.ReadAll(resp.Body)
-			var gbif GBIFResponse
-			if err := json.Unmarshal(body, &gbif); err == nil {
-				mu.Lock()
-				genusData[genus] = gbif
-				mu.Unlock()
-			}
-
-			if idx%100 == 0 {
-				log.Printf("Fetched %d/%d genera...", idx, len(generaList))
-			}
-		}(i, g)
-	}
-
-	wg.Wait()
-	log.Printf("Successfully fetched data for %d genera from GBIF", len(genusData))
-
-	// 3. Update metadata taxonomy
-	for species, rec := range metadata {
-		rec.Taxonomy.FamilyCommon = "" // Always clear family-common names
-		parts := strings.Split(species, " ")
-		if len(parts) > 0 {
-			genus := parts[0]
-			if gbif, ok := genusData[genus]; ok {
-				rec.Taxonomy.Class = gbif.Class
-				rec.Taxonomy.Order = gbif.Order
-				rec.Taxonomy.Family = gbif.Family
-			}
+	rejects := map[string]reject{}
+	for _, name := range work {
+		q := url.Values{"name": {name}, "strict": {"true"}}
+		body, err := c.Get(cfg.api + "?" + q.Encode())
+		if err != nil {
+			return fmt.Errorf("fetch %s: %w", name, err)
 		}
-		metadata[species] = rec
+		var m match
+		if err := json.Unmarshal(body, &m); err != nil {
+			return fmt.Errorf("decode response for %s: %w", name, err)
+		}
+		rec := meta[name]
+		t, reason := decide(rec.Taxonomy, m)
+		if t != rec.Taxonomy {
+			rec.Taxonomy = t
+			meta[name] = rec
+		}
+		if reason == "" {
+			gbifFilled++
+			log.Printf("fill %s: order=%s family=%s status=%s", name, t.Order, t.Family, m.Status)
+			continue
+		}
+		log.Printf("reject %s: %s", name, reason)
+		r := reject{Class: t.Class, Name: name, Reason: reason}
+		if m.MatchType != "NONE" {
+			r.GBIF = toGBIFMatch(m)
+		}
+		rejects[name] = r
 	}
 
-	// 4. Save back
-	buf, err := dataset.MarshalJSON(metadata)
+	// A rejected record may now have a partner that GBIF filled in this run.
+	for _, name := range pending(meta) {
+		if _, ok := rejects[name]; !ok {
+			continue
+		}
+		if t, ok := aliasFill(meta, partners, name); ok {
+			rec := meta[name]
+			rec.Taxonomy = t
+			meta[name] = rec
+			delete(rejects, name)
+			aliasFilled++
+			log.Printf("alias %s: order=%s family=%s", name, t.Order, t.Family)
+		}
+	}
+	log.Printf("in scope %d: %d from alias partners, %d from GBIF, %d rejected", total, aliasFilled, gbifFilled, len(rejects))
+
+	if cfg.dryRun {
+		return nil
+	}
+	buf, err := dataset.MarshalJSON(meta)
 	if err != nil {
-		log.Fatalf("Failed to encode metadata: %v", err)
+		return fmt.Errorf("encode metadata: %w", err)
 	}
-	if err := os.WriteFile(metadataPath, buf, 0o644); err != nil {
-		log.Fatalf("Failed to create %s: %v", metadataPath, err)
+	if err := os.WriteFile(cfg.metadataPath, buf, 0o644); err != nil {
+		return fmt.Errorf("write metadata: %w", err)
 	}
-
-	log.Println("Metadata successfully overwritten with pure GBIF (CC0) data!")
+	if cfg.limit > 0 {
+		return nil
+	}
+	rep := report{Comment: reportComment, Rejects: []reject{}}
+	for _, name := range pending(meta) {
+		if r, ok := rejects[name]; ok {
+			rep.Rejects = append(rep.Rejects, r)
+		}
+	}
+	buf, err = dataset.MarshalJSON(rep)
+	if err != nil {
+		return fmt.Errorf("encode report: %w", err)
+	}
+	if err := os.WriteFile(cfg.reportPath, buf, 0o644); err != nil {
+		return fmt.Errorf("write report: %w", err)
+	}
+	return nil
 }

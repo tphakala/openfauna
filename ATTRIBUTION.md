@@ -23,7 +23,7 @@ These translations are released under the **Creative Commons Attribution-ShareAl
 
 ## 2. Taxonomy Classification Metadata (Class, Order, Family)
 
-The taxonomic metadata containing Class, Order, and Family tree information is derived from the **GBIF Backbone Taxonomy**. For species imported from the BirdNET+ Taxonomy (section 6) the class comes from that dataset.
+The taxonomic metadata containing Class, Order, and Family tree information is derived from the **GBIF Backbone Taxonomy**. For species imported from the BirdNET+ Taxonomy (section 6) the class comes from that dataset. GBIF places the reptile orders Squamata, Testudines and Crocodylia at class rank; OpenFauna keeps class Reptilia for these species and stores the GBIF value as the order.
 
 *License Note:* The GBIF Backbone Taxonomy is released into the public domain under **CC0 1.0**. (https://doi.org/10.15468/39omei)
 
