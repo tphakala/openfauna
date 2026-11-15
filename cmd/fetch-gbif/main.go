@@ -21,6 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"maps"
 	"net/http"
 	"net/url"
 	"os"
@@ -213,34 +214,54 @@ func pending(meta map[string]dataset.SpeciesRecord) []string {
 	return names
 }
 
+func writeJSON(path string, v any) error {
+	buf, err := dataset.MarshalJSON(v)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, buf, 0o644)
+}
+
 func execute(cfg config, c *fetch.Client) error {
 	meta, err := dataset.LoadMetadata(cfg.metadataPath)
 	if err != nil {
 		return fmt.Errorf("load metadata: %w", err)
 	}
-	var rawAliases map[string]string
-	if data, err := os.ReadFile(cfg.aliasesPath); err != nil {
+	data, err := os.ReadFile(cfg.aliasesPath)
+	if err != nil {
 		return fmt.Errorf("load aliases: %w", err)
-	} else if err := json.Unmarshal(data, &rawAliases); err != nil {
+	}
+	var rawAliases map[string]string
+	if err := json.Unmarshal(data, &rawAliases); err != nil {
 		return fmt.Errorf("parse aliases: %w", err)
 	}
 	partners := buildPartners(rawAliases)
 
 	// Fills are applied to meta in memory and written only after the last
 	// request succeeds, so a failed run leaves the files as they were.
-	total := len(pending(meta))
 	aliasFilled, gbifFilled := 0, 0
-	for _, name := range pending(meta) {
-		if t, ok := aliasFill(meta, partners, name); ok {
-			rec := meta[name]
-			rec.Taxonomy = t
-			meta[name] = rec
+	set := func(name string, t dataset.Taxonomy) {
+		rec := meta[name]
+		rec.Taxonomy = t
+		meta[name] = rec
+	}
+	fromAlias := func(name string) bool {
+		t, ok := aliasFill(meta, partners, name)
+		if ok {
+			set(name, t)
 			aliasFilled++
 			log.Printf("alias %s: order=%s family=%s", name, t.Order, t.Family)
 		}
+		return ok
 	}
 
-	work := pending(meta)
+	inScopeNames := pending(meta)
+	var work []string
+	for _, name := range inScopeNames {
+		if !fromAlias(name) {
+			work = append(work, name)
+		}
+	}
 	if cfg.limit > 0 && cfg.limit < len(work) {
 		work = work[:cfg.limit]
 	}
@@ -255,12 +276,8 @@ func execute(cfg config, c *fetch.Client) error {
 		if err := json.Unmarshal(body, &m); err != nil {
 			return fmt.Errorf("decode response for %s: %w", name, err)
 		}
-		rec := meta[name]
-		t, reason := decide(rec.Taxonomy, m)
-		if t != rec.Taxonomy {
-			rec.Taxonomy = t
-			meta[name] = rec
-		}
+		t, reason := decide(meta[name].Taxonomy, m)
+		set(name, t)
 		if reason == "" {
 			gbifFilled++
 			log.Printf("fill %s: order=%s family=%s status=%s", name, t.Order, t.Family, m.Status)
@@ -275,45 +292,28 @@ func execute(cfg config, c *fetch.Client) error {
 	}
 
 	// A rejected record may now have a partner that GBIF filled in this run.
-	for _, name := range pending(meta) {
-		if _, ok := rejects[name]; !ok {
-			continue
-		}
-		if t, ok := aliasFill(meta, partners, name); ok {
-			rec := meta[name]
-			rec.Taxonomy = t
-			meta[name] = rec
+	for _, name := range slices.Sorted(maps.Keys(rejects)) {
+		if fromAlias(name) {
 			delete(rejects, name)
-			aliasFilled++
-			log.Printf("alias %s: order=%s family=%s", name, t.Order, t.Family)
 		}
 	}
-	log.Printf("in scope %d: %d from alias partners, %d from GBIF, %d rejected", total, aliasFilled, gbifFilled, len(rejects))
+	log.Printf("in scope %d: %d from alias partners, %d from GBIF, %d rejected",
+		len(inScopeNames), aliasFilled, gbifFilled, len(rejects))
 
 	if cfg.dryRun {
 		return nil
 	}
-	buf, err := dataset.MarshalJSON(meta)
-	if err != nil {
-		return fmt.Errorf("encode metadata: %w", err)
-	}
-	if err := os.WriteFile(cfg.metadataPath, buf, 0o644); err != nil {
+	if err := writeJSON(cfg.metadataPath, meta); err != nil {
 		return fmt.Errorf("write metadata: %w", err)
 	}
 	if cfg.limit > 0 {
 		return nil
 	}
 	rep := report{Comment: reportComment, Rejects: []reject{}}
-	for _, name := range pending(meta) {
-		if r, ok := rejects[name]; ok {
-			rep.Rejects = append(rep.Rejects, r)
-		}
+	for _, name := range slices.Sorted(maps.Keys(rejects)) {
+		rep.Rejects = append(rep.Rejects, rejects[name])
 	}
-	buf, err = dataset.MarshalJSON(rep)
-	if err != nil {
-		return fmt.Errorf("encode report: %w", err)
-	}
-	if err := os.WriteFile(cfg.reportPath, buf, 0o644); err != nil {
+	if err := writeJSON(cfg.reportPath, rep); err != nil {
 		return fmt.Errorf("write report: %w", err)
 	}
 	return nil

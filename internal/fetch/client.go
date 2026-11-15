@@ -41,10 +41,8 @@ func (c *Client) Get(rawURL string) ([]byte, error) {
 	var lastErr error
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		if c.Interval > 0 {
-			if wait := c.Interval - time.Since(c.last); wait > 0 {
-				if err := c.sleep(wait); err != nil {
-					return nil, err
-				}
+			if err := c.sleep(c.Interval - time.Since(c.last)); err != nil {
+				return nil, err
 			}
 		}
 		c.last = time.Now()
