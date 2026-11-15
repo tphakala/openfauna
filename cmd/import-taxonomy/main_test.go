@@ -636,11 +636,13 @@ func newRunFixture(t *testing.T) runFixture {
 	writeFile(t, filepath.Join(f.labels, "m.txt"), "Genus1 new\nGenus1 blank\n")
 	writeFile(t, f.renames[0], "Genus1 old\tGenus1 oldish\n")
 	writeFile(t, f.exclusions, `{"exclude": {"de": {"Genus1 old": {"value": "x", "reason": "r"}}}}`)
-	writeFile(t, f.zwnj, `{"tokens": {}}`)
+	writeFile(t, f.zwnj, `{"tokens": {"`+bareBrown+`": "`+joinedBrown+`"}}`)
 	writeFile(t, filepath.Join(f.data, "metadata.json"), "{}\n")
 	writeFile(t, filepath.Join(f.data, "aliases.json"), "{}\n")
 	writeFile(t, filepath.Join(f.data, "locales", "en.json"), "{\n  \"Genus1 old\": \"Old Bird\"\n}\n")
-	writeFile(t, filepath.Join(f.data, "locales", "de.json"), "{}\n")
+	// Cells under the alias key of the rename pair.
+	writeFile(t, filepath.Join(f.data, "locales", "de.json"), "{\n  \"Genus1 oldish\": \"Alt\"\n}\n")
+	writeFile(t, filepath.Join(f.data, "locales", "fa.json"), "{\n  \"Genus1 oldish\": \""+bareBrown+"\"\n}\n")
 	return f
 }
 
@@ -699,6 +701,7 @@ func TestRun_DryRunThenWriteThenRerun(t *testing.T) {
 	for _, want := range []string{
 		"English name set to the scientific name (no English name): Genus1 blank",
 		"exclusion does not match the taxonomy, update or remove it: de \"Genus1 old\"",
+		"alias cells merged: 2 (0 equal, 0 case only, 2 moved,",
 	} {
 		if !strings.Contains(out, want) {
 			t.Errorf("output lacks %q:\n%s", want, out)
@@ -726,6 +729,12 @@ func TestRun_DryRunThenWriteThenRerun(t *testing.T) {
 	}
 	if st.aliases["Genus1 oldish"] != "Genus1 old" {
 		t.Errorf("aliases = %v", st.aliases)
+	}
+	if got := st.locales["de"]; !reflect.DeepEqual(got, map[string]string{"Genus1 old": "Alt", "Genus1 new": "Neuer Vogel", "Genus1 blank": "Leerer Vogel"}) {
+		t.Errorf("de = %v, want the alias cell moved under the canonical key", got)
+	}
+	if got := st.locales["fa"]; !reflect.DeepEqual(got, map[string]string{"Genus1 old": joinedBrown}) {
+		t.Errorf("fa = %v, want the alias cell moved in its joined form", got)
 	}
 	after := readTree(t, f.data)
 	for p := range after {
