@@ -1,0 +1,88 @@
+Antrozous pallidus
+Barbastella barbastellus
+Conocephalus dorsalis
+Conocephalus fuscus
+Corynorhinus townsendii
+Eptesicus fuscus
+Eptesicus nilssonii
+Eptesicus serotinus
+Euderma maculatum
+Eumops perotis
+Hypsugo savii
+Idionycteris phyllotis
+Lasionycteris noctivagans
+Lasiurus blossevillii
+Lasiurus borealis
+Lasiurus cinereus
+Lasiurus intermedius
+Lasiurus seminolus
+Lasiurus xanthinus
+Leptophyes punctatissima
+Metrioptera brachyptera
+Miniopterus schreibersii
+Muscardinus avellanarius
+Myotis alcathoe
+Myotis austroriparius
+Myotis bechsteinii
+Myotis brandtii
+Myotis californicus
+Myotis capaccinii
+Myotis ciliolabrum
+Myotis dasycneme
+Myotis daubentonii
+Myotis emarginatus
+Myotis evotis
+Myotis grisescens
+Myotis leibii
+Myotis lucifugus
+Myotis myotis
+Myotis mystacinus
+Myotis nattereri
+Myotis septentrionalis
+Myotis sodalis
+Myotis thysanodes
+Myotis velifer
+Myotis volans
+Myotis yumanensis
+NOISE
+Nyctalus lasiopterus
+Nyctalus leisleri
+Nyctalus noctula
+Nycticeius humeralis
+Nyctinomops femorosaccus
+Nyctinomops macrotis
+Parastrellus hesperus
+Perimyotis subflavus
+Pholidoptera griseoaptera
+Pipistrellus kuhlii
+Pipistrellus maderensis
+Pipistrellus nathusii
+Pipistrellus pipistrellus
+Pipistrellus pygmaeus
+Plecotus auritus
+Plecotus austriacus
+Plecotus spec.
+Rattus norvegicus
+Rhinolophus blasii
+Rhinolophus ferrumequinum
+Rhinolophus hipposideros
+Sorex araneus
+Sorex minutus
+Tadarida brasiliensis
+Tadarida teniotis
+Tettigonia viridissima
+Tettigoniidea
+Vespertilio murinus
+audiomoth
+background
+bird
+collected
+electrical
+insect
+mechanical
+noise
+noise-us
+other
+pro
+rain
+silence
