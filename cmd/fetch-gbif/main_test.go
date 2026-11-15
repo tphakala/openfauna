@@ -467,3 +467,34 @@ func TestExecute_FetchErrorWritesNothing(t *testing.T) {
 		t.Errorf("files changed after a failed run")
 	}
 }
+
+func TestExecute_RejectReportCarriesGBIFMatch(t *testing.T) {
+	meta := map[string]dataset.SpeciesRecord{
+		"Aaa fuzzy":    {Taxonomy: dataset.Taxonomy{Class: "Aves"}},
+		"Bbb mismatch": {Taxonomy: dataset.Taxonomy{Class: "Insecta"}},
+	}
+	fuzzy := exact("Aves", "Passeriformes", "Corvidae")
+	fuzzy.MatchType, fuzzy.CanonicalName, fuzzy.UsageKey = "FUZZY", "Aaa fuzzi", 42
+	mismatch := exact("Aves", "Passeriformes", "Corvidae")
+	mismatch.CanonicalName, mismatch.UsageKey, mismatch.Phylum = "Bbb mismatch", 7, "Chordata"
+	e := newEnv(t, meta, nil, map[string]match{"Aaa fuzzy": fuzzy, "Bbb mismatch": mismatch})
+	e.run(t)
+	rep := e.bytes(t, e.cfg.reportPath)
+	checkCanonical(t, rep)
+	var r report
+	if err := json.Unmarshal(rep, &r); err != nil {
+		t.Fatal(err)
+	}
+	want := []reject{
+		{Class: "Aves", Name: "Aaa fuzzy", Reason: "not_exact", GBIF: &gbifMatch{CanonicalName: "Aaa fuzzi", Class: "Aves",
+			Family: "Corvidae", Kingdom: "Animalia", MatchType: "FUZZY", Order: "Passeriformes", Rank: "SPECIES", Status: "ACCEPTED", UsageKey: 42}},
+		{Class: "Insecta", Name: "Bbb mismatch", Reason: "class_mismatch", GBIF: &gbifMatch{CanonicalName: "Bbb mismatch", Class: "Aves",
+			Family: "Corvidae", Kingdom: "Animalia", MatchType: "EXACT", Order: "Passeriformes", Phylum: "Chordata", Rank: "SPECIES", Status: "ACCEPTED", UsageKey: 7}},
+	}
+	if !reflect.DeepEqual(r.Rejects, want) {
+		t.Errorf("rejects = %+v", r.Rejects)
+	}
+	if got := e.meta(t); !reflect.DeepEqual(got, meta) {
+		t.Errorf("rejected records changed: %+v", got)
+	}
+}
