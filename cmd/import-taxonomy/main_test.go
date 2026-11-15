@@ -86,49 +86,104 @@ func TestApplyRenames(t *testing.T) {
 	}
 }
 
+const (
+	bareBrown   = "قهوهای"
+	joinedBrown = "قهوه\u200cای"
+)
+
 func mergeFixture() *state {
-	return newState(nil, map[string]map[string]string{
-		"en": {"Poo hyp": "Warbling-Finch", "Poo hypo": "Warbling Finch"},
-		"a":  {"Poo hyp": "Warbling-Finch", "Poo hypo": "Real A"}, // canonical echo: duplicate wins
-		"b":  {"Poo hyp": "Real B1", "Poo hypo": "Real B2"},       // both real: canonical wins
-		"c":  {"Poo hypo": "Real C"},                              // only the duplicate: moved
-		"d":  {"Poo hyp": "Real D"},                               // only the canonical: untouched
-		"e":  {"Poo hyp": "Warbling Finch", "Poo hypo": "Real E"}, // canonical echoes the duplicate's English name
-		"f":  {"Poo hyp": "Real F", "Poo hypo": "Warbling-Finch"}, // duplicate is an echo: canonical stays
-	})
+	return newState(
+		map[string]string{
+			"Poo hypo": "Poo hyp",
+			"Two a1":   "Two can", "Two a2": "Two can",
+			"_comment": "text",
+			"Chain z":  "Chain b", "Chain b": "Chain c", // chain: cells under z stay
+			"Self s":  "Self s", // self alias: cell and en entry stay
+			"Empty e": "",
+		},
+		map[string]map[string]string{
+			"en":  {"Poo hyp": "Warbling-Finch", "Poo hypo": "Warbling Finch", "Self s": "Self", "Chain c": "C"},
+			"a":   {"Poo hyp": "Warbling-Finch", "Poo hypo": "Real A"}, // canonical echoes its English name: alias wins
+			"sci": {"Poo hyp": "Poo hyp", "Poo hypo": "Real S"},        // canonical echoes its scientific name: alias wins
+			"b":   {"Poo hyp": "Real B1", "Poo hypo": "Real B2"},       // both real: canonical kept, conflict
+			"c":   {"Poo hypo": "Real C"},                              // only the alias: moved
+			"d":   {"Poo hyp": "Real D"},                               // only the canonical: untouched
+			"x":   {"Poo hypo": "poo hyp"},                             // only the alias, an echo: dropped
+			"y":   {"Poo hypo": "  "},                                  // only the alias, blank: dropped
+			"g":   {"Poo hyp": "Real G", "Poo hypo": "real g"},         // case only: canonical kept
+			"h":   {"Poo hyp": "Real H", "Poo hypo": "Real H"},         // equal
+			"f":   {"Poo hyp": "Real F", "Poo hypo": "Warbling-Finch"}, // alias echoes, canonical real: canonical kept
+			"k":   {"Two a1": "First", "Two a2": "Second"},             // two aliases, no canonical: sorted first wins
+			"fa":  {"Poo hypo": bareBrown},                             // moved in its joined form
+			"u":   {"_comment": "kept", "Chain z": "Z", "Self s": "S", "Empty e": "E"},
+		})
 }
 
-func TestApplyRenames_MergesFullEntry(t *testing.T) {
-	want := map[string]map[string]string{
-		"en": {"Poo hyp": "Warbling-Finch"},
-		"a":  {"Poo hyp": "Real A"},
-		"b":  {"Poo hyp": "Real B1"},
-		"c":  {"Poo hyp": "Real C"},
-		"d":  {"Poo hyp": "Real D"},
-		"e":  {"Poo hyp": "Real E"},
-		"f":  {"Poo hyp": "Real F"},
-	}
-	pairs := []renamePair{{"Poo hyp", "Poo hypo"}}
-
+func TestMergeAliasCells(t *testing.T) {
+	fa := zwnjTokens{bareBrown: joinedBrown}
 	s := mergeFixture()
-	if err := applyRenames(s, pairs); err != nil {
-		t.Fatal(err)
+	rep := mergeAliasCells(s, fa)
+
+	want := map[string]map[string]string{
+		"en":  {"Poo hyp": "Warbling-Finch", "Self s": "Self", "Chain c": "C"},
+		"a":   {"Poo hyp": "Real A"},
+		"sci": {"Poo hyp": "Real S"},
+		"b":   {"Poo hyp": "Real B1"},
+		"c":   {"Poo hyp": "Real C"},
+		"d":   {"Poo hyp": "Real D"},
+		"x":   {},
+		"y":   {},
+		"g":   {"Poo hyp": "Real G"},
+		"h":   {"Poo hyp": "Real H"},
+		"f":   {"Poo hyp": "Real F"},
+		"k":   {"Two can": "First"},
+		"fa":  {"Poo hyp": joinedBrown},
+		"u":   {"_comment": "kept", "Chain z": "Z", "Self s": "S", "Empty e": "E"},
 	}
 	if !reflect.DeepEqual(s.locales, want) {
-		t.Errorf("locales = %v, want %v", s.locales, want)
+		t.Errorf("locales = %v\nwant %v", s.locales, want)
 	}
-	if s.aliases["Poo hypo"] != "Poo hyp" {
-		t.Errorf("alias not set: %v", s.aliases)
+	wantRep := mergeReport{equal: 1, caseOnly: 1, moved: 3, echoReplaced: 2, echoDropped: 2, conflicts: []string{
+		`b: "Poo hypo" "Real B2" dropped, "Poo hyp" keeps "Real B1"`,
+		`f: "Poo hypo" "Warbling-Finch" dropped, "Poo hyp" keeps "Real F"`,
+		`k: "Two a2" "Second" dropped, "Two can" keeps "First"`,
+	}}
+	if !reflect.DeepEqual(rep, wantRep) {
+		t.Errorf("report = %+v\nwant %+v", rep, wantRep)
+	}
+	if rep.total() != 12 {
+		t.Errorf("total = %d, want 12", rep.total())
 	}
 
-	// State after an interrupted run: the alias exists, the duplicate is still a full entry.
-	s = mergeFixture()
-	s.aliases["Poo hypo"] = "Poo hyp"
-	if err := applyRenames(s, pairs); err != nil {
+	// A second pass finds nothing.
+	before := s.clone()
+	if again := mergeAliasCells(s, fa); again.total() != 0 || !reflect.DeepEqual(s, before) {
+		t.Errorf("second pass changed state or reported %+v", again)
+	}
+}
+
+// A rename pair whose model name has cells only in non-English locales becomes
+// an alias over those cells; the merge moves them under the geomodel name.
+func TestMergeAliasCells_AfterRename(t *testing.T) {
+	s := newState(nil, map[string]map[string]string{
+		"en": {"Geo one": "One"},
+		"de": {"Mod one": "Eins"},
+		"fr": {"Mod one": "Un", "Geo one": "Un bis"},
+	})
+	if err := applyRenames(s, []renamePair{{"Geo one", "Mod one"}}); err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(s.locales, want) {
-		t.Errorf("resumed locales = %v, want %v", s.locales, want)
+	if got := s.locales["de"]; !reflect.DeepEqual(got, map[string]string{"Mod one": "Eins"}) {
+		t.Fatalf("applyRenames changed locale cells: %v", got)
+	}
+	rep := mergeAliasCells(s, nil)
+	want := map[string]map[string]string{
+		"en": {"Geo one": "One"},
+		"de": {"Geo one": "Eins"},
+		"fr": {"Geo one": "Un bis"},
+	}
+	if !reflect.DeepEqual(s.locales, want) || rep.moved != 1 || len(rep.conflicts) != 1 {
+		t.Errorf("locales = %v, report = %+v", s.locales, rep)
 	}
 }
 
@@ -166,7 +221,7 @@ func TestImportSpecies_Sequences(t *testing.T) {
 	var fullReport importReport
 	full := func() *state {
 		s, tax, a, b := seqFixture()
-		fullReport = importSpecies(s, tax, append(append([]string{}, a...), b...), nil)
+		fullReport = importSpecies(s, tax, append(append([]string{}, a...), b...), nil, nil)
 		return s
 	}()
 	initial, tax, a, b := seqFixture()
@@ -255,7 +310,7 @@ func TestImportSpecies_Sequences(t *testing.T) {
 
 	// A second run changes nothing.
 	again := full.clone()
-	if rep := importSpecies(again, tax, append(append([]string{}, a...), b...), nil); len(rep.sciFallback) != 0 {
+	if rep := importSpecies(again, tax, append(append([]string{}, a...), b...), nil, nil); len(rep.sciFallback) != 0 {
 		t.Errorf("second run reported %v", rep.sciFallback)
 	}
 	if !reflect.DeepEqual(again, full) {
@@ -265,8 +320,8 @@ func TestImportSpecies_Sequences(t *testing.T) {
 	// import(A u B) equals import(A) then import(B), in both orders.
 	for _, order := range [][2][]string{{a, b}, {b, a}} {
 		s, tax, _, _ := seqFixture()
-		importSpecies(s, tax, order[0], nil)
-		importSpecies(s, tax, order[1], nil)
+		importSpecies(s, tax, order[0], nil, nil)
+		importSpecies(s, tax, order[1], nil, nil)
 		if !reflect.DeepEqual(s, full) {
 			t.Errorf("sequenced run %v then %v differs from the union run", order[0], order[1])
 		}
@@ -279,7 +334,7 @@ func TestImportSpecies_Sequences(t *testing.T) {
 			s.locales[loc] = copyMap(m)
 		}
 	}
-	importSpecies(s, tax, append(append([]string{}, a...), b...), nil)
+	importSpecies(s, tax, append(append([]string{}, a...), b...), nil, nil)
 	if !reflect.DeepEqual(s, full) {
 		t.Errorf("resumed run differs from the uninterrupted run")
 	}
@@ -313,17 +368,6 @@ func copyMap(m map[string]string) map[string]string {
 	return out
 }
 
-func TestApplyRenames_ErrorAfterMergeRestoresLocales(t *testing.T) {
-	s := mergeFixture()
-	err := applyRenames(s, []renamePair{{"Poo hyp", "Poo hypo"}, {"Nowhere", "Mod"}})
-	if err == nil {
-		t.Fatal("want an error from the second row")
-	}
-	if want := mergeFixture(); !reflect.DeepEqual(s, want) {
-		t.Errorf("locales changed by a run that failed after a merge: %v", s.locales)
-	}
-}
-
 func TestLocaleStem(t *testing.T) {
 	for in, want := range map[string]string{"es_EC": "es_ec", "pt_PT": "pt_pt", "zh-CN": "zh_cn", "de": "de"} {
 		if got := localeStem(in); got != want {
@@ -353,7 +397,7 @@ func TestImportSpecies_ExcludedCells(t *testing.T) {
 			"Genus1 stale":      {Value: "Broken Bird", Reason: "names another animal"},
 		},
 	}
-	report := importSpecies(s, tax, []string{"Genus1 badlocale", "Genus1 badenglish", "Genus1 dashed", "Genus1 casevar", "Genus1 stale"}, excl)
+	report := importSpecies(s, tax, []string{"Genus1 badlocale", "Genus1 badenglish", "Genus1 dashed", "Genus1 casevar", "Genus1 stale"}, excl, nil)
 
 	if len(report.sciFallback) != 0 {
 		t.Errorf("an excluded English cell was reported as a fallback: %v", report.sciFallback)
@@ -570,8 +614,8 @@ func TestExclusions_Mismatches(t *testing.T) {
 // runFixture writes a small data directory, taxonomy, manifest, rename file and
 // exclusion list, and returns the arguments of run.
 type runFixture struct {
-	taxonomy, labels, exclusions, data string
-	renames                            []string
+	taxonomy, labels, exclusions, zwnj, data string
+	renames                                  []string
 }
 
 func newRunFixture(t *testing.T) runFixture {
@@ -581,6 +625,7 @@ func newRunFixture(t *testing.T) runFixture {
 		taxonomy:   filepath.Join(d, "tax.csv"),
 		labels:     filepath.Join(d, "labels"),
 		exclusions: filepath.Join(d, "excl.json"),
+		zwnj:       filepath.Join(d, "zwnj.json"),
 		data:       filepath.Join(d, "data"),
 		renames:    []string{filepath.Join(d, "renames.tsv")},
 	}
@@ -591,6 +636,7 @@ func newRunFixture(t *testing.T) runFixture {
 	writeFile(t, filepath.Join(f.labels, "m.txt"), "Genus1 new\nGenus1 blank\n")
 	writeFile(t, f.renames[0], "Genus1 old\tGenus1 oldish\n")
 	writeFile(t, f.exclusions, `{"exclude": {"de": {"Genus1 old": {"value": "x", "reason": "r"}}}}`)
+	writeFile(t, f.zwnj, `{"tokens": {}}`)
 	writeFile(t, filepath.Join(f.data, "metadata.json"), "{}\n")
 	writeFile(t, filepath.Join(f.data, "aliases.json"), "{}\n")
 	writeFile(t, filepath.Join(f.data, "locales", "en.json"), "{\n  \"Genus1 old\": \"Old Bird\"\n}\n")
@@ -599,7 +645,7 @@ func newRunFixture(t *testing.T) runFixture {
 }
 
 func (f runFixture) run(dry bool) error {
-	return run(f.taxonomy, f.renames, f.data, f.labels, f.exclusions, dry)
+	return run(f.taxonomy, f.renames, f.data, f.labels, f.exclusions, f.zwnj, dry)
 }
 
 func readTree(t *testing.T, root string) map[string]string {
@@ -728,5 +774,28 @@ func TestRun_InterruptedWriteIsCompletedByRerun(t *testing.T) {
 	}
 	if got := readTree(t, f.data); !reflect.DeepEqual(got, want) {
 		t.Errorf("rerun after an interrupted run differs from an uninterrupted run")
+	}
+}
+
+func TestImportSpecies_NormalizesPersian(t *testing.T) {
+	s := newState(nil, map[string]map[string]string{"en": {}, "de": {}, "fa": {}})
+	tax := map[string]taxon{
+		"Genus1 one": {sci: "Genus1 one", common: "One", group: "Aves", recType: "species",
+			names: map[string]string{"fa": bareBrown, "de": bareBrown}},
+		"Genus1 two": {sci: "Genus1 two", common: "Two", group: "Aves", recType: "species",
+			names: map[string]string{"fa": "\u200c"}},
+	}
+	rep := importSpecies(s, tax, []string{"Genus1 one", "Genus1 two"}, nil, zwnjTokens{bareBrown: joinedBrown})
+	if got := s.locales["fa"]["Genus1 one"]; got != joinedBrown {
+		t.Errorf("fa = %q, want %q", got, joinedBrown)
+	}
+	if got := s.locales["de"]["Genus1 one"]; got != bareBrown {
+		t.Errorf("de = %q, want it untouched", got)
+	}
+	if v, ok := s.locales["fa"]["Genus1 two"]; ok {
+		t.Errorf("fa cell written for a name that is only U+200C: %q", v)
+	}
+	if rep.localeValues != 2 {
+		t.Errorf("localeValues = %d, want 2", rep.localeValues)
 	}
 }

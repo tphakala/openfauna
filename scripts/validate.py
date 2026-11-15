@@ -8,9 +8,9 @@ Checks (each can be skipped with --skip <name>):
   structure  Every JSON data file (data/locales, data/validation, metadata,
              aliases, sources, media and curated names) parses to an object, has
              keys sorted ascending and ends with a newline.
-  aliases    No scientific name is both a full locale entry and an alias key;
-             every alias canonical resolves (exists in en.json or is an
-             allowlisted control label).
+  aliases    No alias key is an entry of any locale file (its name belongs under
+             the canonical key); every alias canonical resolves (exists in
+             en.json or is an allowlisted control label).
   shadowing  No locale uses the scientific name as the common-name value while
              base 'en' has a real common name, unless listed in
              data/validation/shadow_allowlist.json. This is the class of bug
@@ -40,6 +40,9 @@ Checks (each can be skipped with --skip <name>):
              label resolution is always a reviewed one.
   exclusions No cell listed in data/validation/taxonomy_exclusions.json is
              present in the locale data with its listed (wrong) value.
+  fa_zwnj    No fa value holds a stray zero-width non-joiner (U+200C outside a
+             word) or the bare form of a token listed in
+             data/validation/fa_zwnj_tokens.json.
 
 Usage:
   python3 scripts/validate.py                 # run all checks
@@ -55,6 +58,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 from urllib.parse import urlparse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -71,6 +75,9 @@ ECHO_BASELINE = os.path.join(VALIDATION_DIR, "english_echo_baseline.json")
 EXCLUSIONS_FILE = os.path.join(VALIDATION_DIR, "taxonomy_exclusions.json")
 LABELS_DIR = os.path.join(VALIDATION_DIR, "labels")
 LABEL_BASELINE = os.path.join(VALIDATION_DIR, "label_baseline.json")
+FA_ZWNJ_TOKENS = os.path.join(VALIDATION_DIR, "fa_zwnj_tokens.json")
+
+ZWNJ = "\u200c"
 
 # Locales whose vernacular species names use a lowercase initial. Verified
 # against the national authorities (Kotus/Luomus, Spakradet/Artdatabanken,
@@ -165,13 +172,17 @@ def check_structure(report: Report) -> None:
 def check_aliases(report: Report, en: dict) -> None:
     aliases = load_json(ALIASES_FILE)
     problems: list[str] = []
+    for path in locale_paths():
+        loc = locale_name(path)
+        for alias in sorted(aliases.keys() & load_json(path).keys()):
+            if not alias.startswith("_"):
+                problems.append(
+                    f"{loc}: {alias!r} is both an alias and a locale entry; its name belongs "
+                    f"under {aliases[alias]!r} (cmd/import-taxonomy merges it)"
+                )
     for alias, canonical in aliases.items():
         if alias.startswith("_"):
             continue
-        if alias in en:
-            problems.append(
-                f"{alias!r} is both an alias and a full en.json entry (dedupe: keep the canonical only)"
-            )
         if canonical not in en and canonical not in ALIAS_CANONICAL_EXCEPTIONS:
             problems.append(
                 f"{alias!r} -> {canonical!r}: canonical missing from en.json (alias cannot inherit a translation)"
@@ -425,6 +436,69 @@ def check_exclusions(report: Report) -> None:
         report.ok("exclusions", f"{count} excluded cells absent from the data")
 
 
+def is_letter(ch: str) -> bool:
+    return unicodedata.category(ch)[0] in "LM"
+
+
+def has_stray_zwnj(value: str) -> bool:
+    """True when a U+200C is not between two letters (leading, trailing, doubled,
+    next to a space or punctuation), where it has no effect on letter joining."""
+    return any(ch == ZWNJ and not (0 < i < len(value) - 1
+                                   and is_letter(value[i - 1]) and is_letter(value[i + 1]))
+               for i, ch in enumerate(value))
+
+
+def word_tokens(value: str) -> list[str]:
+    """Maximal runs of letters, marks and U+200C, the unit cmd/import-taxonomy
+    looks up in fa_zwnj_tokens.json."""
+    out, cur = [], []
+    for ch in value:
+        if ch == ZWNJ or is_letter(ch):
+            cur.append(ch)
+        elif cur:
+            out.append("".join(cur))
+            cur = []
+    if cur:
+        out.append("".join(cur))
+    return out
+
+
+def check_fa_zwnj(report: Report) -> None:
+    """Persian joins or separates letters inside a word with U+200C. The token map
+    lists words that must carry it; no fa value may hold the bare form of one, and
+    no fa value may hold a U+200C outside a word."""
+    rel = os.path.relpath(FA_ZWNJ_TOKENS, ROOT)
+    if not os.path.exists(FA_ZWNJ_TOKENS):
+        report.fail("fa_zwnj", [f"{rel} is missing; it is a required, version-controlled data file."])
+        return
+    tokens = load_json(FA_ZWNJ_TOKENS).get("tokens")
+    if not isinstance(tokens, dict):
+        report.fail("fa_zwnj", [f"{rel} has no \"tokens\" object"])
+        return
+    problems: list[str] = []
+    if list(tokens) != sorted(tokens):
+        problems.append(f"{rel}: tokens are not sorted")
+    for bare, joined in tokens.items():
+        if (not isinstance(joined, str) or not all(is_letter(ch) for ch in bare) or joined == bare
+                or joined.replace(ZWNJ, "") != bare or has_stray_zwnj(joined)):
+            problems.append(f"{rel}: {bare!r} -> {joined!r}: the key must be one word of letters "
+                            "and the value the same word with U+200C inserted between letters")
+    fa_path = os.path.join(LOCALE_DIR, "fa.json")
+    for key, value in (load_json(fa_path) if os.path.exists(fa_path) else {}).items():
+        if not isinstance(value, str):
+            continue
+        if has_stray_zwnj(value):
+            problems.append(f"fa: {key!r} -> {value!r} has a U+200C that is not between two letters")
+        for tok in word_tokens(value):
+            if tok in tokens:
+                problems.append(f"fa: {key!r} -> {value!r}: write {tok!r} as {tokens[tok]!r}")
+    if problems:
+        report.fail("fa_zwnj", problems)
+    else:
+        report.ok("fa_zwnj", f"no fa value holds the bare form of {len(tokens)} mapped tokens "
+                  "or a stray U+200C")
+
+
 def check_curated(report: Report, en: dict) -> None:
     """Every data/curated_names.json entry must appear verbatim in its locale file.
     The file holds hand-verified, reviewer-checked names (e.g. the issue #11 bat
@@ -568,7 +642,7 @@ def check_media(report: Report) -> None:
         report.ok("media", f"{count} media item(s) valid")
 
 
-CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated", "sources", "media_sources", "media", "labels", "exclusions")
+CHECKS = ("structure", "aliases", "shadowing", "casing", "dashes", "english_echo", "curated", "sources", "media_sources", "media", "labels", "exclusions", "fa_zwnj")
 
 
 def main() -> int:
@@ -654,6 +728,8 @@ def main() -> int:
         check_labels(report, en, meta)
     if "exclusions" not in args.skip:
         check_exclusions(report)
+    if "fa_zwnj" not in args.skip:
+        check_fa_zwnj(report)
 
     if report.failures:
         print(f"\nFAILED: {report.failures} problem(s) found.")

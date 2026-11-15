@@ -5,8 +5,8 @@
 // Contract:
 //
 //   - Add-only. An existing metadata record, en.json entry or locale value is
-//     never changed. The one exception is the merge of a rename pair whose model
-//     name is already a full en.json entry (see applyRenames).
+//     never changed. The one exception is that locale cells stored under an
+//     alias key are merged into the canonical key (see mergeAliasCells).
 //   - Idempotent and resumable. A second run with the same inputs changes no
 //     byte, and a run interrupted between file writes is completed by rerunning
 //     it: en.json and aliases.json, the files whose state decides what a rerun
@@ -20,7 +20,8 @@
 // name, wrong value, reason) are never imported while the taxonomy still has
 // the listed value (compared case-insensitively); a listed entry the taxonomy
 // no longer matches is reported on every run. scripts/validate.py fails when a
-// listed value is present in the data.
+// listed value is present in the data. Persian names it adds are written with
+// the joiner forms listed in data/validation/fa_zwnj_tokens.json.
 //
 // The English name is the common_name column alone. When it is empty, contains
 // an en or em dash, or is excluded, the scientific name becomes the English
@@ -116,18 +117,19 @@ func main() {
 	dataDir := flag.String("data", "data", "OpenFauna data directory")
 	labelsDir := flag.String("labels", "data/validation/labels", "Directory of label manifests (*.txt)")
 	exclusionsPath := flag.String("exclusions", "data/validation/taxonomy_exclusions.json", "JSON list of known-wrong taxonomy cells that are never imported")
+	zwnjPath := flag.String("fa-zwnj", "data/validation/fa_zwnj_tokens.json", "JSON map of Persian tokens to their zero-width non-joiner form, applied to imported fa names")
 	dryRun := flag.Bool("dry-run", false, "Report what would change without writing")
 	flag.Parse()
 
 	if *taxonomyPath == "" {
 		log.Fatal("-taxonomy is required")
 	}
-	if err := run(*taxonomyPath, renames, *dataDir, *labelsDir, *exclusionsPath, *dryRun); err != nil {
+	if err := run(*taxonomyPath, renames, *dataDir, *labelsDir, *exclusionsPath, *zwnjPath, *dryRun); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir, exclusionsPath string, dryRun bool) error {
+func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir, exclusionsPath, zwnjPath string, dryRun bool) error {
 	s, err := loadState(dataDir)
 	if err != nil {
 		return err
@@ -139,6 +141,10 @@ func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir, exclusio
 		return err
 	}
 	if err := excl.validate(s.locales); err != nil {
+		return err
+	}
+	fa, err := loadZWNJTokens(zwnjPath)
+	if err != nil {
 		return err
 	}
 	targets, err := loadTargets(labelsDir)
@@ -161,11 +167,17 @@ func run(taxonomyPath string, renameFiles []string, dataDir, labelsDir, exclusio
 	if err := applyRenames(s, pairs); err != nil {
 		return err
 	}
-	rep := importSpecies(s, tax, targets, excl)
+	merged := mergeAliasCells(s, fa)
+	rep := importSpecies(s, tax, targets, excl, fa)
 
 	fmt.Printf("taxonomy sha256 %x (%d rows)\n", sum, len(tax))
 	fmt.Printf("targets: %d\n", len(targets))
 	fmt.Printf("aliases: %d -> %d\n", aliasesBefore, len(s.aliases))
+	fmt.Printf("alias cells merged: %d (%d equal, %d case only, %d moved, %d replaced an echo, %d echo dropped, %d conflicts)\n",
+		merged.total(), merged.equal, merged.caseOnly, merged.moved, merged.echoReplaced, merged.echoDropped, len(merged.conflicts))
+	for _, line := range merged.conflicts {
+		fmt.Printf("alias cell dropped, canonical kept: %s\n", line)
+	}
 	fmt.Printf("metadata records added: %d\n", rep.metaAdded)
 	fmt.Printf("English names added: %d\n", rep.namesAdded)
 	fmt.Printf("locale values added: %d\n", rep.localeValues)
@@ -352,13 +364,6 @@ func hasDash(s string) bool { return strings.ContainsAny(s, "\u2013\u2014") }
 // checked in order against the alias map as already extended by earlier pairs,
 // and s is left unchanged unless every pair passes, so the alias map stays a
 // single-hop function (no chain, no double target).
-//
-// When the model name is a full en.json entry (the alias key would break the
-// "alias key is not a full entry" rule), its names are merged into the
-// geomodel entry first: in en the geomodel value stays; in every other locale a
-// value only the model name has is moved over, and when both have one the
-// model's replaces the geomodel's only if the geomodel's is an English echo and
-// the model's is not. The model entries are then deleted.
 func applyRenames(s *state, pairs []renamePair) error {
 	work := s.clone()
 	before := s.aliases
@@ -389,28 +394,95 @@ func applyRenames(s *state, pairs []renamePair) error {
 		if _, ok := en[g]; !ok {
 			return fmt.Errorf("%s: geomodel name is not an en.json key", where)
 		}
-		if _, full := en[m]; full {
-			mergeEntry(work, g, m)
-		}
 		work.aliases[m] = g
 	}
 	*s = *work
 	return nil
 }
 
-// mergeEntry folds the locale entries of m into g and deletes m.
-func mergeEntry(s *state, g, m string) {
-	enG, enM := s.locales[enLocale][g], s.locales[enLocale][m]
-	isEcho := func(v string) bool { return strings.EqualFold(v, enG) || strings.EqualFold(v, enM) }
-	for loc, entries := range s.locales {
+// mergeReport counts the locale cells mergeAliasCells found under alias keys,
+// by outcome. conflicts lists each dropped cell whose name differs from the
+// canonical one by more than letter case.
+type mergeReport struct {
+	equal, caseOnly, moved, echoReplaced, echoDropped int
+	conflicts                                         []string
+}
+
+func (r mergeReport) total() int {
+	return r.equal + r.caseOnly + r.moved + r.echoReplaced + r.echoDropped + len(r.conflicts)
+}
+
+// mergeAliasCells folds every locale cell stored under an alias key into the
+// alias's canonical key and deletes it, so that no alias key is a locale entry.
+// Aliases are taken in sorted order, which decides the outcome when two aliases
+// of one canonical name both have a cell and the canonical has none. An alias
+// whose target is empty or itself an alias key (a chain or a self alias) is
+// left alone; scripts/validate.py reports its cells. A moved or replacing fa
+// value is normalized with fa first.
+func mergeAliasCells(s *state, fa zwnjTokens) mergeReport {
+	var rep mergeReport
+	for _, alias := range sortedKeys(s.aliases) {
+		canonical := s.aliases[alias]
+		if _, chained := s.aliases[canonical]; chained || canonical == "" || strings.HasPrefix(alias, "_") {
+			continue
+		}
+		mergeEntry(s, canonical, alias, fa, &rep)
+	}
+	return rep
+}
+
+// mergeEntry folds the locale entries of m into g and deletes m. In en the
+// value of g stays. In every other locale a value only m has is moved over,
+// unless it is empty or merely echoes a scientific or English name of the pair; when both
+// have a value, m's replaces g's only if g's is such an echo and m's is not.
+func mergeEntry(s *state, g, m string, fa zwnjTokens, rep *mergeReport) {
+	echoes := []string{g, m}
+	for _, k := range []string{g, m} {
+		if v, ok := s.locales[enLocale][k]; ok {
+			echoes = append(echoes, v)
+		}
+	}
+	isEcho := func(v string) bool {
+		if strings.TrimSpace(v) == "" {
+			return true
+		}
+		for _, e := range echoes {
+			if strings.EqualFold(v, e) {
+				return true
+			}
+		}
+		return false
+	}
+	for _, loc := range sortedKeys(s.locales) {
+		entries := s.locales[loc]
 		mv, ok := entries[m]
 		if !ok {
 			continue
 		}
-		if gv, has := entries[g]; loc != enLocale && (!has || (isEcho(gv) && !isEcho(mv))) {
-			entries[g] = mv
-		}
 		delete(entries, m)
+		if loc == enLocale {
+			continue
+		}
+		if loc == faLocale {
+			mv = fa.normalize(mv)
+		}
+		gv, has := entries[g]
+		switch {
+		case !has && isEcho(mv):
+			rep.echoDropped++
+		case !has:
+			entries[g] = mv
+			rep.moved++
+		case gv == mv:
+			rep.equal++
+		case strings.EqualFold(gv, mv):
+			rep.caseOnly++
+		case isEcho(gv) && !isEcho(mv):
+			entries[g] = mv
+			rep.echoReplaced++
+		default:
+			rep.conflicts = append(rep.conflicts, fmt.Sprintf("%s: %q %q dropped, %q keeps %q", loc, m, mv, g, gv))
+		}
 	}
 }
 
@@ -532,7 +604,7 @@ func genusRanks(meta map[string]dataset.SpeciesRecord) map[string]rank {
 // existing locale files lack, except the cells listed in excl. An English name
 // that is empty, dashed or excluded becomes the scientific name (reported in
 // sciFallback, except when excluded). Nothing existing is changed.
-func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclusions) importReport {
+func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclusions, fa zwnjTokens) importReport {
 	var rep importReport
 	ranks := genusRanks(s.meta)
 	en := s.locales[enLocale]
@@ -576,6 +648,11 @@ func importSpecies(s *state, tax map[string]taxon, targets []string, excl exclus
 			}
 			if lowercaseLocales[loc] {
 				v = lowercaseInitial(target, v)
+			}
+			if loc == faLocale {
+				if v = fa.normalize(v); v == "" {
+					continue
+				}
 			}
 			s.locales[loc][target] = v
 			rep.localeValues++

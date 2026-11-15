@@ -31,6 +31,7 @@ BASE = {
     "curated_names.json": {"names": {}},
     "validation/shadow_allowlist.json": {"allow": {}},
     "validation/taxonomy_exclusions.json": {"exclude": {}},
+    "validation/fa_zwnj_tokens.json": {"tokens": {}},
 }
 
 
@@ -131,6 +132,55 @@ class ValidateTest(unittest.TestCase):
             with self.subTest(row["name"]):
                 lowered = validate.starts_upper(value) and not validate.keeps_capital(key, value)
                 self.assertEqual(lowered, want != value)
+
+    def test_aliases_rejects_alias_key_in_any_locale(self):
+        files = {"aliases.json": {"Zz yy": "Aa bb"}, "locales/sv.json": {"Aa bb": "alfa", "Zz yy": "alfa"}}
+        self.assertFails(Tree(self, files).run(), "aliases", "sv: 'Zz yy'", "'Aa bb'")
+        # An alias key that is no locale entry, and a "_" key, are fine.
+        files = {"aliases.json": {"_comment": "x", "Zz yy": "Aa bb"}, "locales/sv.json": {"Aa bb": "alfa", "_comment": "x"}}
+        proc = Tree(self, files).run()
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+
+    def test_fa_zwnj_rejects_bare_token_and_stray_joiner(self):
+        tokens = {"tokens": {"اب": "ا\u200cب"}}
+        cases = {
+            "bare mapped token": "x اب y",
+            "bare token next to punctuation": "(اب)",
+            "leading joiner": "\u200cجد",
+            "trailing joiner": "جد\u200c",
+            "doubled joiner": "ج\u200c\u200cد",
+            "joiner next to a space": "جد \u200cجد",
+        }
+        for name, value in cases.items():
+            with self.subTest(name):
+                files = {"validation/fa_zwnj_tokens.json": tokens, "locales/fa.json": {"Aa bb": value}}
+                self.assertFails(Tree(self, files).run(), "fa_zwnj", "fa: 'Aa bb'")
+
+    def test_fa_zwnj_accepts_joined_token_and_skips_odd_cells(self):
+        files = {
+            "validation/fa_zwnj_tokens.json": {"tokens": {"اب": "ا\u200cب"}},
+            "locales/fa.json": {"Aa bb": "ا\u200cب جد", "Dd ee": 5, "Hh cc": "اباب"},
+        }
+        proc = Tree(self, files).run()
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+
+    def test_fa_zwnj_rejects_bad_token_map(self):
+        cases = {
+            "value changes a letter": {"tokens": {"اب": "ا\u200cج"}},
+            "value equals key": {"tokens": {"اب": "اب"}},
+            "key is not one word": {"tokens": {"ا ب": "ا\u200c ب"}},
+            "stray joiner in value": {"tokens": {"اب": "اب\u200c"}},
+            "tokens missing": {"_comment": "x"},
+            "value is not a string": {"tokens": {"اب": 5}},
+        }
+        for name, doc in cases.items():
+            with self.subTest(name):
+                self.assertFails(Tree(self, {"validation/fa_zwnj_tokens.json": doc}).run(), "fa_zwnj")
+
+    def test_fa_zwnj_requires_token_map(self):
+        tree = Tree(self)
+        os.remove(os.path.join(tree.root, "data", "validation", "fa_zwnj_tokens.json"))
+        self.assertFails(tree.run(), "fa_zwnj", "fa_zwnj_tokens.json is missing")
 
 
 if __name__ == "__main__":

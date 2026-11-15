@@ -79,10 +79,11 @@ python3 scripts/validate.py
 ```
 
 It checks the structure of every JSON data file, including `data/validation/`
-(sorted keys, trailing newline), alias integrity, scientific-name placeholders
+(sorted keys, trailing newline), alias integrity (no alias key is an entry in
+any locale file), scientific-name placeholders
 that would shadow a real English common name, the lowercase naming convention
 for `fi`/`sv`/`no` species names, stray em/en dashes, the English-fallback
-baseline, curated names, the link, media-source and media registries, the
+baseline, curated names, Persian zero-width non-joiner forms, the link, media-source and media registries, the
 model-label baseline in `data/validation/labels/`, and the taxonomy exclusion
 list. It exits non-zero on any problem, and runs automatically on pull requests
 via `.github/workflows/validate.yml` (which also verifies the compiled artifacts
@@ -134,7 +135,7 @@ Currently, OpenFauna provides translation support across the major bioacoustics 
 These CSVs can be natively embedded in your application for rapid database seeding during startup.
 
 ### Importing from the BirdNET+ Taxonomy
-To add the species, English names and locale names of a BirdNET+ Taxonomy CSV for every label in `data/validation/labels/`, and to record reviewed rename pairs as aliases (add-only and idempotent). A cell listed in `data/validation/taxonomy_exclusions.json` is skipped while its upstream value still matches the listed one; once upstream changes the value, the cell is imported and every run reports the stale entry until it is updated or removed:
+To add the species, English names and locale names of a BirdNET+ Taxonomy CSV for every label in `data/validation/labels/`, and to record reviewed rename pairs as aliases (add-only and idempotent, except that names stored under an alias key are merged into the canonical key). A cell listed in `data/validation/taxonomy_exclusions.json` is skipped while its upstream value still matches the listed one; once upstream changes the value, the cell is imported and every run reports the stale entry until it is updated or removed. Persian names are written with the joiner forms listed in `data/validation/fa_zwnj_tokens.json`:
 ```bash
 go run ./cmd/import-taxonomy -taxonomy=/path/to/BirdNET_Taxonomy.csv -renames=/path/to/renames.tsv
 ```
