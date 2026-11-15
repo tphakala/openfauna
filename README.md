@@ -71,22 +71,24 @@ The `build/` artifacts are committed and reproducible; CI fails if they drift fr
 
 ### Validating the Data
 
-A static validator runs a set of deterministic, network-free checks over the
-locale files, `aliases.json` and `metadata.json`:
+A static validator runs deterministic, network-free checks over the files in
+`data/`:
 
 ```bash
 python3 scripts/validate.py
 ```
 
-It checks JSON structure (sorted keys, trailing newline), alias integrity (no
-scientific name is both a full entry and an alias), scientific-name
-placeholders that would shadow a real English common name, the lowercase naming
-convention for `fi`/`sv`/`no` species names, stray em/en dashes, and that every
-`data/sources.json` entry has a name and a `{id}` URL template, and that the labels of each model in `data/validation/labels/` without a metadata record or a name match a committed baseline. It exits
-non-zero on any problem, and runs automatically on pull requests via
-`.github/workflows/validate.yml` (which also verifies the compiled artifacts are
-in sync). When a species genuinely has no native common name in a locale, list
-it in `data/validation/shadow_allowlist.json` so the placeholder check accepts it.
+It checks the structure of every JSON data file, including `data/validation/`
+(sorted keys, trailing newline), alias integrity, scientific-name placeholders
+that would shadow a real English common name, the lowercase naming convention
+for `fi`/`sv`/`no` species names, stray em/en dashes, the English-fallback
+baseline, curated names, the link, media-source and media registries, the
+model-label baseline in `data/validation/labels/`, and the taxonomy exclusion
+list. It exits non-zero on any problem, and runs automatically on pull requests
+via `.github/workflows/validate.yml` (which also verifies the compiled artifacts
+are in sync). When a species genuinely has no native common name in a locale,
+list it in `data/validation/shadow_allowlist.json` so the placeholder check
+accepts it.
 
 ### Metadata Schema
 
@@ -132,7 +134,7 @@ Currently, OpenFauna provides translation support across the major bioacoustics 
 These CSVs can be natively embedded in your application for rapid database seeding during startup.
 
 ### Importing from the BirdNET+ Taxonomy
-To add the species, English names and locale names of a BirdNET+ Taxonomy CSV for every label in `data/validation/labels/`, and to record reviewed rename pairs as aliases (add-only and idempotent):
+To add the species, English names and locale names of a BirdNET+ Taxonomy CSV for every label in `data/validation/labels/`, and to record reviewed rename pairs as aliases (add-only and idempotent). A cell listed in `data/validation/taxonomy_exclusions.json` is skipped while its upstream value still matches the listed one; once upstream changes the value, the cell is imported and every run reports the stale entry until it is updated or removed:
 ```bash
 go run ./cmd/import-taxonomy -taxonomy=/path/to/BirdNET_Taxonomy.csv -renames=/path/to/renames.tsv
 ```

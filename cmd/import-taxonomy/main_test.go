@@ -1,9 +1,14 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/json"
+	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/tphakala/openfauna/internal/dataset"
@@ -148,18 +153,20 @@ func seqFixture() (*state, map[string]taxon, []string, []string) {
 		"Genus3 a":        {sci: "Genus3 a", common: "Three A", group: "Aves", recType: "species", inat: "8"},
 		"Genus3 b":        {sci: "Genus3 b", common: "Three B", group: "Aves", recType: "species", inat: "9"},
 		"Genus5 nocommon": {sci: "Genus5 nocommon", common: "", group: "Aves", recType: "species", names: map[string]string{"de": "Ohne"}},
+		"Genus6 dashed":   {sci: "Genus6 dashed", common: "Dash\u2013Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Strich"}},
 		"Genus4 echo": {sci: "Genus4 echo", common: "Echo Bird", group: "Aves", recType: "species",
-			names: map[string]string{"de": "Genus4 echo", "fr": "echo bird", "fi": "Toinen lintu"}},
+			names: map[string]string{"de": "genus4 Echo", "fr": "echo bird", "fi": "Toinen lintu"}},
 	}
 	a := []string{"Genus1 newmeta", "Genus1 nameonly", "Genus4 echo"}
-	b := []string{"Genus2 alias", "Genus1 mammal", "Genus3 a", "Genus3 b", "Genus5 nocommon", "Soundy", "No row"}
+	b := []string{"Genus2 alias", "Genus1 mammal", "Genus3 a", "Genus3 b", "Genus5 nocommon", "Genus6 dashed", "Soundy", "No row"}
 	return s, tax, a, b
 }
 
 func TestImportSpecies_Sequences(t *testing.T) {
+	var fullReport importReport
 	full := func() *state {
 		s, tax, a, b := seqFixture()
-		importSpecies(s, tax, append(append([]string{}, a...), b...), nil)
+		fullReport = importSpecies(s, tax, append(append([]string{}, a...), b...), nil)
 		return s
 	}()
 	initial, tax, a, b := seqFixture()
@@ -178,8 +185,19 @@ func TestImportSpecies_Sequences(t *testing.T) {
 	if _, ok := full.meta["Genus2 alias"]; !ok {
 		t.Errorf("alias-key target got no metadata record")
 	}
-	if _, ok := full.locales["en"]["Genus5 nocommon"]; ok {
-		t.Errorf("an empty English name was written")
+	for _, sci := range []string{"Genus5 nocommon", "Genus6 dashed"} {
+		if got := full.locales["en"][sci]; got != sci {
+			t.Errorf("unusable English name of %q became %q, want the scientific name", sci, got)
+		}
+	}
+	if got := full.locales["de"]["Genus5 nocommon"]; got != "Ohne" {
+		t.Errorf("de of a species without an English name = %q", got)
+	}
+	if got := full.locales["de"]["Genus6 dashed"]; got != "Strich" {
+		t.Errorf("de of a species with a dashed English name = %q", got)
+	}
+	if want := []fallback{{"Genus5 nocommon", "no English name"}, {"Genus6 dashed", "English name contains a dash"}}; !reflect.DeepEqual(fullReport.sciFallback, want) {
+		t.Errorf("sciFallback = %v, want %v", fullReport.sciFallback, want)
 	}
 	if _, ok := full.meta["Genus5 nocommon"]; !ok {
 		t.Errorf("species with an empty common name got no metadata record")
@@ -237,7 +255,9 @@ func TestImportSpecies_Sequences(t *testing.T) {
 
 	// A second run changes nothing.
 	again := full.clone()
-	importSpecies(again, tax, append(append([]string{}, a...), b...), nil)
+	if rep := importSpecies(again, tax, append(append([]string{}, a...), b...), nil); len(rep.sciFallback) != 0 {
+		t.Errorf("second run reported %v", rep.sciFallback)
+	}
 	if !reflect.DeepEqual(again, full) {
 		t.Errorf("second run changed the state")
 	}
@@ -265,19 +285,21 @@ func TestImportSpecies_Sequences(t *testing.T) {
 	}
 }
 
+// TestLowercaseInitial reads the fixture scripts/test_validate.py also reads, so
+// the Go rule and the validator's keeps_capital cannot drift apart.
 func TestLowercaseInitial(t *testing.T) {
-	tests := []struct{ name, key, value, want string }{
-		{"plain capitalized name is lowered", "Pica pica", "Harmaa lintu", "harmaa lintu"},
-		{"eponym keeps its capital", "Pica pica", "Stellers sjolejon", "Stellers sjolejon"},
-		{"synonym sharing the key's epithet", "Pica pica", "Garrulus pica", "Garrulus pica"},
-		{"value in the key's genus", "Osteopilus ocellatus", "Osteopilus brunneus", "Osteopilus brunneus"},
-		{"first letter follows a non-letter", "Pica pica", "“Harmaa” lintu", "“harmaa” lintu"},
-		{"already lowercase", "Pica pica", "harmaa lintu", "harmaa lintu"},
+	var tests []struct{ Name, Key, Value, Want string }
+	b, err := os.ReadFile("testdata/lowercase_initial.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal(b, &tests); err != nil {
+		t.Fatal(err)
 	}
 	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			if got := lowercaseInitial(tc.key, tc.value); got != tc.want {
-				t.Errorf("lowercaseInitial(%q, %q) = %q, want %q", tc.key, tc.value, got, tc.want)
+		t.Run(tc.Name, func(t *testing.T) {
+			if got := lowercaseInitial(tc.Key, tc.Value); got != tc.Want {
+				t.Errorf("lowercaseInitial(%q, %q) = %q, want %q", tc.Key, tc.Value, got, tc.Want)
 			}
 		})
 	}
@@ -316,15 +338,39 @@ func TestImportSpecies_ExcludedCells(t *testing.T) {
 		"Genus1 badlocale":  {sci: "Genus1 badlocale", common: "Locale Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Falsch", "fr": "Oiseau"}},
 		"Genus1 badenglish": {sci: "Genus1 badenglish", common: "Wrong Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Vogel"}},
 		"Genus1 dashed":     {sci: "Genus1 dashed", common: "Wrong\u2013Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Gestrichelt"}},
+		"Genus1 casevar":    {sci: "Genus1 casevar", common: "Case Bird", group: "Aves", recType: "species", names: map[string]string{"de": "FALSCH", "fr": "Oiseau"}},
+		"Genus1 stale":      {sci: "Genus1 stale", common: "Fixed Bird", group: "Aves", recType: "species", names: map[string]string{"de": "Neu"}},
 	}
 	excl := exclusions{
-		"de": {"Genus1 badlocale": {Value: "Falsch", Reason: "names another species"}},
+		"de": {
+			"Genus1 badlocale": {Value: "Falsch", Reason: "names another species"},
+			"Genus1 casevar":   {Value: "falsch", Reason: "names another species"},
+			"Genus1 stale":     {Value: "Alt", Reason: "names another species"},
+		},
 		"en": {
 			"Genus1 badenglish": {Value: "Wrong Bird", Reason: "names another animal"},
 			"Genus1 dashed":     {Value: "Wrong\u2013Bird", Reason: "names another animal"},
+			"Genus1 stale":      {Value: "Broken Bird", Reason: "names another animal"},
 		},
 	}
-	importSpecies(s, tax, []string{"Genus1 badlocale", "Genus1 badenglish", "Genus1 dashed"}, excl)
+	report := importSpecies(s, tax, []string{"Genus1 badlocale", "Genus1 badenglish", "Genus1 dashed", "Genus1 casevar", "Genus1 stale"}, excl)
+
+	if len(report.sciFallback) != 0 {
+		t.Errorf("an excluded English cell was reported as a fallback: %v", report.sciFallback)
+	}
+
+	if _, ok := s.locales["de"]["Genus1 casevar"]; ok {
+		t.Errorf("a cell that differs from the listed value only by case was imported")
+	}
+	if got := s.locales["fr"]["Genus1 casevar"]; got != "Oiseau" {
+		t.Errorf("other locale of the case-variant species = %q", got)
+	}
+	if got := s.locales["de"]["Genus1 stale"]; got != "Neu" {
+		t.Errorf("de cell whose listed value no longer matches = %q, want it imported", got)
+	}
+	if got := s.locales["en"]["Genus1 stale"]; got != "Fixed Bird" {
+		t.Errorf("English cell whose listed value no longer matches = %q, want it imported", got)
+	}
 
 	if _, ok := s.locales["de"]["Genus1 badlocale"]; ok {
 		t.Errorf("excluded de cell was imported: %q", s.locales["de"]["Genus1 badlocale"])
@@ -357,11 +403,23 @@ func TestExclusions_Validate(t *testing.T) {
 	if err := (exclusions{"fa_IR": {"A b": {Value: "x", Reason: "r"}}}).validate(locales); err == nil {
 		t.Errorf("unknown locale accepted")
 	}
+	if err := (exclusions{"de": nil}).validate(locales); err == nil {
+		t.Errorf("null locale list accepted")
+	}
 	if err := (exclusions{"de": {"A b": {Value: "x"}}}).validate(locales); err == nil {
 		t.Errorf("entry without a reason accepted")
 	}
 	if err := (exclusions{"de": {"A b": {Reason: "r"}}}).validate(locales); err == nil {
 		t.Errorf("entry without a value accepted")
+	}
+	for name, x := range map[string]exclusion{
+		"blank value":  {Value: " \t", Reason: "r"},
+		"blank reason": {Value: "x", Reason: "  "},
+		"padded value": {Value: " x", Reason: "r"},
+	} {
+		if err := (exclusions{"de": {"A b": x}}).validate(locales); err == nil {
+			t.Errorf("%s accepted", name)
+		}
 	}
 }
 
@@ -390,19 +448,285 @@ func TestLoadExclusions(t *testing.T) {
 	}
 }
 
-func TestLoadTaxonomy_LocaleColumns(t *testing.T) {
-	csv := "scientific_name,common_name,taxon_group,record_type,inat_id,wikidata_qid,common_name_alt,common_name_en,common_name_es_EC,common_name_zh-CN,common_name_de\n" +
-		"Genus1 a,Bird,Aves,species,1,Q1,Alt,En,Pajaro,Niao,Vogel\n"
-	path := filepath.Join(t.TempDir(), "tax.csv")
-	if err := os.WriteFile(path, []byte(csv), 0o644); err != nil {
+func writeFile(t *testing.T, path, content string) {
+	t.Helper()
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	tax, _, err := loadTaxonomy(path)
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestLoadTaxonomy_LocaleColumns(t *testing.T) {
+	// A BOM before a quoted first header, regional English columns, and a
+	// locale column listed before its neighbours in no particular order.
+	csv := "\xef\xbb\xbf\"scientific_name\",common_name,taxon_group,record_type,inat_id,wikidata_qid,common_name_alt,common_name_en,common_name_en_UK,common_name_en-US,common_name_es_EC,common_name_zh-CN,common_name_de\n" +
+		"Genus1 a,Bird,Aves,species,1,Q1,Alt,En,Brit,Yank,Pajaro,Niao,Vogel\n"
+	path := filepath.Join(t.TempDir(), "tax.csv")
+	writeFile(t, path, csv)
+	tax, sum, err := loadTaxonomy(path)
 	if err != nil {
 		t.Fatal(err)
 	}
 	want := map[string]string{"es_ec": "Pajaro", "zh_cn": "Niao", "de": "Vogel"}
 	if got := tax["Genus1 a"].names; !reflect.DeepEqual(got, want) {
 		t.Errorf("names = %v, want %v", got, want)
+	}
+	if wantSum := sha256.Sum256([]byte(csv)); sum != wantSum {
+		t.Errorf("sum is not the sha256 of the file bytes")
+	}
+}
+
+func TestLoadTaxonomy_Errors(t *testing.T) {
+	const hdr = "scientific_name,common_name,taxon_group,record_type,inat_id,wikidata_qid"
+	tests := []struct {
+		name, csv, want string
+	}{
+		{"empty file", "", "empty"},
+		{"missing required column", "scientific_name,common_name,taxon_group,record_type,inat_id\nA b,c,d,e,f\n", "wikidata_qid"},
+		{"two columns for one locale", hdr + ",common_name_es_EC,common_name_es-ec\nA b,c,d,e,f,g,h,i\n", "common_name_es-ec"},
+		{"duplicate required header", hdr + ",common_name\nA b,c,d,e,f,g,h\n", "duplicate column"},
+		{"duplicate scientific name", hdr + "\nA b,c,d,e,f,g\nA b,c,d,e,f,g\n", "duplicate scientific_name"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "tax.csv")
+			writeFile(t, path, tc.csv)
+			_, _, err := loadTaxonomy(path)
+			if err == nil || !strings.Contains(err.Error(), tc.want) {
+				t.Errorf("err = %v, want one containing %q", err, tc.want)
+			}
+		})
+	}
+	if _, _, err := loadTaxonomy(filepath.Join(t.TempDir(), "missing.csv")); err == nil {
+		t.Errorf("missing file accepted")
+	}
+}
+
+func TestLoadRenames(t *testing.T) {
+	dir := t.TempDir()
+	good := filepath.Join(dir, "good.tsv")
+	writeFile(t, good, "# comment\r\n\r\n Geo a \t Mod a \t note\r\nGeo b\tMod b\n")
+	got, err := loadRenames(good)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := []renamePair{{"Geo a", "Mod a"}, {"Geo b", "Mod b"}}; !reflect.DeepEqual(got, want) {
+		t.Errorf("pairs = %v, want %v", got, want)
+	}
+
+	short := filepath.Join(dir, "short.tsv")
+	writeFile(t, short, "Geo a\tMod a\nonlyone\n")
+	if _, err := loadRenames(short); err == nil || !strings.Contains(err.Error(), "short.tsv:2:") {
+		t.Errorf("one-column line: err = %v, want one naming line 2", err)
+	}
+	if _, err := loadRenames(filepath.Join(dir, "missing.tsv")); err == nil {
+		t.Errorf("missing file accepted")
+	}
+}
+
+func TestLoadTargets(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "a.txt"), "B b\r\n\nA a\n")
+	writeFile(t, filepath.Join(dir, "b.txt"), " A a \nC c")
+	got, err := loadTargets(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := []string{"A a", "B b", "C c"}; !reflect.DeepEqual(got, want) {
+		t.Errorf("targets = %v, want %v", got, want)
+	}
+	if _, err := loadTargets(t.TempDir()); err == nil {
+		t.Errorf("directory without manifests accepted")
+	}
+}
+
+func TestExclusions_Mismatches(t *testing.T) {
+	tax := map[string]taxon{
+		"A b": {sci: "A b", common: "Real Bird", names: map[string]string{"de": "Vogel", "sv": "gammal"}},
+		"C d": {sci: "C d", common: "", names: map[string]string{}},
+	}
+	tests := []struct {
+		name string
+		excl exclusions
+		want int
+	}{
+		{"equal ignoring case", exclusions{"sv": {"A b": {Value: "GAMMAL", Reason: "r"}}}, 0},
+		{"different non-empty cell", exclusions{"de": {"A b": {Value: "Falsch", Reason: "r"}}}, 1},
+		{"different English cell", exclusions{"en": {"A b": {Value: "Wrong Bird", Reason: "r"}}}, 1},
+		{"empty upstream cell", exclusions{"de": {"C d": {Value: "x", Reason: "r"}}, "en": {"C d": {Value: "x", Reason: "r"}}}, 0},
+		{"no row", exclusions{"de": {"E f": {Value: "x", Reason: "r"}}}, 0},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := tc.excl.mismatches(tax); len(got) != tc.want {
+				t.Errorf("mismatches = %q, want %d", got, tc.want)
+			}
+		})
+	}
+}
+
+// runFixture writes a small data directory, taxonomy, manifest, rename file and
+// exclusion list, and returns the arguments of run.
+type runFixture struct {
+	taxonomy, labels, exclusions, data string
+	renames                            []string
+}
+
+func newRunFixture(t *testing.T) runFixture {
+	t.Helper()
+	d := t.TempDir()
+	f := runFixture{
+		taxonomy:   filepath.Join(d, "tax.csv"),
+		labels:     filepath.Join(d, "labels"),
+		exclusions: filepath.Join(d, "excl.json"),
+		data:       filepath.Join(d, "data"),
+		renames:    []string{filepath.Join(d, "renames.tsv")},
+	}
+	writeFile(t, f.taxonomy, "scientific_name,common_name,taxon_group,record_type,inat_id,wikidata_qid,common_name_de\n"+
+		"Genus1 new,New Bird,Aves,species,1,Q1,Neuer Vogel\n"+
+		"Genus1 old,Old Bird,Aves,species,2,Q2,Alter Vogel\n"+
+		"Genus1 blank,,Aves,species,3,Q3,Leerer Vogel\n")
+	writeFile(t, filepath.Join(f.labels, "m.txt"), "Genus1 new\nGenus1 blank\n")
+	writeFile(t, f.renames[0], "Genus1 old\tGenus1 oldish\n")
+	writeFile(t, f.exclusions, `{"exclude": {"de": {"Genus1 old": {"value": "x", "reason": "r"}}}}`)
+	writeFile(t, filepath.Join(f.data, "metadata.json"), "{}\n")
+	writeFile(t, filepath.Join(f.data, "aliases.json"), "{}\n")
+	writeFile(t, filepath.Join(f.data, "locales", "en.json"), "{\n  \"Genus1 old\": \"Old Bird\"\n}\n")
+	writeFile(t, filepath.Join(f.data, "locales", "de.json"), "{}\n")
+	return f
+}
+
+func (f runFixture) run(dry bool) error {
+	return run(f.taxonomy, f.renames, f.data, f.labels, f.exclusions, dry)
+}
+
+func readTree(t *testing.T, root string) map[string]string {
+	t.Helper()
+	tree := map[string]string{}
+	err := filepath.WalkDir(root, func(p string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		b, err := os.ReadFile(p)
+		rel, _ := filepath.Rel(root, p)
+		tree[rel] = string(b)
+		return err
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return tree
+}
+
+// captureStdout returns what fn prints to os.Stdout.
+func captureStdout(t *testing.T, fn func()) string {
+	t.Helper()
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	old := os.Stdout
+	os.Stdout = w
+	done := make(chan string)
+	go func() {
+		b, _ := io.ReadAll(r)
+		done <- string(b)
+	}()
+	fn()
+	os.Stdout = old
+	if err := w.Close(); err != nil {
+		t.Fatal(err)
+	}
+	return <-done
+}
+
+func TestRun_DryRunThenWriteThenRerun(t *testing.T) {
+	f := newRunFixture(t)
+	before := readTree(t, f.data)
+	var runErr error
+	out := captureStdout(t, func() { runErr = f.run(true) })
+	if runErr != nil {
+		t.Fatal(runErr)
+	}
+	for _, want := range []string{
+		"English name set to the scientific name (no English name): Genus1 blank",
+		"exclusion does not match the taxonomy, update or remove it: de \"Genus1 old\"",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("output lacks %q:\n%s", want, out)
+		}
+	}
+	if !reflect.DeepEqual(readTree(t, f.data), before) {
+		t.Fatalf("dry run changed the data directory")
+	}
+
+	if err := f.run(false); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadState(f.data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := st.meta["Genus1 new"]; !ok {
+		t.Errorf("no metadata record for the new species")
+	}
+	if got := st.locales["en"]["Genus1 new"]; got != "New Bird" {
+		t.Errorf("en = %q", got)
+	}
+	if got := st.locales["de"]["Genus1 new"]; got != "Neuer Vogel" {
+		t.Errorf("de = %q", got)
+	}
+	if st.aliases["Genus1 oldish"] != "Genus1 old" {
+		t.Errorf("aliases = %v", st.aliases)
+	}
+	after := readTree(t, f.data)
+	for p := range after {
+		if strings.HasSuffix(p, ".tmp") {
+			t.Errorf("leftover %s", p)
+		}
+	}
+
+	if err := f.run(false); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(readTree(t, f.data), after) {
+		t.Errorf("second run changed the data directory")
+	}
+}
+
+func TestRun_InterruptedWriteIsCompletedByRerun(t *testing.T) {
+	ref := newRunFixture(t)
+	if err := ref.run(false); err != nil {
+		t.Fatal(err)
+	}
+	want := readTree(t, ref.data)
+	f := newRunFixture(t)
+	before := readTree(t, f.data)
+	obstacle := filepath.Join(f.data, "metadata.json.tmp")
+	if err := os.Mkdir(obstacle, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.run(false); err == nil {
+		t.Fatal("run succeeded despite the obstacle")
+	}
+	mid := readTree(t, f.data)
+	if mid["locales/de.json"] == before["locales/de.json"] {
+		t.Errorf("de.json was not written before the failure")
+	}
+	for _, name := range []string{"locales/en.json", "aliases.json"} {
+		if mid[name] != before[name] {
+			t.Errorf("%s was written before metadata.json", name)
+		}
+	}
+	if err := os.Remove(obstacle); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.run(false); err != nil {
+		t.Fatal(err)
+	}
+	if got := readTree(t, f.data); !reflect.DeepEqual(got, want) {
+		t.Errorf("rerun after an interrupted run differs from an uninterrupted run")
 	}
 }
